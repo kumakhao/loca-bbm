@@ -31,7 +31,7 @@ int main(){
 
 	// 0=picTest  1=sim  2=framework
 
-	switch(2) {
+	switch(1) {
 	case 0:
 		//unitTests::landmarkTest();
 		//unitTests::cvProjectTest();
