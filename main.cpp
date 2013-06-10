@@ -31,7 +31,7 @@ int main(){
 
 	// 0=picTest  1=sim  2=framework
 
-	switch(0) {
+	switch(1) {
 	case 0:
 		//unitTests::landmarkTest();
 		//unitTests::cvProjectTest();
@@ -46,12 +46,12 @@ int main(){
 		break;
 	case 1:
 		mainLoca->landmarks.addLandmark(1,-5.0,-5.0);
-		//mainLoca->landmarks.addLandmark(2,5.0,-5.0);
-		//mainLoca->landmarks.addLandmark(3,-5.0,5.0);
-		//mainLoca->landmarks.addLandmark(4,5.0,5.0);
+		mainLoca->landmarks.addLandmark(2,5.0,-5.0);
+		mainLoca->landmarks.addLandmark(3,-5.0,5.0);
+		mainLoca->landmarks.addLandmark(4,5.0,5.0);
 
-		//mainSim.setParticleFilter(mainLoca);
-		//mainSim.enableLandmarks();
+		mainSim.setLocalisation(mainLoca);
+		mainSim.setObserveMode(Simulation::GPS);
 		mainSim.enablePadControl();
 		mainSim.Initialize();
 		mainSim.Realize();

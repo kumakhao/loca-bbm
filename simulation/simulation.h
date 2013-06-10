@@ -27,13 +27,20 @@
 
 class Simulation{
 public:
+	enum ObserveMode
+	{
+		noObserve,
+		GPS,
+		Landmarks,
+		Pictures
+	};
 	Simulation();
 	~Simulation();
 	void Initialize();
 	void Realize();
 	void Step();
 	void setLocalisation(localisation *loca);
-	void enableLandmarks();
+	void setObserveMode(ObserveMode mode);
 	void enablePadControl();
 	double getRobX();
 	double getRobY();
@@ -47,12 +54,15 @@ private:
 	osg::Geode* Leinwand();
 	osg::Geode* Ground();
 	osg::Group* SetupScene();
+	void Observe();
+	void Dynamic();
 	bool particles_on_;
-	bool landmarks_on_;
 	bool setup_done_;
 	bool picture_processed_;
 	bool pad_control_on_;
 	bool take_picture_button_pressed_;
+
+	ObserveMode observe_mode_;
 
 	double old_increments_right_;
 	double old_increments_left_;

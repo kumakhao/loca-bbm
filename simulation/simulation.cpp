@@ -11,11 +11,11 @@
 
 Simulation::Simulation():
 	particles_on_(false),
-	landmarks_on_(false),
 	setup_done_(false),
 	picture_processed_(false),
 	pad_control_on_(false),
 	take_picture_button_pressed_(false),
+	observe_mode_(noObserve),
 	old_increments_right_(0.0),
 	old_increments_left_(0.0),
 	step_counter_(0.0),
@@ -41,6 +41,25 @@ void Simulation::Initialize() {
 
 		particle_view_->Update(localisation_->getParticles());
 		particle_view_->AddToThis(root_);
+
+		std::vector<int> landmark_IDs;
+		switch (observe_mode_){
+		case Landmarks:
+			// Setup visualisation of landmarks.
+			landmark_IDs = landmarks_.getIDVector();
+			for(std::vector<int>::iterator it = landmark_IDs.begin();it != landmark_IDs.end();it++){
+				osg::PositionAttitudeTransform* landmark_view = new osg::PositionAttitudeTransform();
+				landmark_view->addChild(locaUtil::pyramid());
+				landmark_view->setScale(osg::Vec3d(0.1,0.1,0.1));
+				landmark_view->setPosition( osg::Vec3d(landmarks_.getXofID(*it),landmarks_.getYofID(*it),0.0) );
+				root_->addChild(landmark_view);
+			}
+			break;
+
+		default:
+			break;
+		}
+
 	}
 
 	// Declare a 'viewer'
@@ -67,17 +86,6 @@ void Simulation::Initialize() {
 	manipulator->setTrackNode(robot_->getChild(0));
 	manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
 
-	if(particles_on_ && landmarks_on_){
-		// Setup visualisation of landmarks.
-		std::vector<int> landmark_IDs = landmarks_.getIDVector();
-		for(std::vector<int>::iterator it = landmark_IDs.begin();it != landmark_IDs.end();it++){
-			osg::PositionAttitudeTransform* landmark_view = new osg::PositionAttitudeTransform();
-			landmark_view->addChild(locaUtil::pyramid());
-			landmark_view->setScale(osg::Vec3d(0.1,0.1,0.1));
-			landmark_view->setPosition( osg::Vec3d(landmarks_.getXofID(*it),landmarks_.getYofID(*it),0.0) );
-			root_->addChild(landmark_view);
-		}
-	}
 }
 
 void Simulation::Realize() {
@@ -105,17 +113,8 @@ void Simulation::Step() {
 	//windowMatrix = viewer.getCamera()->getViewport()->computeWindowMatrix();
 	//projectionMatrix = viewer.getCamera()->getProjectionMatrix();
 
+	//Picture handling
 	if(screen_shot_callback_->isPicTaken() && !picture_processed_){
-		if(particles_on_){
-			// observe for particle filter is done here.
-			//testLoca->observeGPS(robotData->posX,robotData->posY,robotData->psi);
-			if(landmarks_on_){
-				std::vector<int> landmark_IDs = landmarks_.getIDVector();
-				for(std::vector<int>::iterator it = landmark_IDs.begin();it != landmark_IDs.end();it++)
-					localisation_->observeLandmark(*it, landmarks_.getAngleToLandmark(*it,robotdata_->x_pos_,robotdata_->y_pos_,robotdata_->psi_));
-				localisation_->resample(localisation_->param.nrOfParticles);
-			}
-		}
 		osg::ref_ptr<osg::Image> osgImage = screen_shot_callback_->getImage();
 		cv::Mat cvImg(osgImage->t(), osgImage->s(), CV_8UC3);
 		cvImg.data = (uchar*)osgImage->data();
@@ -124,8 +123,13 @@ void Simulation::Step() {
 		// Write position, orientation and image to log file.
 		//dataWriter->writeData(robotData->incrementeLeft, robotData->incrementeRight, robotData->posX,robotData->posY,robotData->psi, cvImg);
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_, view_matrix_eye_[0],view_matrix_eye_[1],asin(view_matrix_(0,0)),  cvImg);
+
+		// observe for particle filter is done here.
+		Observe();
+
 		picture_processed_ = true;
 	}
+
 	else if(step_counter_ > 19){
 		// This block is only executed every 20th pass.
 		step_counter_ = 0;
@@ -142,6 +146,7 @@ void Simulation::Step() {
 		old_increments_right_ = robotdata_->incremente_right_;
 	}
 
+	// without pad_control pictures are taken every 2sec
 	if(!pad_control_on_ && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>2000) ){
 		screen_shot_callback_->queueShot();
 		picture_processed_ = false;
@@ -199,10 +204,29 @@ void Simulation::setLocalisation(localisation* loca) {
 	this->localisation_ = loca;
 }
 
-void Simulation::enableLandmarks() {
-	if(localisation_){
-		this->landmarks_ = localisation_->landmarks;
-		landmarks_on_ = true;
+void Simulation::setObserveMode(ObserveMode mode) {
+	switch (mode){
+	case noObserve:
+		observe_mode_ = mode;
+		break;
+
+	case GPS:
+		observe_mode_ = mode;
+		break;
+
+	case Landmarks:
+		if(localisation_){
+			this->landmarks_ = localisation_->landmarks;
+			observe_mode_ = mode;
+		}
+		break;
+
+	case Pictures:
+		observe_mode_ = mode;
+		break;
+
+	default:
+		break;
 	}
 }
 
@@ -388,5 +412,31 @@ osg::Group* Simulation::SetupScene() {
 	root->addChild(lightPos);*/
 	return root;
 }
+
+void Simulation::Observe() {
+	if(!particles_on_)
+		return;
+	std::vector<int> landmark_IDs;
+	switch (observe_mode_){
+	case GPS:
+		localisation_->observeGPS(robotdata_->x_pos_,robotdata_->y_pos_,robotdata_->psi_);
+		localisation_->resample(localisation_->param.nrOfParticles);
+		break;
+
+	case Landmarks:
+		landmark_IDs = landmarks_.getIDVector();
+		for(std::vector<int>::iterator it = landmark_IDs.begin();it != landmark_IDs.end();it++)
+			localisation_->observeLandmark(*it, landmarks_.getAngleToLandmark(*it,robotdata_->x_pos_,robotdata_->y_pos_,robotdata_->psi_));
+		localisation_->resample(localisation_->param.nrOfParticles);
+		break;
+
+	default:
+		break;
+	}
+}
+
+void Simulation::Dynamic() {
+}
+
 
 
