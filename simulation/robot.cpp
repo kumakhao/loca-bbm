@@ -15,8 +15,8 @@
 
 
 //parameter
-const double kSpeed = 0.1;
-const double kPsiSpeed = 0.02;
+const double kSpeed = 1; // m/s
+const double kPsiSpeed = 0.2; // ?/s
 const int kImpulesProMeter = 57694; //impulse / m
 const double kDistanceWheels = 0.07; //m
 const double kSigmaIncrement = 0.0;
@@ -30,20 +30,21 @@ RobotData::RobotData(osg::Node* n)
 	psi_ = 0.0;
 	speed_ = 0;
 	psi_speed_ = 0;
+	timer_.Start();
 	robotXform_ =
 	 dynamic_cast <osg::PositionAttitudeTransform*> (n);
 }
 
 void RobotData::UpdatePosition()
 {
-	x_pos_ += cos(psi_)*speed_;
-	y_pos_ += sin(psi_)*speed_;
+	x_pos_ += cos(psi_)*speed_*timer_.last_step_time_*0.000001;
+	y_pos_ += sin(psi_)*speed_*timer_.last_step_time_*0.000001;
 	robotXform_->setPosition(osg::Vec3(x_pos_,y_pos_,0));
 }
 
 void RobotData::UpdateOrientation()
 {
-	psi_ += psi_speed_;
+	psi_ += psi_speed_*timer_.last_step_time_*0.000001;
 	robotXform_->setAttitude(osg::Quat(psi_, osg::Vec3d(0.0, 0.0, 1.0)));
 }
 
@@ -59,8 +60,8 @@ void RobotData::AddPsiSpeed(double value)
 
 void RobotData::UpdateIncrements()
 {
-	double deltaIncL = speed_*kImpulesProMeter -psi_speed_*kDistanceWheels*kImpulesProMeter/2.0;
-	double deltaIncR = speed_*kImpulesProMeter +psi_speed_*kDistanceWheels*kImpulesProMeter/2.0;
+	double deltaIncL = speed_*timer_.last_step_time_*0.000001*kImpulesProMeter -psi_speed_*timer_.last_step_time_*0.000001*kDistanceWheels*kImpulesProMeter/2.0;
+	double deltaIncR = speed_*timer_.last_step_time_*0.000001*kImpulesProMeter +psi_speed_*timer_.last_step_time_*0.000001*kDistanceWheels*kImpulesProMeter/2.0;
 	double errIncL = kSigmaIncrement*sqrt(abs(deltaIncL)+abs(deltaIncR))*RandomGaussian();
 	double errIncR = kSigmaIncrement*sqrt(abs(deltaIncL)+abs(deltaIncR))*RandomGaussian();
 	incremente_left_ += deltaIncL + errIncL;
@@ -70,6 +71,10 @@ void RobotData::UpdateIncrements()
 double RobotData::RandomUniform()
 {
 	return ((double) rand())/RAND_MAX;
+}
+
+void RobotData::UpdateTimer() {
+	timer_.getTimeStep();
 }
 
 double RobotData::RandomGaussian()
@@ -168,6 +173,7 @@ public:
 				dynamic_cast<RobotData*> (node->getUserData());
 		if(robotdata)
 		{
+			robotdata->UpdateTimer();
 			robotdata->UpdatePosition();
 			robotdata->UpdateOrientation();
 			robotdata->UpdateIncrements();

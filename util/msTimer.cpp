@@ -16,7 +16,7 @@
 void msTimer::Start() {
 	gettimeofday(&stTimeVal, NULL);
 	start_time_ =  stTimeVal.tv_sec * 1000000ll + stTimeVal.tv_usec;
-	step_time_ = start_time_;
+	last_absolut_time_step_ = start_time_;
 }
 
 /**
@@ -32,7 +32,8 @@ long long msTimer::getTimeFromStart() {
  */
 long long msTimer::getTimeStep() {
 	gettimeofday(&stTimeVal, NULL);
-	long long time_holder = (stTimeVal.tv_sec * 1000000ll + stTimeVal.tv_usec) - step_time_;
-	step_time_ = stTimeVal.tv_sec * 1000000ll + stTimeVal.tv_usec;
-	return time_holder;
+	last_step_time_ = (stTimeVal.tv_sec * 1000000ll + stTimeVal.tv_usec) - last_absolut_time_step_;
+	last_absolut_time_step_ = stTimeVal.tv_sec * 1000000ll + stTimeVal.tv_usec;
+	return last_step_time_;
 }
+

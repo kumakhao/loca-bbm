@@ -13,7 +13,8 @@
 class msTimer{
 public:
 	long long start_time_;
-	long long step_time_;
+	long long last_step_time_;
+	long long last_absolut_time_step_;
 	struct timeval stTimeVal;
 	void Start();
 	long long getTimeFromStart();

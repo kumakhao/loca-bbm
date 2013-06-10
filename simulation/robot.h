@@ -14,11 +14,13 @@
 #include <osgDB/ReadFile>
 #include <osgGA/GUIEventHandler>
 #include <osg/ref_ptr>
+#include "util/msTimer.h"
 
 class RobotData : public osg::Referenced
 {
 public:
 	explicit RobotData(osg::Node*n);
+	void UpdateTimer();
 	void UpdatePosition();
 	void UpdateOrientation();
 	void AddSpeed(double value);
@@ -32,6 +34,8 @@ public:
 	double x_pos_, y_pos_, psi_;
 protected:
 	osg::PositionAttitudeTransform* robotXform_;
+private:
+	msTimer timer_;
 };
 
 class KeyboardEventHandler : public osgGA::GUIEventHandler
