@@ -53,7 +53,7 @@ int main(){
 
 		mainSim.setLocalisation(mainLoca);
 		//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
-		mainSim.setObserveMode(Simulation::Landmarks);
+		//mainSim.setObserveMode(Simulation::Landmarks);
 		mainSim.enablePadControl();
 		mainSim.Initialize();
 		mainSim.Realize();

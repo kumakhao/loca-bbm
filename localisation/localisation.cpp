@@ -135,7 +135,8 @@ void localisation::createSamples(int nrOfParticles) {
 
 void localisation::createOneParticle() {
 	particles.clear();
-	Particle oneParticle(this, 1.0, -2.83599, -0.093889, 0.0);
+	//Particle oneParticle(this, 1.0, -2.83599, -0.093889, 0.0);
+	Particle oneParticle(this, 1.0, 0.0, 0.0, 0.0);
 	particles.push_back(oneParticle);
 }
 
