@@ -27,6 +27,7 @@ int main(){
 	Simulation mainSim;
 	localisation *mainLoca = new localisation;
 
+	std::vector<double> orientaion, position;
 
 
 	// 0=picTest  1=sim  2=framework
@@ -58,6 +59,12 @@ int main(){
 		mainSim.Realize();
 		while(!mainSim.done()){
 			mainSim.Step();
+			orientaion = mainLoca->getOrientation();
+			position = mainLoca->getPosition();
+			std::cout<<"Angle: "<<orientaion.at(1)<<" | VAR: "<<orientaion.at(0)<<std::endl;
+			std::cout<<"X: "<<position.at(0)<<" | VAR: "<<position.at(1)<<std::endl;
+			std::cout<<"Y: "<<position.at(2)<<" | VAR: "<<position.at(3)<<std::endl;
+
 		}
 		break;
 	case 2:

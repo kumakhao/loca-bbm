@@ -77,7 +77,6 @@ void localisation::observeImg(cv::Mat* img) {
 }
 
 void localisation::observeLandmark(int ID, double angle) {
-	//TODO
 	for (unsigned int i = 0; i < particles.size(); i++) {
 		particles.at(i).observeLandmark(ID, angle);
 	}
@@ -139,14 +138,50 @@ std::vector<localisation::Particle> localisation::getParticles() {
 	return particles;
 }
 
+/**
+ * computes the mean orientation over all particles.
+ * @return the first value is the variance from 0..1, the 2nd is the angle.
+ */
 std::vector<double> localisation::getOrientation() {
-	//TODO
 	std::vector<double> ori;
+	double sumSinPsi, sumCosPsi, variancePsi, meanPsi;
+	for (unsigned int i = 0; i < particles.size(); i++) {
+		sumSinPsi += sin(particles.at(i).psi);
+		sumCosPsi += cos(particles.at(i).psi);
+	}
+	sumSinPsi = sumSinPsi/particles.size();
+	sumCosPsi = sumCosPsi/particles.size();
+	variancePsi = sqrt(sumSinPsi*sumSinPsi+sumCosPsi*sumCosPsi);
+	if( (sumSinPsi == 0) && (sumCosPsi == 0) )
+		meanPsi = 0;
+	else
+		meanPsi = atan2(sumSinPsi,sumCosPsi);
+	ori.push_back(variancePsi);
+	ori.push_back(meanPsi);
 	return ori;
 }
 
+/**
+ * computes the mean position over all particles.
+ * @return (0):meanX, (1):varX, (2):meanY, (3):varY
+ */
 std::vector<double> localisation::getPosition() {
-	//TODO
 	std::vector<double> pos;
+	double meanXPos = 0, meanYPos = 0;
+	double varXPos = 0, varYPos = 0;
+	for (unsigned int i = 0; i < particles.size(); i++) {
+		meanXPos += particles.at(i).xPos;
+		meanYPos += particles.at(i).yPos;
+	}
+	meanXPos = meanXPos/particles.size();
+	meanYPos = meanYPos/particles.size();
+	for (unsigned int i = 0; i < particles.size(); i++) {
+			varXPos += pow(particles.at(i).xPos-meanXPos,2);
+			varYPos += pow(particles.at(i).yPos-meanYPos,2);
+	}
+	pos.push_back(meanXPos);
+	pos.push_back(varXPos);
+	pos.push_back(meanXPos);
+	pos.push_back(varYPos);
 	return pos;
 }

@@ -23,8 +23,8 @@ std::vector<patternPoint> picRating::clipANDmark(
 	patternPoint tmp;
 	int index = 0;
 	for(std::vector<cv::Point2d>::iterator i = imagePoints.begin() ; i != imagePoints.end();i++){
-		if((i->x < width) & (i->x >= 0)){
-			if((i->y < height) & (i->y >= 0	)){
+		if((i->x < width) && (i->x >= 0)){
+			if((i->y < height) && (i->y >= 0)){
 				tmp.x = i->x;
 				tmp.y = i->y;
 				tmp.patternValue = pattern[index];
