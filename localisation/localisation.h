@@ -16,6 +16,8 @@
 #include <highgui/highgui_c.h>
 #include <iostream>
 #include "landmarkSet.h"
+#include "cameraParam.h"
+#include "picRating.h"
 
 class localisation
 {
@@ -37,8 +39,6 @@ public:
 		double sigmaAngle;
 		Parameters();
 	};
-
-	Parameters param;
 
 	class Particle
 	{
@@ -65,38 +65,30 @@ public:
 		{}
 
 		void observeImg (cv::Mat* img);
-
 		void observeLandmark(int ID, double angle);
-
 		void observeGPS(double x, double y, double psi);
-
 		void dynamic (double dDistance, double dPsi);
 	};
 
+	Parameters param;
 	std::vector<Particle> particles;
-
 	landmarkSet landmarks;
+	cv::Mat Points_3D_;
+	//cameraParam camera_model_;
+	cameraParam camera_model_;
 
 	localisation();
-
 	void observeImg(cv::Mat* img);
-
 	void observeLandmark(int ID, double angle);
-
 	void observeGPS(double x, double y, double psi);
-
 	void dynamic(int incLeft, int incRight);
-
 	void createSamples(int nrOfParticles);
-
+	void createOneParticle();
 	void resample(int nrOfParticles);
-
 	void resample() {resample(particles.size());}
 
 	std::vector<localisation::Particle> getParticles();
-
 	std::vector<double> getPosition();
-
 	std::vector<double> getOrientation();
 
 };

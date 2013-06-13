@@ -38,6 +38,9 @@ void Simulation::Initialize() {
 		particle_view_ = new Particles();
 		particle_view_->Populate(localisation_->param.nrOfParticles);
 		localisation_->createSamples(localisation_->param.nrOfParticles);
+//			particle_view_->Populate(1);
+//			localisation_->createOneParticle();
+
 
 		particle_view_->Update(localisation_->getParticles());
 		particle_view_->AddToThis(root_);
@@ -120,6 +123,7 @@ void Simulation::Step() {
 		cvImg.data = (uchar*)osgImage->data();
 		cv::flip(cvImg, cvImg, 0); // Flipping because of different origins
 
+		//localisation_->observeImg(&cvImg);
 		// Write position, orientation and image to log file.
 		//dataWriter->writeData(robotData->incrementeLeft, robotData->incrementeRight, robotData->posX,robotData->posY,robotData->psi, cvImg);
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_, view_matrix_eye_[0],view_matrix_eye_[1],asin(view_matrix_(0,0)),  cvImg);

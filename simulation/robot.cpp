@@ -15,8 +15,8 @@
 
 
 //parameter
-const double kSpeed = 1; // m/s
-const double kPsiSpeed = 0.2; // ?/s
+const double kSpeed = 2; // m/s
+const double kPsiSpeed = 0.5; // ?/s
 const int kImpulesProMeter = 57694; //impulse / m
 const double kDistanceWheels = 0.07; //m
 const double kSigmaIncrement = 0.0;

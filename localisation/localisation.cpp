@@ -22,6 +22,21 @@ localisation::Parameters::Parameters() :
 
 void localisation::Particle::observeImg(cv::Mat* img) {
 	//TODO
+	std::vector<cv::Point2d> imagePoints, imagePointsCliped;
+	std::vector<patternPoint> clipedImagePoints;
+	int grid = 1;
+	this->loca->camera_model_.setExtr(psi,xPos,yPos);
+	loca->camera_model_.projectTo2D(&(loca->Points_3D_),&imagePoints);
+	clipedImagePoints = picRating::clipANDmark(imagePoints,locaUtil::getPatternCode93(), img->cols, img->rows);
+	double p = picRating::rateImage(*img, clipedImagePoints,grid);
+
+	for(unsigned int i=0; i<imagePoints.size(); i++)
+		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
+		cv::rectangle(*img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
+	std::ostringstream s;
+	s<<"Gewichtung: "<<p;
+	cv::putText(*img, s.str(), cvPoint(30,700),
+		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
 }
 
 void localisation::Particle::observeLandmark(int ID, double angle) {
@@ -59,6 +74,7 @@ void localisation::Particle::dynamic(double dDistance, double dPsi) {
 }
 
 localisation::localisation() {
+	Points_3D_ = locaUtil::getBit3Dlocations_all();
 
 }
 
@@ -74,6 +90,12 @@ void localisation::dynamic(int incLeft, int incRight) {
 
 void localisation::observeImg(cv::Mat* img) {
 	//TODO
+	if(particles.size() > 0)
+		particles.at(0).observeImg(img);
+
+//	for (unsigned int i = 0; i < particles.size(); i++) {
+//			particles.at(i).observeImg(img);
+//	}
 }
 
 void localisation::observeLandmark(int ID, double angle) {
@@ -109,6 +131,12 @@ void localisation::createSamples(int nrOfParticles) {
 		}
 
 	}
+}
+
+void localisation::createOneParticle() {
+	particles.clear();
+	Particle oneParticle(this, 1.0, -2.83599, -0.093889, 0.0);
+	particles.push_back(oneParticle);
 }
 
 void localisation::resample(int nrOfParticles) {
