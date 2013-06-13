@@ -51,6 +51,7 @@ int main(){
 		mainLoca->landmarks.addLandmark(3,-5.0,5.0);
 		mainLoca->landmarks.addLandmark(4,5.0,5.0);
 
+
 		mainSim.setLocalisation(mainLoca);
 		//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
 		mainSim.setObserveMode(Simulation::Landmarks);
