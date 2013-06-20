@@ -113,9 +113,10 @@ void Simulation::Step() {
 
 	viewer_.getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
 	view_matrix_ = viewer_.getCamera()->getViewMatrix();
-	//windowMatrix = viewer.getCamera()->getViewport()->computeWindowMatrix();
-	//projectionMatrix = viewer.getCamera()->getProjectionMatrix();
-
+//	osg::Matrix windowMatrix = viewer_.getCamera()->getViewport()->computeWindowMatrix();
+//	osg::Matrix projectionMatrix = viewer_.getCamera()->getProjectionMatrix();
+//	osg::Matrix mat = projectionMatrix*windowMatrix;
+//	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
 	//Picture handling
 	if(screen_shot_callback_->isPicTaken() && !picture_processed_){
 		osg::ref_ptr<osg::Image> osgImage = screen_shot_callback_->getImage();

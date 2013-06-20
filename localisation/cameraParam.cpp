@@ -12,9 +12,12 @@
 
 cameraParam::cameraParam() {
 	intrMat = cv::Mat(3, 3, CV_64FC1);
-	intrMat.at<double>(0, 0) = 1476.92;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 1366.0 / 2;
-	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 1476.92;	intrMat.at<double>(1, 2) = 768.0 / 2;
+	intrMat.at<double>(0, 0) = 2076.92;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 1920.0 / 2;
+	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 2076.92;	intrMat.at<double>(1, 2) = 1080.0 / 2;
 	intrMat.at<double>(2, 0) = 0.0;		intrMat.at<double>(2, 1) = 0.0;		intrMat.at<double>(2, 2) = 1.0;
+//	intrMat.at<double>(0, 0) = 1476.92;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 1366.0 / 2;
+//	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 1476.92;	intrMat.at<double>(1, 2) = 768.0 / 2;
+//	intrMat.at<double>(2, 0) = 0.0;		intrMat.at<double>(2, 1) = 0.0;		intrMat.at<double>(2, 2) = 1.0;
 	rotMat = cv::Mat(3, 3, CV_64FC1);
 	rotMat4x4 = cv::Mat(4, 4, CV_64FC1);
 	rotMat_World2Robot = cv::Mat(4, 4, CV_64FC1);
