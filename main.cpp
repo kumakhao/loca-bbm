@@ -26,6 +26,8 @@
 int main(){
 	Simulation mainSim;
 	localisation *mainLoca = new localisation;
+	mainLoca->param.sigmaAngle = 0.0;
+	mainLoca->param.sigmaDistance = 0.0;
 
 	std::vector<double> orientaion, position;
 
