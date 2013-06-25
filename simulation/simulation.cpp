@@ -31,6 +31,7 @@ void Simulation::Initialize() {
 	root_ = SetupScene();
 	robot_ = SetupRobot();
 	root_->addChild(robot_);
+	root_->addChild(hud_.getGroup());
 	screen_shot_callback_ = new ScreenShotCallback();
 	root_->addUpdateCallback(new Particles::ParticleNodeCallback());
 

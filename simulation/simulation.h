@@ -12,10 +12,12 @@
 #include <opencv.hpp>
 #include <osg/Node>
 #include <osg/Texture2D>
+
 //
 //
 #include "robot.h"
 #include "camera.h"
+#include "hud.h"
 #include "screenShotCallback.h"
 #include "particles.h"
 #include "../locaUtil.h"
@@ -73,6 +75,7 @@ private:
 
 	osg::Group *robot_;
 	osg::Group *root_;
+	HUD hud_;
 	osg::Matrix view_matrix_;
 //	osg::Matrixd projectionMatrix;
 	osg::Vec3d view_matrix_eye_, view_matrix_center_, view_matrix_up_;

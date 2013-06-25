@@ -61,6 +61,7 @@ int main(){
 		mainSim.Realize();
 		while(!mainSim.done()){
 			mainSim.Step();
+			usleep(10000);
 //			orientaion = mainLoca->getOrientation();
 //			position = mainLoca->getPosition();
 //			std::cout<<"Angle: "<<orientaion.at(1)<<" | VAR: "<<orientaion.at(0)<<std::endl;
