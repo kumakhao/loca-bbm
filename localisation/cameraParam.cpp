@@ -69,8 +69,6 @@ void cameraParam::setExtr(double psi, double x, double y, double z) {
 	transMat.at<double>(1,0) = rotMat4x4.at<double>(1,3);
 	transMat.at<double>(2,0) = rotMat4x4.at<double>(2,3);
 
-	std::cout<<"Trans:"<<transMat.at<double>(0,0)<<"  "<<transMat.at<double>(2,0)<<std::endl;
-
 	rotMat.at<double>(0,0) = rotMat4x4.at<double>(0,0);
 	rotMat.at<double>(1,0) = rotMat4x4.at<double>(1,0);
 	rotMat.at<double>(2,0) = rotMat4x4.at<double>(2,0);
@@ -80,8 +78,6 @@ void cameraParam::setExtr(double psi, double x, double y, double z) {
 	rotMat.at<double>(0,2) = rotMat4x4.at<double>(0,2);
 	rotMat.at<double>(1,2) = rotMat4x4.at<double>(1,2);
 	rotMat.at<double>(2,2) = rotMat4x4.at<double>(2,2);
-
-	//cv::Rodrigues(rotMat, rotv);
 
 }
 
