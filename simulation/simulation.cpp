@@ -127,18 +127,25 @@ void Simulation::Step() {
 		// Write position, orientation and image to log file.
 		//dataWriter->writeData(robotData->incrementeLeft, robotData->incrementeRight, robotData->posX,robotData->posY,robotData->psi, cvImg);
 		//data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_, view_matrix_eye_[0],view_matrix_eye_[1],asin(view_matrix_(0,0)),  cvImg);
+//		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
+//												robotdata_->x_pos_, view_matrix_eye_[0],
+//												robotdata_->y_pos_, view_matrix_eye_[1],
+//												robotdata_->psi_, asin(view_matrix_(0,0)), cvImg);
+//		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
+//														robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
+//														robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
+//														robotdata_->psi_, asin(view_matrix_(0,0)), localisation_->particles.at(0).psi, cvImg);
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
-												robotdata_->x_pos_, view_matrix_eye_[0],
-												robotdata_->y_pos_, view_matrix_eye_[1],
-												robotdata_->psi_, asin(view_matrix_(0,0)), cvImg);
-
+												robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
+												robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
+												robotdata_->psi_, view_matrix_(0,0), localisation_->particles.at(0).psi, cvImg);
 		// observe for particle filter is done here.
 		Observe();
 
 		picture_processed_ = true;
 	}
 
-	else if(step_counter_ > 19){
+	else if(step_counter_ > 0){
 		// This block is only executed every 20th pass.
 		step_counter_ = 0;
 		if(particles_on_){
@@ -153,10 +160,14 @@ void Simulation::Step() {
 //										view_matrix_eye_[0],
 //										view_matrix_eye_[1],
 //										asin(view_matrix_(0,0)));
+//		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
+//										robotdata_->x_pos_, view_matrix_eye_[0],
+//										robotdata_->y_pos_, view_matrix_eye_[1],
+//										robotdata_->psi_, asin(view_matrix_(0,0)));
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
-										robotdata_->x_pos_, view_matrix_eye_[0],
-										robotdata_->y_pos_, view_matrix_eye_[1],
-										robotdata_->psi_, asin(view_matrix_(0,0)));
+														robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
+														robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
+														robotdata_->psi_, view_matrix_(0,0), localisation_->particles.at(0).psi);
 		old_increments_left_ = robotdata_->incremente_left_;
 		old_increments_right_ = robotdata_->incremente_right_;
 	}

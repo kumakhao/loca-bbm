@@ -21,7 +21,7 @@ localisation::Parameters::Parameters() :
 }
 
 void localisation::Particle::observeImg(cv::Mat* img) {
-	//TODO
+	//TODO work in progress
 	std::vector<cv::Point2d> imagePoints, imagePointsCliped;
 	std::vector<patternPoint> clipedImagePoints;
 	int grid = 1;
@@ -66,7 +66,7 @@ void localisation::Particle::dynamic(double dDistance, double dPsi) {
 	//TODO: randomGaussian
 	double errDistance = dDistance * locaUtil::randomGaussian()
 			* loca->param.sigmaDistance;
-	// auch bei geradeausfahrt winkelfehler möglich
+	//TODO auch bei geradeausfahrt winkelfehler möglich
 	double errPsi = dPsi * locaUtil::randomGaussian() * loca->param.sigmaAngle;
 	xPos = xPos + cos(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
 	yPos = yPos + sin(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
@@ -79,8 +79,7 @@ localisation::localisation() {
 }
 
 void localisation::dynamic(int incLeft, int incRight) {
-	double dPsi = (incRight - incLeft) / param.impulesProMeter
-			/ param.distanceWheels;
+	double dPsi = (incRight - incLeft) / param.impulesProMeter	/ param.distanceWheels;
 	double dDistance = (incLeft + incRight) / 2 / param.impulesProMeter;
 	//std::cout<<"dPsi: "<<dPsi<<"    dDistance: "<<dDistance<<endl;
 	for (unsigned int i = 0; i < particles.size(); i++) {
@@ -89,7 +88,7 @@ void localisation::dynamic(int incLeft, int incRight) {
 }
 
 void localisation::observeImg(cv::Mat* img) {
-	//TODO
+	//TODO changed for testing, needs reverting
 	if(particles.size() > 0)
 		particles.at(0).observeImg(img);
 

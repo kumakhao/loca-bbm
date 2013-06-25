@@ -46,7 +46,7 @@ public:
 	   bool done;
 	   osg::Matrix* wcMatrix;
 	};
-	static osg::Matrixd* getWorldCoords( osg::Node* node);
+	//static osg::Matrixd* getWorldCoords( osg::Node* node);
 
 
 	static const double squareSize = 0.125;		/**< Size of the squares on the lightwall in m */

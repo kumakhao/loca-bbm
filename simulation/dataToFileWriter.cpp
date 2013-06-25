@@ -195,6 +195,7 @@ void DataWriter::WriteData(double increment_left, double increment_right,
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << partPsi << delimiter_;
 
 	text << WriteImg(img);
+	WriteData(text.str());
 }
 
 void DataWriter::WriteData(double increment_left, double increment_right,
