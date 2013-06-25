@@ -13,16 +13,13 @@
 #include "robot.h"
 
 
-
-//parameter
-const double kSpeed = 2; // m/s
-const double kPsiSpeed = 0.5; // ?/s
-const int kImpulesProMeter = 57694; //impulse / m
-const double kDistanceWheels = 0.07; //m
-const double kSigmaIncrement = 0.0;
-
 RobotData::RobotData(osg::Node* n)
 {
+	parameter_.kSpeed = 2;
+	parameter_.kPsiSpeed = 0.5;
+	parameter_.kImpulesProMeter = 57694;
+	parameter_.kDistanceWheels = 0.07;
+	parameter_.kSigmaIncrement = 0.0;
 	incremente_left_ = 0;
 	incremente_right_ = 0;
 	x_pos_ = 0;
@@ -48,22 +45,47 @@ void RobotData::UpdateOrientation()
 	robotXform_->setAttitude(osg::Quat(psi_, osg::Vec3d(0.0, 0.0, 1.0)));
 }
 
-void RobotData::AddSpeed(double value)
+void RobotData::AddSpeed()
 {
-	speed_ += value;
+	speed_ += parameter_.kSpeed;
 }
 
-void RobotData::AddPsiSpeed(double value)
+void RobotData::RemoveSpeed()
 {
-	psi_speed_ += value;
+	speed_ -= parameter_.kSpeed;
 }
 
+void RobotData::AddPsiSpeed()
+{
+	psi_speed_ += parameter_.kPsiSpeed;
+}
+
+void RobotData::RemovePsiSpeed()
+{
+	psi_speed_ -= parameter_.kPsiSpeed;
+}
 void RobotData::UpdateIncrements()
 {
-	double deltaIncL = speed_*timer_.last_step_time_*0.000001*kImpulesProMeter -psi_speed_*timer_.last_step_time_*0.000001*kDistanceWheels*kImpulesProMeter/2.0;
-	double deltaIncR = speed_*timer_.last_step_time_*0.000001*kImpulesProMeter +psi_speed_*timer_.last_step_time_*0.000001*kDistanceWheels*kImpulesProMeter/2.0;
-	double errIncL = kSigmaIncrement*sqrt(abs(deltaIncL)+abs(deltaIncR))*RandomGaussian();
-	double errIncR = kSigmaIncrement*sqrt(abs(deltaIncL)+abs(deltaIncR))*RandomGaussian();
+	double deltaIncL = speed_*timer_.last_step_time_*0.000001	// speed -> distance
+						*parameter_.kImpulesProMeter 			// distance -> impluses
+						-
+						psi_speed_*timer_.last_step_time_*0.000001	// rotSpeed -> rotAngle
+						*parameter_.kDistanceWheels					// rotAngle -> arcLength
+						*parameter_.kImpulesProMeter				// arcLength -> impluses
+						/2.0;										// total impulses -> impulses for one wheel
+	double deltaIncR = speed_*timer_.last_step_time_*0.000001
+						*parameter_.kImpulesProMeter
+						+
+						psi_speed_*timer_.last_step_time_*0.000001
+						*parameter_.kDistanceWheels
+						*parameter_.kImpulesProMeter
+						/2.0;
+	double errIncL = 	parameter_.kSigmaIncrement
+						*sqrt(abs(deltaIncL)+abs(deltaIncR))
+						*RandomGaussian();
+	double errIncR = 	parameter_.kSigmaIncrement
+						*sqrt(abs(deltaIncL)+abs(deltaIncR))
+						*RandomGaussian();
 	incremente_left_ += deltaIncL + errIncL;
 	incremente_right_ += deltaIncR + errIncR;
 }
@@ -93,22 +115,22 @@ bool KeyboardEventHandler::handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIAct
 			{
 			case(osgGA::GUIEventAdapter::KEY_W):
 				{
-					if(!w_){robotdata_->AddSpeed(kSpeed);w_=true;}
+					if(!w_){robotdata_->AddSpeed();w_=true;}
 					return true;
 				}
 			case(osgGA::GUIEventAdapter::KEY_S):
 				{
-					if(!s_){robotdata_->AddSpeed(-kSpeed);s_=true;}
+					if(!s_){robotdata_->RemoveSpeed();s_=true;}
 					return true;
 				}
 			case(osgGA::GUIEventAdapter::KEY_A):
 				{
-					if(!a_){robotdata_->AddPsiSpeed(kPsiSpeed);a_=true;}
+					if(!a_){robotdata_->AddPsiSpeed();a_=true;}
 					return true;
 				}
 			case(osgGA::GUIEventAdapter::KEY_D):
 				{
-					if(!d_){robotdata_->AddPsiSpeed(-kPsiSpeed);d_=true;}
+					if(!d_){robotdata_->RemovePsiSpeed();d_=true;}
 					return true;
 				}
 			default:
@@ -122,25 +144,25 @@ bool KeyboardEventHandler::handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIAct
 			{
 			case(osgGA::GUIEventAdapter::KEY_W):
 				{
-					robotdata_->AddSpeed(-kSpeed);
+					robotdata_->RemoveSpeed();
 					w_=false;
 					return true;
 				}
 			case(osgGA::GUIEventAdapter::KEY_S):
 				{
-					robotdata_->AddSpeed(kSpeed);
+					robotdata_->AddSpeed();
 					s_=false;
 					return true;
 				}
 			case(osgGA::GUIEventAdapter::KEY_A):
 				{
-					robotdata_->AddPsiSpeed(-kPsiSpeed);
+					robotdata_->RemovePsiSpeed();
 					a_=false;
 					return true;
 				}
 			case(osgGA::GUIEventAdapter::KEY_D):
 				{
-					robotdata_->AddPsiSpeed(kPsiSpeed);
+					robotdata_->AddPsiSpeed();
 					d_=false;
 					return true;
 				}
