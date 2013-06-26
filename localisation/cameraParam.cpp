@@ -9,14 +9,12 @@
 #include <opencv.hpp>
 #include <highgui/highgui_c.h>
 #include <calib3d/calib3d.hpp>
+#include "local_settings.h"
 
 cameraParam::cameraParam() {
 	intrMat = cv::Mat(3, 3, CV_64FC1);
-//	intrMat.at<double>(0, 0) = 2076.92;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 1920.0 / 2;
-//	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 2076.92;	intrMat.at<double>(1, 2) = 1080.0 / 2;
-//	intrMat.at<double>(2, 0) = 0.0;		intrMat.at<double>(2, 1) = 0.0;		intrMat.at<double>(2, 2) = 1.0;
-	intrMat.at<double>(0, 0) = 1476.92;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 1366.0 / 2;
-	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 1476.92;	intrMat.at<double>(1, 2) = 768.0 / 2;
+	intrMat.at<double>(0, 0) = LOCAL_Fx;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = LOCAL_Cx;
+	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = LOCAL_Fy;	intrMat.at<double>(1, 2) = LOCAL_Cy;
 	intrMat.at<double>(2, 0) = 0.0;		intrMat.at<double>(2, 1) = 0.0;		intrMat.at<double>(2, 2) = 1.0;
 	rotMat = cv::Mat(3, 3, CV_64FC1);
 	//rotv = cv::Mat(3, 1, CV_64FC1);
