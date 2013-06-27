@@ -9,8 +9,7 @@
 #define CAMERAPARAM_H_
 
 #include <opencv.hpp>
-#include <osg/Node>
-#include <osgViewer/Viewer>
+#include <osg/Matrix>
 
 class cameraParam{
 public:

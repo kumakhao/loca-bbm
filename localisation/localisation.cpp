@@ -1,9 +1,11 @@
 #include "localisation.h"
-#include "../locaUtil.h"
+#include <vector>
 #include <math.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <highgui/highgui_c.h>
 #include <iostream>
+#include "picRating.h"
+#include "../locaUtil.h"
 
 localisation::Parameters::Parameters() :
 		nrOfInitialOrientations(1),
@@ -78,9 +80,9 @@ localisation::localisation() {
 
 }
 
-void localisation::dynamic(int incLeft, int incRight) {
+void localisation::dynamic(double incLeft, double incRight) {
 	double dPsi = (incRight - incLeft) / param.impulesProMeter	/ param.distanceWheels;
-	double dDistance = (incLeft + incRight) / 2 / param.impulesProMeter;
+	double dDistance = (incLeft + incRight) / 2.0 / param.impulesProMeter;
 	//std::cout<<"dPsi: "<<dPsi<<"    dDistance: "<<dDistance<<endl;
 	for (unsigned int i = 0; i < particles.size(); i++) {
 		particles.at(i).dynamic(dDistance, dPsi);
