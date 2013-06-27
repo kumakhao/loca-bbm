@@ -69,6 +69,7 @@ int main(){
 //			std::cout<<"Y: "<<position.at(2)<<" | VAR: "<<position.at(3)<<std::endl;
 
 		}
+		mainSim.CleanUp();
 		break;
 	case 2:
 		expoBot_test();

@@ -38,7 +38,9 @@ std::string DataWriter::WriteImg(cv::Mat img) {
 	img_name << path_;
 	img_name << std::setw(4) << std::setfill('0') << img_counter_;
 	img_name << ".jpg";
-	cv::imwrite( img_name.str(), img );
+	//cv::imwrite( img_name.str(), img );
+	imgBuffer.push_back(img);
+	imgNameBuffer.push_back(img_name.str());
 	img_counter_++;
 	return img_name.str();
 }
@@ -219,6 +221,13 @@ void DataWriter::WriteData(double increment_left, double increment_right,
 
 	text << WriteImg(img);
 	WriteData(text.str());
+}
+
+void DataWriter::SaveImages() {
+	for(unsigned int i=0;i<imgBuffer.size();i++)
+	{
+		cv::imwrite( imgNameBuffer.at(i), imgBuffer.at(i) );
+	}
 }
 
 std::string DataWriter::Header() {

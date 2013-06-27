@@ -122,10 +122,11 @@ void Simulation::Step() {
 	if(screen_shot_callback_->isPicTaken() && !picture_processed_){
 		osg::ref_ptr<osg::Image> osgImage = screen_shot_callback_->getImage();
 		cv::Mat cvImg(osgImage->t(), osgImage->s(), CV_8UC3);
+		cv::Mat cvCopyImg(osgImage->t(), osgImage->s(), CV_8UC3);
 		cvImg.data = (uchar*)osgImage->data();
-		cv::flip(cvImg, cvImg, 0); // Flipping because of different origins
+		cv::flip(cvImg, cvCopyImg, 0); // Flipping because of different origins
 
-		localisation_->observeImg(&cvImg);
+		localisation_->observeImg(&cvCopyImg);
 		// Write position, orientation and image to log file.
 		//dataWriter->writeData(robotData->incrementeLeft, robotData->incrementeRight, robotData->posX,robotData->posY,robotData->psi, cvImg);
 		//data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_, view_matrix_eye_[0],view_matrix_eye_[1],asin(view_matrix_(0,0)),  cvImg);
@@ -140,7 +141,7 @@ void Simulation::Step() {
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
 												robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
 												robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
-												robotdata_->psi_, view_matrix_(0,0), localisation_->particles.at(0).psi, cvImg);
+												robotdata_->psi_, view_matrix_(0,0), localisation_->particles.at(0).psi, cvCopyImg);
 		// observe for particle filter is done here.
 		Observe();
 
@@ -461,6 +462,10 @@ void Simulation::Observe() {
 	default:
 		break;
 	}
+}
+
+void Simulation::CleanUp() {
+	data_to_file_writer_.SaveImages();
 }
 
 void Simulation::Dynamic() {

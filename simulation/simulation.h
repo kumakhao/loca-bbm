@@ -41,6 +41,7 @@ public:
 	void Initialize();
 	void Realize();
 	void Step();
+	void CleanUp();
 	void setLocalisation(localisation *loca);
 	void setObserveMode(ObserveMode mode);
 	void enablePadControl();

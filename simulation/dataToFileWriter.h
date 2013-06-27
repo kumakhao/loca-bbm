@@ -24,8 +24,11 @@ public:
 		blank_entry_("BLANK")
 	{
 		WriteData(Header());
+		imgBuffer.clear();
+		imgNameBuffer.clear();
 	}
 	DataWriter(std::string picPath, std::string filePath);
+	void SaveImages();
 
 	void WriteData(double increment_left, double increment_right);
 	void WriteData(double increment_left, double increment_right, 	double robX, double robY, double robPsi);
@@ -55,6 +58,8 @@ protected:
 	std::string WriteImg(cv::Mat img);
 	void WriteData(std::string imgName);
 	std::string Header();
+	std::vector<cv::Mat> imgBuffer;
+	std::vector<std::string> imgNameBuffer;
 };
 
 
