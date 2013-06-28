@@ -30,7 +30,7 @@ void localisation::Particle::observeImg(cv::Mat* img) {
 	this->loca->camera_model_.setExtr(psi,xPos,yPos);
 	loca->camera_model_.projectTo2D(&(loca->Points_3D_),&imagePoints);
 	clipedImagePoints = picRating::clipANDmark(imagePoints,locaUtil::getPatternCode93(), img->cols, img->rows);
-	double p = picRating::rateImage(*img, clipedImagePoints,grid);
+	double p = picRating::rateImage(*img, clipedImagePoints, grid);
 
 	for(unsigned int i=0; i<imagePoints.size(); i++)
 		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
@@ -56,6 +56,7 @@ void localisation::Particle::observeGPS(double x, double y, double psi) {
 					- locaUtil::angleNormalisation(psi));
 	double errSum2Pos = errX * errX + errY * errY;
 	double errSum2Psi = errPsi * errPsi;
+	//TODO hier wird 2x weight berechnet!
 	//winkel normalisieren
 	//std::cout<<"weight vorher: "<<this->weight<<" nachher: ";
 	this->weight *= exp(
@@ -70,8 +71,10 @@ void localisation::Particle::dynamic(double dDistance, double dPsi) {
 			* loca->param.sigmaDistance;
 	//TODO auch bei geradeausfahrt winkelfehler möglich
 	double errPsi = dPsi * locaUtil::randomGaussian() * loca->param.sigmaAngle;
-	xPos = xPos + cos(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
-	yPos = yPos + sin(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
+	xPos = xPos + cos(psi + errPsi) * (dDistance + errDistance);
+	yPos = yPos + sin(psi + errPsi) * (dDistance + errDistance);
+//	xPos = xPos + cos(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
+//	yPos = yPos + sin(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
 	psi = psi + (dPsi + errPsi);
 }
 

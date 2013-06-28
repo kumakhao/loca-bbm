@@ -34,6 +34,15 @@ RobotData::RobotData(osg::Node* n)
 
 void RobotData::UpdatePosition()
 {
+//	double bogenStrecke = speed_*timer_.last_step_time_*0.000001;
+//	double dPsi = psi_speed_*timer_.last_step_time_*0.000001;
+//	double sehnenStrecke = 0;
+//	if(dPsi != 0)
+//		sehnenStrecke = 2.0*(bogenStrecke/dPsi)*sin(dPsi/2);
+//	else
+//		sehnenStrecke = bogenStrecke;
+//	x_pos_ += sehnenStrecke*cos(psi_+dPsi);
+//	y_pos_ += sehnenStrecke*sin(psi_+dPsi);
 	x_pos_ += cos(psi_)*speed_*timer_.last_step_time_*0.000001;
 	y_pos_ += sin(psi_)*speed_*timer_.last_step_time_*0.000001;
 	robotXform_->setPosition(osg::Vec3(x_pos_,y_pos_,0));
