@@ -156,7 +156,6 @@ double picRating::rateImage_3x3(cv::Mat img,
 
 	// Hier wird der quadratische Abstand der Bildpixelwerte zu den mittleren
 	// Schwarz- bzw Weißwerten gebildet und durch den Kontrast geteilt.
-	std::cout<<"p: ";
 	for(unsigned int i=0;i<pattern.size();i++){
 		double p = 0;
 		if(pattern.at(i).patternValue == 0)
@@ -164,14 +163,12 @@ double picRating::rateImage_3x3(cv::Mat img,
 		if(pattern.at(i).patternValue == 255)
 			p = pattern.at(i).pixelValue - avgWhite;
 		p *= p;
-		std::cout<<p<<" ";
 		pSum += (p+minKontrast*minKontrast)/(kontrast2/4+minKontrast*minKontrast);
 	}
-	std::cout<<std::endl;
 	//pSum = pSum;
-	std::cout<<std::endl;
-	std::cout<<"avgWhite: "<<avgWhite<<"  avgBlack: "<<avgBlack<<"  pSum: "<<pSum<<"  exp(-pSum): "<<exp(-pSum)<<std::endl;
-	std::cout<<std::endl;
+//	std::cout<<std::endl;
+//	std::cout<<"avgWhite: "<<avgWhite<<"  avgBlack: "<<avgBlack<<"  pSum: "<<pSum<<"  exp(-pSum): "<<exp(-pSum)<<std::endl;
+//	std::cout<<std::endl;
 
 	return exp(-0.5*pSum);
 }
