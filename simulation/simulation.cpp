@@ -37,10 +37,10 @@ void Simulation::Initialize() {
 
 	if(particles_on_){
 		particle_view_ = new Particles();
-//		particle_view_->Populate(localisation_->param.nrOfParticles);
-//		localisation_->createSamples(localisation_->param.nrOfParticles);
-			particle_view_->Populate(1);
-			localisation_->createOneParticle();
+		particle_view_->Populate(localisation_->param.nrOfParticles);
+		localisation_->createSamples(localisation_->param.nrOfParticles);
+//			particle_view_->Populate(1);
+//			localisation_->createOneParticle();
 
 
 		particle_view_->Update(localisation_->getParticles());
@@ -125,8 +125,8 @@ void Simulation::Step() {
 		cv::Mat cvCopyImg(osgImage->t(), osgImage->s(), CV_8UC3);
 		cvImg.data = (uchar*)osgImage->data();
 		cv::flip(cvImg, cvCopyImg, 0); // Flipping because of different origins
+		observedImg_ = &cvCopyImg;
 
-		localisation_->observeImg(&cvCopyImg);
 		// Write position, orientation and image to log file.
 		//dataWriter->writeData(robotData->incrementeLeft, robotData->incrementeRight, robotData->posX,robotData->posY,robotData->psi, cvImg);
 		//data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_, view_matrix_eye_[0],view_matrix_eye_[1],asin(view_matrix_(0,0)),  cvImg);
@@ -144,7 +144,6 @@ void Simulation::Step() {
 												robotdata_->psi_, view_matrix_(0,0), localisation_->particles.at(0).psi, cvCopyImg);
 		// observe for particle filter is done here.
 		Observe();
-
 		picture_processed_ = true;
 	}
 
@@ -175,6 +174,8 @@ void Simulation::Step() {
 		old_increments_right_ = robotdata_->incremente_right_;
 	}
 
+	UpdateHUD();
+
 	// without pad_control pictures are taken every 2sec
 	if(!pad_control_on_ && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>2000) ){
 		screen_shot_callback_->queueShot();
@@ -196,8 +197,8 @@ void Simulation::Step() {
 		// If Padcontrol is enabled, the inputs from the pad are written to the robotData.
 		// That way the callback will use the inputs to move the robot.
 		if(sixaxes_->buttonPressed(BUTTON_L1) && sixaxes_->buttonPressed(BUTTON_R1)){
-			robotdata_->speed_ = sixaxes_->axis(AXIS_LY)*-0.1;
-			robotdata_->psi_speed_ = sixaxes_->axis(AXIS_RX)*-0.04;
+			robotdata_->speed_ = sixaxes_->axis(AXIS_LY)*-2;
+			robotdata_->psi_speed_ = sixaxes_->axis(AXIS_RX)*-0.5;
 		}
 		else{
 			robotdata_->speed_ = 0.0;
@@ -458,7 +459,10 @@ void Simulation::Observe() {
 			localisation_->observeLandmark(*it, landmarks_.getAngleToLandmark(*it,robotdata_->x_pos_,robotdata_->y_pos_,robotdata_->psi_));
 		localisation_->resample(localisation_->param.nrOfParticles);
 		break;
-
+	case Pictures:
+		localisation_->observeImg(observedImg_);
+		localisation_->resample(localisation_->param.nrOfParticles);
+		break;
 	default:
 		break;
 	}
@@ -470,6 +474,23 @@ void Simulation::CleanUp() {
 
 void Simulation::Dynamic() {
 }
+
+void Simulation::UpdateHUD() {
+	std::stringstream hud_text;
+	hud_text <<    "True Position: (x "<<robotdata_->x_pos_<<
+								" / y "<<robotdata_->y_pos_<<
+									" )"<<std::endl;
+	hud_text <<    "Part Position: (x "<<this->localisation_->getPosition().at(0)<<
+								" / y "<<this->localisation_->getPosition().at(2)<<
+									" )"<<std::endl;
+	hud_text <<    "VAR  Position: (x "<<this->localisation_->getPosition().at(1)<<
+								" / y "<<this->localisation_->getPosition().at(3)<<
+									" )"<<std::endl;
+	hud_text <<    "Nr of Particles: "<<localisation_->param.nrOfParticles<<"("<<localisation_->good_rating_count<<")"<<
+					"   Observe Highscore: "<<localisation_->highscore<<"("<<localisation_->highscore_count<<")";
+	hud_.setText(hud_text.str());
+}
+
 
 
 

@@ -59,6 +59,7 @@ private:
 	osg::Group* SetupScene();
 	void Observe();
 	void Dynamic();
+	void UpdateHUD();
 	bool particles_on_;
 	bool setup_done_;
 	bool picture_processed_;
@@ -89,6 +90,7 @@ private:
 	DataWriter data_to_file_writer_;
 	RobotData *robotdata_;
 	cJoystick *sixaxes_;
+	cv::Mat *observedImg_;
 
 };
 

@@ -71,6 +71,9 @@ public:
 	cv::Mat Points_3D_;
 	//cameraParam camera_model_;
 	cameraParam camera_model_;
+	double highscore;
+	int highscore_count;
+	int good_rating_count;
 
 	localisation();
 	void observeImg(cv::Mat* img);

@@ -9,7 +9,7 @@
 
 localisation::Parameters::Parameters() :
 		nrOfInitialOrientations(1),
-		nrOfParticlesPerLenth(20),
+		nrOfParticlesPerLenth(50),
 		nrOfParticles(nrOfInitialOrientations * nrOfParticlesPerLenth * nrOfParticlesPerLenth),
 		fieldY(12),
 		fieldX(12),
@@ -31,14 +31,26 @@ void localisation::Particle::observeImg(cv::Mat* img) {
 	loca->camera_model_.projectTo2D(&(loca->Points_3D_),&imagePoints);
 	clipedImagePoints = picRating::clipANDmark(imagePoints,locaUtil::getPatternCode93(), img->cols, img->rows);
 	double p = picRating::rateImage(*img, clipedImagePoints, grid);
-
-	for(unsigned int i=0; i<imagePoints.size(); i++)
-		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
-		cv::rectangle(*img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
-	std::ostringstream s;
-	s<<"Gewichtung: "<<p;
-	cv::putText(*img, s.str(), cvPoint(30,700),
-		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
+	//std::cout<<"Particle::observeImg: "<<p<<std::endl;
+	if(loca->highscore < p){
+		loca->highscore = p;
+		loca->highscore_count = 1;
+	}
+	if(loca->highscore == p)
+		loca->highscore_count++;
+	if(p>0.001){
+		this->weight *= p;
+		loca->good_rating_count++;
+	}
+	else
+		this->weight *= 0.001;
+//	for(unsigned int i=0; i<imagePoints.size(); i++)
+//		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
+//		cv::rectangle(*img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
+//	std::ostringstream s;
+//	s<<"Gewichtung: "<<p;
+//	cv::putText(*img, s.str(), cvPoint(30,700),
+//		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
 }
 
 void localisation::Particle::observeLandmark(int ID, double angle) {
@@ -94,12 +106,13 @@ void localisation::dynamic(double incLeft, double incRight) {
 
 void localisation::observeImg(cv::Mat* img) {
 	//TODO changed for testing, needs reverting
-	if(particles.size() > 0)
-		particles.at(0).observeImg(img);
-
-//	for (unsigned int i = 0; i < particles.size(); i++) {
-//			particles.at(i).observeImg(img);
-//	}
+//	if(particles.size() > 0)
+//		particles.at(0).observeImg(img);
+	highscore = 0.0;
+	good_rating_count = 0;
+	for (unsigned int i = 0; i < particles.size(); i++) {
+			particles.at(i).observeImg(img);
+	}
 }
 
 void localisation::observeLandmark(int ID, double angle) {
@@ -214,7 +227,7 @@ std::vector<double> localisation::getPosition() {
 	}
 	pos.push_back(meanXPos);
 	pos.push_back(varXPos);
-	pos.push_back(meanXPos);
+	pos.push_back(meanYPos);
 	pos.push_back(varYPos);
 	return pos;
 }
