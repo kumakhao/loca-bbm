@@ -244,7 +244,18 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 
 }
 
+/**
+ * get pixel at x/y coordinates. If out of bound, it will be set to min or max value
+ * @param img
+ * @param x
+ * @param y
+ * @return
+ */
 int picRating::pixel(cv::Mat img, int x, int y) {
+	if(x < 0) x = 0;
+	if(x >= img.cols) x = img.cols-1;
+	if(y < 0) y = 0;
+	if(y >= img.rows) y = img.rows-1;
 	int ret = 0;
 	unsigned char *adr = img.data+img.step[0]*y+img.step[1]*x;
 			ret += *adr;

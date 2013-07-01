@@ -128,22 +128,22 @@ cv::Mat locaUtil::getBit3Dlocations_all() {
 }
 
 /**
- * TODO
+ * TODO not needed?
  * @param node
  * @return
  */
-osg::Matrixd* locaUtil::getWorldCoords(osg::Node* node) {
-	getWorldCoordOfNodeVisitor* ncv = new getWorldCoordOfNodeVisitor();
-	   if (node && ncv)
-	   {
-	      node->accept(*ncv);
-	      return ncv->giveUpDaMat();
-	   }
-	   else
-	   {
-	      return NULL;
-	   }
-}
+//osg::Matrixd* locaUtil::getWorldCoords(osg::Node* node) {
+//	getWorldCoordOfNodeVisitor* ncv = new getWorldCoordOfNodeVisitor();
+//	   if (node && ncv)
+//	   {
+//	      node->accept(*ncv);
+//	      return ncv->giveUpDaMat();
+//	   }
+//	   else
+//	   {
+//	      return NULL;
+//	   }
+//}
 /**
  * Creates an array with an alternating pattern starting with white(255).
  * @return pointer to unsigned char array [192]

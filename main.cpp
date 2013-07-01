@@ -27,6 +27,7 @@ int main(){
 	Simulation mainSim;
 	localisation *mainLoca = new localisation;
 
+
 	std::vector<double> orientaion, position;
 
 
@@ -54,12 +55,13 @@ int main(){
 
 		mainSim.setLocalisation(mainLoca);
 		//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
-		mainSim.setObserveMode(Simulation::Landmarks);
+		mainSim.setObserveMode(Simulation::Pictures);
 		mainSim.enablePadControl();
 		mainSim.Initialize();
 		mainSim.Realize();
 		while(!mainSim.done()){
 			mainSim.Step();
+			usleep(10000);
 //			orientaion = mainLoca->getOrientation();
 //			position = mainLoca->getPosition();
 //			std::cout<<"Angle: "<<orientaion.at(1)<<" | VAR: "<<orientaion.at(0)<<std::endl;
@@ -67,6 +69,7 @@ int main(){
 //			std::cout<<"Y: "<<position.at(2)<<" | VAR: "<<position.at(3)<<std::endl;
 
 		}
+		mainSim.CleanUp();
 		break;
 	case 2:
 		expoBot_test();

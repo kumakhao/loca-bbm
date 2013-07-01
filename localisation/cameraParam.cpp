@@ -9,19 +9,21 @@
 #include <opencv.hpp>
 #include <highgui/highgui_c.h>
 #include <calib3d/calib3d.hpp>
+#include "local_settings.h"
 
 cameraParam::cameraParam() {
 	intrMat = cv::Mat(3, 3, CV_64FC1);
-	intrMat.at<double>(0, 0) = 1476.92;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 1366.0 / 2;
-	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 1476.92;	intrMat.at<double>(1, 2) = 768.0 / 2;
+	intrMat.at<double>(0, 0) = LOCAL_Fx;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = LOCAL_Cx;
+	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = LOCAL_Fy;	intrMat.at<double>(1, 2) = LOCAL_Cy;
 	intrMat.at<double>(2, 0) = 0.0;		intrMat.at<double>(2, 1) = 0.0;		intrMat.at<double>(2, 2) = 1.0;
 	rotMat = cv::Mat(3, 3, CV_64FC1);
+	//rotv = cv::Mat(3, 1, CV_64FC1);
 	rotMat4x4 = cv::Mat(4, 4, CV_64FC1);
 	rotMat_World2Robot = cv::Mat(4, 4, CV_64FC1);
 	rotMat_Robot2CameraCV = cv::Mat(4, 4, CV_64FC1);
 			rotMat_Robot2CameraCV.at<double>(0,0) = 0;	rotMat_Robot2CameraCV.at<double>(0,1) = -1;rotMat_Robot2CameraCV.at<double>(0,2) = 0;	rotMat_Robot2CameraCV.at<double>(0,3) = -0.093889;
 			rotMat_Robot2CameraCV.at<double>(1,0) = 0;	rotMat_Robot2CameraCV.at<double>(1,1) = 0;	rotMat_Robot2CameraCV.at<double>(1,2) = -1;rotMat_Robot2CameraCV.at<double>(1,3) = 0.260804;
-			rotMat_Robot2CameraCV.at<double>(2,0) = 1;	rotMat_Robot2CameraCV.at<double>(2,1) = 0;	rotMat_Robot2CameraCV.at<double>(2,2) = 0;	rotMat_Robot2CameraCV.at<double>(2,3) = 2.83599;
+			rotMat_Robot2CameraCV.at<double>(2,0) = 1; rotMat_Robot2CameraCV.at<double>(2,1) = 0;	rotMat_Robot2CameraCV.at<double>(2,2) = 0;	rotMat_Robot2CameraCV.at<double>(2,3) = 2.83599;
 			rotMat_Robot2CameraCV.at<double>(3,0) = 0;	rotMat_Robot2CameraCV.at<double>(3,1) = 0;	rotMat_Robot2CameraCV.at<double>(3,2) = 0;	rotMat_Robot2CameraCV.at<double>(3,3) = 1;
 	transMat = cv::Mat(3, 1, CV_64FC1);
 	distCoeffsVec = cv::Mat(4, 1, CV_64FC1);
@@ -48,24 +50,19 @@ void cameraParam::setCy(double cy) {
 }
 
 void cameraParam::setExtr(double psi, double x, double y, double z) {
+
 	cv::Mat testTranslMatr = cv::Mat(4, 4, CV_64FC1);
-	testTranslMatr.at<double>(0,0) = 1; testTranslMatr.at<double>(0,1) = 0; testTranslMatr.at<double>(0,2) = 0; testTranslMatr.at<double>(0,3) = -x-2.83599;//cos(psi)*x+sin(psi)*y;
-	testTranslMatr.at<double>(1,0) = 0; testTranslMatr.at<double>(1,1) = 1; testTranslMatr.at<double>(1,2) = 0; testTranslMatr.at<double>(1,3) = -y-0.093889;//sin(psi)*x+cos(psi)*y;
+	testTranslMatr.at<double>(0,0) = 1; testTranslMatr.at<double>(0,1) = 0; testTranslMatr.at<double>(0,2) = 0; testTranslMatr.at<double>(0,3) = -x;//-x-2.83599;//cos(psi)*x+sin(psi)*y;
+	testTranslMatr.at<double>(1,0) = 0; testTranslMatr.at<double>(1,1) = 1; testTranslMatr.at<double>(1,2) = 0; testTranslMatr.at<double>(1,3) = -y;//-y-0.093889;//sin(psi)*x+cos(psi)*y;
 	testTranslMatr.at<double>(2,0) = 0; testTranslMatr.at<double>(2,1) = 0; testTranslMatr.at<double>(2,2) = 1; testTranslMatr.at<double>(2,3) = 0;
 	testTranslMatr.at<double>(3,0) = 0; testTranslMatr.at<double>(3,1) = 0; testTranslMatr.at<double>(3,2) = 0; testTranslMatr.at<double>(3,3) = 1;
 
-	rotMat_World2Robot.at<double>(0,0) = cos(psi);		rotMat_World2Robot.at<double>(0,1) = 0; rotMat_World2Robot.at<double>(0,2) = sin(psi);	rotMat_World2Robot.at<double>(0,3) = 0;//cos(psi)*x+sin(psi)*y;
-	rotMat_World2Robot.at<double>(1,0) = 0;			rotMat_World2Robot.at<double>(1,1) = 1; rotMat_World2Robot.at<double>(1,2) = 0;			rotMat_World2Robot.at<double>(1,3) = 0;//sin(psi)*x+cos(psi)*y;
-	rotMat_World2Robot.at<double>(2,0) = -sin(psi);	rotMat_World2Robot.at<double>(2,1) = 0; rotMat_World2Robot.at<double>(2,2) = cos(psi);	rotMat_World2Robot.at<double>(2,3) = 0;
-	rotMat_World2Robot.at<double>(3,0) = 0;			rotMat_World2Robot.at<double>(3,1) = 0; rotMat_World2Robot.at<double>(3,2) = 0;			rotMat_World2Robot.at<double>(3,3) = 1;
+	rotMat_World2Robot.at<double>(0,0) = cos(-psi);	rotMat_World2Robot.at<double>(0,1) = -sin(-psi);rotMat_World2Robot.at<double>(0,2) = 0;rotMat_World2Robot.at<double>(0,3) = 0;//cos(psi)*x+sin(psi)*y;
+	rotMat_World2Robot.at<double>(1,0) = sin(-psi);	rotMat_World2Robot.at<double>(1,1) =  cos(-psi);rotMat_World2Robot.at<double>(1,2) = 0;rotMat_World2Robot.at<double>(1,3) = 0;//sin(psi)*x+cos(psi)*y;
+	rotMat_World2Robot.at<double>(2,0) = 0; 		rotMat_World2Robot.at<double>(2,1) =  0; 		rotMat_World2Robot.at<double>(2,2) = 1; rotMat_World2Robot.at<double>(2,3) = 0;
+	rotMat_World2Robot.at<double>(3,0) = 0;		rotMat_World2Robot.at<double>(3,1) =  0; 		rotMat_World2Robot.at<double>(3,2) = 0; rotMat_World2Robot.at<double>(3,3) = 1;
 
-//	std::cout<<"psi: "<<psi<<"  x: "<<x<<"  y: "<<y<<std::endl;
-//	std::cout<<rotMat_World2Robot.at<double>(0,0)<<" "<<rotMat_World2Robot.at<double>(0,1)<<" "<<rotMat_World2Robot.at<double>(0,2)<<" "<<rotMat_World2Robot.at<double>(0,3)<<std::endl;
-//	std::cout<<rotMat_World2Robot.at<double>(1,0)<<" "<<rotMat_World2Robot.at<double>(1,1)<<" "<<rotMat_World2Robot.at<double>(1,2)<<" "<<rotMat_World2Robot.at<double>(1,3)<<std::endl;
-//	std::cout<<rotMat_World2Robot.at<double>(2,0)<<" "<<rotMat_World2Robot.at<double>(2,1)<<" "<<rotMat_World2Robot.at<double>(2,2)<<" "<<rotMat_World2Robot.at<double>(2,3)<<std::endl;
-//	std::cout<<rotMat_World2Robot.at<double>(3,0)<<" "<<rotMat_World2Robot.at<double>(3,1)<<" "<<rotMat_World2Robot.at<double>(3,2)<<" "<<rotMat_World2Robot.at<double>(3,3)<<std::endl;
-
-	rotMat4x4 = rotMat_World2Robot*rotMat_Robot2CameraCV*testTranslMatr;
+	rotMat4x4 = rotMat_Robot2CameraCV*rotMat_World2Robot*testTranslMatr;
 	transMat.at<double>(0,0) = rotMat4x4.at<double>(0,3);
 	transMat.at<double>(1,0) = rotMat4x4.at<double>(1,3);
 	transMat.at<double>(2,0) = rotMat4x4.at<double>(2,3);
@@ -80,17 +77,6 @@ void cameraParam::setExtr(double psi, double x, double y, double z) {
 	rotMat.at<double>(1,2) = rotMat4x4.at<double>(1,2);
 	rotMat.at<double>(2,2) = rotMat4x4.at<double>(2,2);
 
-//	rotMat = rotY(-M_PI/2+psi)*rotX(M_PI/2);//rotMat_World2Robot*rotMat_Robot2CameraCV;
-//	transMat.at<double>(0,0) = -x;//+2.83599;
-//	transMat.at<double>(1,0) = -y;//+0.093889;
-//	transMat.at<double>(2,0) = -z-0.260804;
-//	transMat = rotMat*transMat;
-//	std::cout<<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
-//	std::cout<<"Trans: ("<<transMat.at<double>(0,0)<<", "<<transMat.at<double>(1,0)<<", "<<transMat.at<double>(2,0)<<")"<<std::endl;
-//	std::cout<<"|"<<rotMat.at<double>(0,0)<<" "<<rotMat.at<double>(0,1)<<" "<<rotMat.at<double>(0,2)<<"|"<<std::endl;
-//	std::cout<<"|"<<rotMat.at<double>(1,0)<<" "<<rotMat.at<double>(1,1)<<" "<<rotMat.at<double>(1,2)<<"|"<<std::endl;
-//	std::cout<<"|"<<rotMat.at<double>(2,0)<<" "<<rotMat.at<double>(2,1)<<" "<<rotMat.at<double>(2,2)<<"|"<<std::endl;
-//	std::cout<<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"<<std::endl;
 }
 
 void cameraParam::setExtr(double psi, double x, double y) {

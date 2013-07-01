@@ -1,13 +1,15 @@
 #include "localisation.h"
-#include "../locaUtil.h"
+#include <vector>
 #include <math.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <highgui/highgui_c.h>
 #include <iostream>
+#include "picRating.h"
+#include "../locaUtil.h"
 
 localisation::Parameters::Parameters() :
 		nrOfInitialOrientations(1),
-		nrOfParticlesPerLenth(20),
+		nrOfParticlesPerLenth(50),
 		nrOfParticles(nrOfInitialOrientations * nrOfParticlesPerLenth * nrOfParticlesPerLenth),
 		fieldY(12),
 		fieldX(12),
@@ -21,22 +23,34 @@ localisation::Parameters::Parameters() :
 }
 
 void localisation::Particle::observeImg(cv::Mat* img) {
-	//TODO
+	//TODO work in progress
 	std::vector<cv::Point2d> imagePoints, imagePointsCliped;
 	std::vector<patternPoint> clipedImagePoints;
 	int grid = 1;
 	this->loca->camera_model_.setExtr(psi,xPos,yPos);
 	loca->camera_model_.projectTo2D(&(loca->Points_3D_),&imagePoints);
 	clipedImagePoints = picRating::clipANDmark(imagePoints,locaUtil::getPatternCode93(), img->cols, img->rows);
-	double p = picRating::rateImage(*img, clipedImagePoints,grid);
-
-	for(unsigned int i=0; i<imagePoints.size(); i++)
-		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
-		cv::rectangle(*img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
-	std::ostringstream s;
-	s<<"Gewichtung: "<<p;
-	cv::putText(*img, s.str(), cvPoint(30,700),
-		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
+	double p = picRating::rateImage(*img, clipedImagePoints, grid);
+	//std::cout<<"Particle::observeImg: "<<p<<std::endl;
+	if(loca->highscore < p){
+		loca->highscore = p;
+		loca->highscore_count = 1;
+	}
+	if(loca->highscore == p)
+		loca->highscore_count++;
+	if(p>0.001){
+		this->weight *= p;
+		loca->good_rating_count++;
+	}
+	else
+		this->weight *= 0.001;
+//	for(unsigned int i=0; i<imagePoints.size(); i++)
+//		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
+//		cv::rectangle(*img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
+//	std::ostringstream s;
+//	s<<"Gewichtung: "<<p;
+//	cv::putText(*img, s.str(), cvPoint(30,700),
+//		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
 }
 
 void localisation::Particle::observeLandmark(int ID, double angle) {
@@ -54,6 +68,7 @@ void localisation::Particle::observeGPS(double x, double y, double psi) {
 					- locaUtil::angleNormalisation(psi));
 	double errSum2Pos = errX * errX + errY * errY;
 	double errSum2Psi = errPsi * errPsi;
+	//TODO hier wird 2x weight berechnet!
 	//winkel normalisieren
 	//std::cout<<"weight vorher: "<<this->weight<<" nachher: ";
 	this->weight *= exp(
@@ -66,10 +81,12 @@ void localisation::Particle::dynamic(double dDistance, double dPsi) {
 	//TODO: randomGaussian
 	double errDistance = dDistance * locaUtil::randomGaussian()
 			* loca->param.sigmaDistance;
-	// auch bei geradeausfahrt winkelfehler möglich
+	//TODO auch bei geradeausfahrt winkelfehler möglich
 	double errPsi = dPsi * locaUtil::randomGaussian() * loca->param.sigmaAngle;
-	xPos = xPos + cos(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
-	yPos = yPos + sin(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
+	xPos = xPos + cos(psi + errPsi) * (dDistance + errDistance);
+	yPos = yPos + sin(psi + errPsi) * (dDistance + errDistance);
+//	xPos = xPos + cos(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
+//	yPos = yPos + sin(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
 	psi = psi + (dPsi + errPsi);
 }
 
@@ -78,10 +95,9 @@ localisation::localisation() {
 
 }
 
-void localisation::dynamic(int incLeft, int incRight) {
-	double dPsi = (incRight - incLeft) / param.impulesProMeter
-			/ param.distanceWheels;
-	double dDistance = (incLeft + incRight) / 2 / param.impulesProMeter;
+void localisation::dynamic(double incLeft, double incRight) {
+	double dPsi = (incRight - incLeft) / param.impulesProMeter	/ param.distanceWheels;
+	double dDistance = (incLeft + incRight) / 2.0 / param.impulesProMeter;
 	//std::cout<<"dPsi: "<<dPsi<<"    dDistance: "<<dDistance<<endl;
 	for (unsigned int i = 0; i < particles.size(); i++) {
 		particles.at(i).dynamic(dDistance, dPsi);
@@ -89,13 +105,14 @@ void localisation::dynamic(int incLeft, int incRight) {
 }
 
 void localisation::observeImg(cv::Mat* img) {
-	//TODO
-	if(particles.size() > 0)
-		particles.at(0).observeImg(img);
-
-//	for (unsigned int i = 0; i < particles.size(); i++) {
-//			particles.at(i).observeImg(img);
-//	}
+	//TODO changed for testing, needs reverting
+//	if(particles.size() > 0)
+//		particles.at(0).observeImg(img);
+	highscore = 0.0;
+	good_rating_count = 0;
+	for (unsigned int i = 0; i < particles.size(); i++) {
+			particles.at(i).observeImg(img);
+	}
 }
 
 void localisation::observeLandmark(int ID, double angle) {
@@ -135,7 +152,8 @@ void localisation::createSamples(int nrOfParticles) {
 
 void localisation::createOneParticle() {
 	particles.clear();
-	Particle oneParticle(this, 1.0, -2.83599, -0.093889, 0.0);
+	//Particle oneParticle(this, 1.0, -2.83599, -0.093889, 0.0);
+	Particle oneParticle(this, 1.0, 0.0, 0.0, 0.0);
 	particles.push_back(oneParticle);
 }
 
@@ -209,7 +227,7 @@ std::vector<double> localisation::getPosition() {
 	}
 	pos.push_back(meanXPos);
 	pos.push_back(varXPos);
-	pos.push_back(meanXPos);
+	pos.push_back(meanYPos);
 	pos.push_back(varYPos);
 	return pos;
 }

@@ -16,9 +16,19 @@ void DataWriter::WriteData(double increment_left, double increment_right) {
 	std::ostringstream text;
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_left << delimiter_;
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_right << delimiter_;
-	text << blank_entry_ << delimiter_;
-	text << blank_entry_ << delimiter_;
-	text << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
 	text << blank_entry_;
 	WriteData(text.str());
 }
@@ -28,7 +38,9 @@ std::string DataWriter::WriteImg(cv::Mat img) {
 	img_name << path_;
 	img_name << std::setw(4) << std::setfill('0') << img_counter_;
 	img_name << ".jpg";
-	cv::imwrite( img_name.str(), img );
+	//cv::imwrite( img_name.str(), img );
+	imgBuffer.push_back(img);
+	imgNameBuffer.push_back(img_name.str());
 	img_counter_++;
 	return img_name.str();
 }
@@ -37,21 +49,41 @@ void DataWriter::WriteData(double increment_left, double increment_right,	cv::Ma
 	std::ostringstream text;
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_left << delimiter_;
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_right << delimiter_;
-	text << blank_entry_ << delimiter_;
-	text << blank_entry_ << delimiter_;
-	text << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
 	text << WriteImg(img);
 	WriteData(text.str());
 }
 
 void DataWriter::WriteData(double increment_left, double increment_right,
-		double x, double y, double psi, cv::Mat img) {
+		double robX, double robY, double robPsi, cv::Mat img) {
 	std::ostringstream text;
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_left << delimiter_;
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_right << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << x << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << y << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << psi << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
 	text << WriteImg(img);
 	WriteData(text.str());
 }
@@ -72,25 +104,153 @@ DataWriter::DataWriter(std::string pic_path, std::string file_path):
 				delimiter_("; "),
 				blank_entry_("BLANK")
 {
-	std::ostringstream header;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incLeft" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incRight" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosX" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosY" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPsi" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "imageFile" << delimiter_;
-	WriteData(header.str());
+
+	WriteData(Header());
 }
 
 void DataWriter::WriteData(double increment_left, double increment_right,
-		double x, double y, double psi) {
+		double robX, double robY, double robPsi) {
 	std::ostringstream text;
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_left << delimiter_;
 	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_right << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << x << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << y << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << psi << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
 	text << blank_entry_;
 	WriteData(text.str());
 }
+
+void DataWriter::WriteData(double increment_left, double increment_right,
+		double robX, double camX, double robY, double camY, double robPsi,
+		double camPsi) {
+	std::ostringstream text;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_left << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_right << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << blank_entry_;
+	WriteData(text.str());
+}
+
+void DataWriter::WriteData(double increment_left, double increment_right,
+		double robX, double camX, double partX, double robY, double camY,
+		double partY, double robPsi, double camPsi, double partPsi) {
+	std::ostringstream text;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_left << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_right << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << partX << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << partY << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << partPsi << delimiter_;
+
+	text << blank_entry_;
+	WriteData(text.str());
+}
+
+void DataWriter::WriteData(double increment_left, double increment_right,
+		double robX, double camX, double partX, double robY, double camY,
+		double partY, double robPsi, double camPsi, double partPsi,
+		cv::Mat img) {
+	std::ostringstream text;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_left << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_right << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << partX << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << partY << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << partPsi << delimiter_;
+
+	text << WriteImg(img);
+	WriteData(text.str());
+}
+
+void DataWriter::WriteData(double increment_left, double increment_right,
+		double robX, double camX, double robY, double camY, double robPsi,
+		double camPsi, cv::Mat img) {
+	std::ostringstream text;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_left << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << increment_right << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << robPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << camPsi << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << blank_entry_ << delimiter_;
+
+	text << WriteImg(img);
+	WriteData(text.str());
+}
+
+void DataWriter::SaveImages() {
+	for(unsigned int i=0;i<imgBuffer.size();i++)
+	{
+		cv::imwrite( imgNameBuffer.at(i), imgBuffer.at(i) );
+	}
+}
+
+std::string DataWriter::Header() {
+	std::ostringstream header;
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incLeft" << delimiter_;
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incRight" << delimiter_;
+
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosX" << delimiter_;
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPosX" << delimiter_;
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPosX" << delimiter_;
+
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosY" << delimiter_;
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPosY" << delimiter_;
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPosY" << delimiter_;
+
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPsi" << delimiter_;
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPsi" << delimiter_;
+	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPsi" << delimiter_;
+
+	header << "imageFile";
+
+	return header.str();
+
+}
+
 

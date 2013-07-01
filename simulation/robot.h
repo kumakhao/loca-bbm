@@ -19,15 +19,25 @@
 class RobotData : public osg::Referenced
 {
 public:
+	struct RobotParameter{
+		double kSpeed; // m/s
+		double kPsiSpeed; // ?/s
+		int kImpulesProMeter; //impulse / m
+		double kDistanceWheels; //m
+		double kSigmaIncrement;
+	};
 	explicit RobotData(osg::Node*n);
 	void UpdateTimer();
 	void UpdatePosition();
 	void UpdateOrientation();
-	void AddSpeed(double value);
-	void AddPsiSpeed(double value);
+	void AddSpeed();
+	void RemoveSpeed();
+	void AddPsiSpeed();
+	void RemovePsiSpeed();
 	void UpdateIncrements();
 	double RandomUniform();
 	double RandomGaussian();
+	RobotParameter parameter_;
 	double incremente_left_;
 	double incremente_right_;
 	double speed_, psi_speed_;

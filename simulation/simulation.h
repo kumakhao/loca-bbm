@@ -12,10 +12,12 @@
 #include <opencv.hpp>
 #include <osg/Node>
 #include <osg/Texture2D>
+
 //
 //
 #include "robot.h"
 #include "camera.h"
+#include "hud.h"
 #include "screenShotCallback.h"
 #include "particles.h"
 #include "../locaUtil.h"
@@ -39,6 +41,7 @@ public:
 	void Initialize();
 	void Realize();
 	void Step();
+	void CleanUp();
 	void setLocalisation(localisation *loca);
 	void setObserveMode(ObserveMode mode);
 	void enablePadControl();
@@ -56,6 +59,7 @@ private:
 	osg::Group* SetupScene();
 	void Observe();
 	void Dynamic();
+	void UpdateHUD();
 	bool particles_on_;
 	bool setup_done_;
 	bool picture_processed_;
@@ -73,6 +77,7 @@ private:
 
 	osg::Group *robot_;
 	osg::Group *root_;
+	HUD hud_;
 	osg::Matrix view_matrix_;
 //	osg::Matrixd projectionMatrix;
 	osg::Vec3d view_matrix_eye_, view_matrix_center_, view_matrix_up_;
@@ -85,6 +90,7 @@ private:
 	DataWriter data_to_file_writer_;
 	RobotData *robotdata_;
 	cJoystick *sixaxes_;
+	cv::Mat *observedImg_;
 
 };
 

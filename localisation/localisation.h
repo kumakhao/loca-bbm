@@ -8,16 +8,11 @@
 #ifndef LOCALISATION_H_
 #define LOCALISATION_H_
 
-
-#include <vector>
-#include <math.h>
-#include <stdlib.h>
 #include <opencv.hpp>
-#include <highgui/highgui_c.h>
-#include <iostream>
+
 #include "landmarkSet.h"
 #include "cameraParam.h"
-#include "picRating.h"
+
 
 class localisation
 {
@@ -76,12 +71,19 @@ public:
 	cv::Mat Points_3D_;
 	//cameraParam camera_model_;
 	cameraParam camera_model_;
+	double highscore;
+	int highscore_count;
+	int good_rating_count;
 
 	localisation();
 	void observeImg(cv::Mat* img);
 	void observeLandmark(int ID, double angle);
 	void observeGPS(double x, double y, double psi);
-	void dynamic(int incLeft, int incRight);
+	//TODO changed from int -> double 27.06
+	// the truncing resulted in an error with the particle orientation
+	// over time. For testing this is not a good behavior.
+	// I need to decide if i want to keep this.
+	void dynamic(double incLeft, double incRight);
 	void createSamples(int nrOfParticles);
 	void createOneParticle();
 	void resample(int nrOfParticles);

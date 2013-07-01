@@ -23,21 +23,31 @@ public:
 		delimiter_("; "),
 		blank_entry_("BLANK")
 	{
-		std::ostringstream header;
-		header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incLeft" << delimiter_;
-		header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incRight" << delimiter_;
-		header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosX" << delimiter_;
-		header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosY" << delimiter_;
-		header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPsi" << delimiter_;
-		header << std::setw(width_numeric_entry_) << std::setfill(' ') << "imageFile" << delimiter_;
-		WriteData(header.str());
+		WriteData(Header());
+		imgBuffer.clear();
+		imgNameBuffer.clear();
 	}
 	DataWriter(std::string picPath, std::string filePath);
+	void SaveImages();
 
-	void WriteData(double incrementLeft, double incrementRight);
-	void WriteData(double incrementLeft, double incrementRight, cv::Mat img);
-	void WriteData(double incrementLeft, double incrementRight, double x, double y, double psi, cv::Mat img);
-	void WriteData(double incrementLeft, double incrementRight, double x, double y, double psi);
+	void WriteData(double increment_left, double increment_right);
+	void WriteData(double increment_left, double increment_right, 	double robX, double robY, double robPsi);
+	void WriteData(double increment_left, double increment_right, 	double robX, double camX,
+																	double robY, double camY,
+																	double robPsi, double camPsi);
+	void WriteData(double increment_left, double increment_right, 	double robX, double camX, double partX,
+																	double robY, double camY, double partY,
+																	double robPsi, double camPsi, double partPsi);
+	void WriteData(double increment_left, double increment_right, cv::Mat img);
+	void WriteData(double increment_left, double increment_right, 	double robX, double robY, double robPsi, cv::Mat img);
+	void WriteData(double increment_left, double increment_right, 	double robX, double camX, double partX,
+																	double robY, double camY, double partY,
+																	double robPsi, double camPsi, double partPsi, cv::Mat img);
+	void WriteData(double increment_left, double increment_right, 	double robX, double camX,
+																	double robY, double camY,
+																	double robPsi, double camPsi, cv::Mat img);
+
+
 protected:
 	int img_counter_;
 	int width_numeric_entry_;
@@ -47,6 +57,9 @@ protected:
 	std::string blank_entry_;
 	std::string WriteImg(cv::Mat img);
 	void WriteData(std::string imgName);
+	std::string Header();
+	std::vector<cv::Mat> imgBuffer;
+	std::vector<std::string> imgNameBuffer;
 };
 
 

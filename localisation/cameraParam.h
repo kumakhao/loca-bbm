@@ -9,13 +9,13 @@
 #define CAMERAPARAM_H_
 
 #include <opencv.hpp>
-#include <osg/Node>
-#include <osgViewer/Viewer>
+#include <osg/Matrix>
 
 class cameraParam{
 public:
 	cv::Mat intrMat; //intrinsic parameter matrix
 	cv::Mat rotMat; //rotation matrix
+	//cv::Mat rotv; //rotation as Rodrigues Vector
 	cv::Mat rotMat4x4;
 	cv::Mat rotMat_World2Robot; //rotation matrix
 	cv::Mat rotMat_Robot2CameraCV;
