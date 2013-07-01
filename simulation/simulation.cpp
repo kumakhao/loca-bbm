@@ -75,8 +75,22 @@ void Simulation::Initialize() {
 		viewer_.addEventHandler(robotControlHandler);
 		pad_control_on_ = false;
 	}
+	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
+	traits->x = 40;
+	traits->y = 40;
+	traits->width = 1200;
+	traits->height = 600;
+	traits->windowDecoration = true;
+	traits->doubleBuffer = true;
+	traits->sharedContext = 0;
 
+	osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
 
+	viewer_.getCamera()->setGraphicsContext(gc);
+	viewer_.getCamera()->setViewport(0,0,traits->width,traits->height);
+	GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
+	viewer_.getCamera()->setDrawBuffer(buffer);
+	viewer_.getCamera()->setReadBuffer(buffer);
 	viewer_.getCamera()->setFinalDrawCallback(screen_shot_callback_);
 	viewer_.setSceneData( root_ );
 
@@ -86,7 +100,7 @@ void Simulation::Initialize() {
 	// A manipulator to follow the robot node.
 	osg::ref_ptr<osgGA::NodeTrackerManipulator> manipulator = new osgGA::NodeTrackerManipulator;
 	viewer_.setCameraManipulator(manipulator);
-	manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+	manipulator->setHomePosition(osg::Vec3(0, -1, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
 	manipulator->setTrackNode(robot_->getChild(0));
 	manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
 
