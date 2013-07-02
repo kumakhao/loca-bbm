@@ -75,22 +75,25 @@ void Simulation::Initialize() {
 		viewer_.addEventHandler(robotControlHandler);
 		pad_control_on_ = false;
 	}
+
 	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
 	traits->x = 40;
 	traits->y = 40;
-	traits->width = 1200;
-	traits->height = 600;
+	traits->width = 1920;
+	traits->height = 1080;
 	traits->windowDecoration = true;
 	traits->doubleBuffer = true;
 	traits->sharedContext = 0;
 
 	osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
 
-	viewer_.getCamera()->setGraphicsContext(gc);
+	viewer_.getCamera()->setDefaults();
+//	viewer_.getCamera()->setGraphicsContext(gc);
 	viewer_.getCamera()->setViewport(0,0,traits->width,traits->height);
-	GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
-	viewer_.getCamera()->setDrawBuffer(buffer);
-	viewer_.getCamera()->setReadBuffer(buffer);
+//	GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
+//	viewer_.getCamera()->setDrawBuffer(buffer);
+//	viewer_.getCamera()->setReadBuffer(buffer);
+
 	viewer_.getCamera()->setFinalDrawCallback(screen_shot_callback_);
 	viewer_.setSceneData( root_ );
 
@@ -100,7 +103,7 @@ void Simulation::Initialize() {
 	// A manipulator to follow the robot node.
 	osg::ref_ptr<osgGA::NodeTrackerManipulator> manipulator = new osgGA::NodeTrackerManipulator;
 	viewer_.setCameraManipulator(manipulator);
-	manipulator->setHomePosition(osg::Vec3(0, -1, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+	manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
 	manipulator->setTrackNode(robot_->getChild(0));
 	manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
 
@@ -111,6 +114,48 @@ void Simulation::Realize() {
 	// create the windows and start the required threads.
 	viewer_.realize();
 	take_picture_timer_ = cvGetTickCount();
+
+//	std::cout<<"Viewport.x: "<<viewer_.getCamera()->getViewport()->x()<<"  Viewport.y: "<<viewer_.getCamera()->getViewport()->y()<<std::endl;
+//
+//	std::cout<<"Traits: "<<std::endl;
+//	std::cout<<"   alpha: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->alpha<<std::endl;
+//	std::cout<<"   blue: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->blue<<std::endl;
+//	std::cout<<"   depth: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->depth<<std::endl;
+//	std::cout<<"   displayNum: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->displayNum<<std::endl;
+//	std::cout<<"   doubleBuffer: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->doubleBuffer<<std::endl;
+//	std::cout<<"   face: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->face<<std::endl;
+//	std::cout<<"   format: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->format<<std::endl;
+//	std::cout<<"   glContextFlags: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->glContextFlags<<std::endl;
+//	std::cout<<"   glContextProfileMask: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->glContextProfileMask<<std::endl;
+//	std::cout<<"   glContextVersion: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->glContextVersion<<std::endl;
+//	std::cout<<"   green: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->green<<std::endl;
+//	std::cout<<"   height: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->height<<std::endl;
+//	std::cout<<"   hostName: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->hostName<<std::endl;
+//	std::cout<<"   level: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->level<<std::endl;
+//	std::cout<<"   mipMapGeneration: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->mipMapGeneration<<std::endl;
+//	std::cout<<"   overrideRedirect: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->overrideRedirect<<std::endl;
+//	std::cout<<"   pbuffer: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->pbuffer<<std::endl;
+//	std::cout<<"   quadBufferStereo: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->quadBufferStereo<<std::endl;
+//	std::cout<<"   red: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->red<<std::endl;
+//	std::cout<<"   sampleBuffers: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->sampleBuffers<<std::endl;
+//	std::cout<<"   samples: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->samples<<std::endl;
+//	std::cout<<"   screenNum: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->screenNum<<std::endl;
+//	std::cout<<"   setInheritedWindowPixelFormat: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->setInheritedWindowPixelFormat<<std::endl;
+//	std::cout<<"   stencil: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->stencil<<std::endl;
+//	std::cout<<"   supportsResize: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->supportsResize<<std::endl;
+//	std::cout<<"   swapBarrier: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->swapBarrier<<std::endl;
+//	std::cout<<"   swapGroup: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->swapGroup<<std::endl;
+//	std::cout<<"   swapGroupEnabled: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->swapGroupEnabled<<std::endl;
+//	std::cout<<"   swapMethod: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->swapMethod<<std::endl;
+//	std::cout<<"   target: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->target<<std::endl;
+//	std::cout<<"   useCursor: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->useCursor<<std::endl;
+//	std::cout<<"   useMultiThreadedOpenGLEngine: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->useMultiThreadedOpenGLEngine<<std::endl;
+//	std::cout<<"   vsync: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->vsync<<std::endl;
+//	std::cout<<"   width: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->width<<std::endl;
+//	std::cout<<"   windowDecoration: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->windowDecoration<<std::endl;
+//	std::cout<<"   windowName: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->windowName<<std::endl;
+//	std::cout<<"   x: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->x<<std::endl;
+//	std::cout<<"   y: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->y<<std::endl;
 
 	//osg::Matrix MVPW = viewMatrix*projectionMatrix*windowMatrix;
 	setup_done_ = true;
