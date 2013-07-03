@@ -49,7 +49,7 @@ void localisation::Particle::observeImg(cv::Mat* img) {
 //		cv::rectangle(*img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
 //	std::ostringstream s;
 //	s<<"Gewichtung: "<<p;
-//	cv::putText(*img, s.str(), cvPoint(30,700),
+//	cv::putText(*img, s.str(), cvPoint(30,500),
 //		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
 }
 
