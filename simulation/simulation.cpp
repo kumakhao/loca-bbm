@@ -34,6 +34,10 @@ void Simulation::Initialize() {
 	root_->addChild(hud_.getGroup());
 	screen_shot_callback_ = new ScreenShotCallback();
 	root_->addUpdateCallback(new Particles::ParticleNodeCallback());
+	osgViewer::View* view_robot = new osgViewer::View;
+	osgViewer::View* view_fix = new osgViewer::View;
+	viewer_.addView(view_robot);
+	viewer_.addView(view_fix);
 
 	if(particles_on_){
 		particle_view_ = new Particles();
@@ -72,10 +76,21 @@ void Simulation::Initialize() {
 	if( (!pad_control_on_) || (!sixaxes_->isActiv()) ){
 		KeyboardEventHandler* robotControlHandler;
 		robotControlHandler = new KeyboardEventHandler((RobotData*)robot_->getUserData());
-		viewer_.addEventHandler(robotControlHandler);
+		view_robot->addEventHandler(robotControlHandler);
 		pad_control_on_ = false;
 	}
 
+
+	{
+		view_robot->setSceneData(root_);
+		view_robot->setUpViewInWindow(10,10,800,600);
+		osg::ref_ptr<osgGA::NodeTrackerManipulator> manipulator = new osgGA::NodeTrackerManipulator;
+		manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+		manipulator->setTrackNode(robot_->getChild(0));
+		manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
+		view_robot->setCameraManipulator(manipulator);
+		view_robot->getCamera()->setFinalDrawCallback(screen_shot_callback_);
+	}
 //	{
 //		osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
 //		traits->x = 0;
@@ -100,49 +115,56 @@ void Simulation::Initialize() {
 //		// add this slave camera to the viewer, with a shift left of the projection matrix
 //		viewer_.addSlave(camera.get(), osg::Matrixd::translate(0.0,0.0,0.0), osg::Matrixd());
 //	}
+//
+//	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
+//	traits->x = 0;
+//	traits->y = 0;
+//	traits->width = 800;
+//	traits->height = 600;
+//	traits->windowDecoration = true;
+//	traits->doubleBuffer = true;
+//	traits->sharedContext = 0;
+//
+//	osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
+//
+//	viewer_.getCamera()->setDefaults();
+//	viewer_.getCamera()->setGraphicsContext(gc);
+//	viewer_.getCamera()->setViewport(0,0,traits->width,traits->height);
+//	GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
+//	viewer_.getCamera()->setDrawBuffer(buffer);
+//	viewer_.getCamera()->setReadBuffer(buffer);
+//
+//	viewer_.getCamera()->setFinalDrawCallback(screen_shot_callback_);
+//	viewer_.setSceneData( root_ );
 
-	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
-	traits->x = 0;
-	traits->y = 0;
-	traits->width = 800;
-	traits->height = 600;
-	traits->windowDecoration = true;
-	traits->doubleBuffer = true;
-	traits->sharedContext = 0;
-
-	osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
-
-	viewer_.getCamera()->setDefaults();
-	viewer_.getCamera()->setGraphicsContext(gc);
-	viewer_.getCamera()->setViewport(0,0,traits->width,traits->height);
-	GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
-	viewer_.getCamera()->setDrawBuffer(buffer);
-	viewer_.getCamera()->setReadBuffer(buffer);
-
-	viewer_.getCamera()->setFinalDrawCallback(screen_shot_callback_);
-	viewer_.setSceneData( root_ );
 
     {
-        osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
-        traits->x = 800;
-        traits->y = 100;
-        traits->width = 320;
-        traits->height = 200;
-        traits->windowDecoration = true;
-        traits->doubleBuffer = true;
-        traits->sharedContext = 0;
-
-        osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
-
-        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
-        camera->setGraphicsContext(gc.get());
-        camera->setViewport(new osg::Viewport(0,0, traits->width, traits->height));
-        GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
-        camera->setDrawBuffer(buffer);
-        camera->setReadBuffer(buffer);
-
-        // add this slave camera to the viewer, with a shift left of the projection matrix
-        viewer_.addSlave(camera.get(), osg::Matrixd::translate(0.0,0.0,0.0), osg::Matrixd());
+    	view_fix->setSceneData(root_);
+		view_fix->setUpViewInWindow(820,10,320,320);
+		osg::ref_ptr<osgGA::TrackballManipulator> track_mani = new osgGA::TrackballManipulator;
+		track_mani->setHomePosition(osg::Vec3(0, 0, 23), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+		//view_fix->getCameraManipulator()->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+		view_fix->setCameraManipulator( track_mani );
+//        osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
+//        traits->x = 800;
+//        traits->y = 100;
+//        traits->width = 320;
+//        traits->height = 200;
+//        traits->windowDecoration = true;
+//        traits->doubleBuffer = true;
+//        traits->sharedContext = 0;
+//
+//        osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
+//
+//        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
+//        camera->setGraphicsContext(gc.get());
+//        camera->setViewport(new osg::Viewport(0,0, traits->width, traits->height));
+//        GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
+//        camera->setDrawBuffer(buffer);
+//        camera->setReadBuffer(buffer);
+//
+//        // add this slave camera to the viewer, with a shift left of the projection matrix
+//        viewer_.addSlave(camera.get(), osg::Matrixd::translate(0.0,0.0,0.0), osg::Matrixd());
     }
 
 	// attach a trackball manipulator to all user control of the view
@@ -152,11 +174,11 @@ void Simulation::Initialize() {
 	//viewer_.getCamera()->setViewMatrix(osg::Matrix::lookAt(osg::Vec3(0, -30, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0)));
 
 	// A manipulator to follow the robot node.
-	osg::ref_ptr<osgGA::NodeTrackerManipulator> manipulator = new osgGA::NodeTrackerManipulator;
-	manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
-	manipulator->setTrackNode(robot_->getChild(0));
-	manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
-	viewer_.setCameraManipulator(manipulator);
+//	osg::ref_ptr<osgGA::NodeTrackerManipulator> manipulator = new osgGA::NodeTrackerManipulator;
+//	manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+//	manipulator->setTrackNode(robot_->getChild(0));
+//	manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
+//	viewer_.setCameraManipulator(manipulator);
 
 
 }
@@ -224,7 +246,7 @@ void Simulation::Step() {
 	robotdata_ = dynamic_cast<RobotData*> (robot_->getUserData());
 
 //	viewer_.getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
-//	view_matrix_ = viewer_.getCamera()->getViewMatrix();
+	view_matrix_ = viewer_.getView(0)->getCamera()->getViewMatrix();
 //	osg::Matrix windowMatrix = viewer_.getCamera()->getViewport()->computeWindowMatrix();
 //	osg::Matrix projectionMatrix = viewer_.getCamera()->getProjectionMatrix();
 //	osg::Matrix mat = projectionMatrix*windowMatrix;

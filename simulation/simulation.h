@@ -12,6 +12,7 @@
 #include <opencv.hpp>
 #include <osg/Node>
 #include <osg/Texture2D>
+#include <osgViewer/CompositeViewer>
 
 //
 //
@@ -81,7 +82,7 @@ private:
 	osg::Matrix view_matrix_;
 //	osg::Matrixd projectionMatrix;
 	osg::Vec3d view_matrix_eye_, view_matrix_center_, view_matrix_up_;
-	osgViewer::Viewer viewer_;
+	osgViewer::CompositeViewer viewer_;
 
 	landmarkSet landmarks_;
 	ScreenShotCallback *screen_shot_callback_;
