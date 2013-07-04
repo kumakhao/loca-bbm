@@ -35,9 +35,9 @@ void Simulation::Initialize() {
 	screen_shot_callback_ = new ScreenShotCallback();
 	root_->addUpdateCallback(new Particles::ParticleNodeCallback());
 	osgViewer::View* view_robot = new osgViewer::View;
-	osgViewer::View* view_fix = new osgViewer::View;
+	osgViewer::View* view_map = new osgViewer::View;
 	viewer_.addView(view_robot);
-	viewer_.addView(view_fix);
+	viewer_.addView(view_map);
 
 	if(particles_on_){
 		particle_view_ = new Particles();
@@ -139,12 +139,12 @@ void Simulation::Initialize() {
 
 
     {
-    	view_fix->setSceneData(root_);
-		view_fix->setUpViewInWindow(820,10,320,320);
+    	view_map->setSceneData(root_);
+		view_map->setUpViewInWindow(820,10,320,320);
 		osg::ref_ptr<osgGA::TrackballManipulator> track_mani = new osgGA::TrackballManipulator;
 		track_mani->setHomePosition(osg::Vec3(0, 0, 23), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
 		//view_fix->getCameraManipulator()->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
-		view_fix->setCameraManipulator( track_mani );
+		view_map->setCameraManipulator( track_mani );
 //        osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
 //        traits->x = 800;
 //        traits->y = 100;
@@ -245,10 +245,10 @@ void Simulation::Step() {
 	step_counter_ ++;
 	robotdata_ = dynamic_cast<RobotData*> (robot_->getUserData());
 
-//	viewer_.getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
+	viewer_.getView(0)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
 	view_matrix_ = viewer_.getView(0)->getCamera()->getViewMatrix();
-//	osg::Matrix windowMatrix = viewer_.getCamera()->getViewport()->computeWindowMatrix();
-//	osg::Matrix projectionMatrix = viewer_.getCamera()->getProjectionMatrix();
+//	osg::Matrix windowMatrix = viewer_.getView(0)->getCamera()->getViewport()->computeWindowMatrix();
+//	osg::Matrix projectionMatrix = viewer_.getView(0)->getCamera()->getProjectionMatrix();
 //	osg::Matrix mat = projectionMatrix*windowMatrix;
 //	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
 
@@ -264,14 +264,6 @@ void Simulation::Step() {
 		// Write position, orientation and image to log file.
 		//dataWriter->writeData(robotData->incrementeLeft, robotData->incrementeRight, robotData->posX,robotData->posY,robotData->psi, cvImg);
 		//data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_, view_matrix_eye_[0],view_matrix_eye_[1],asin(view_matrix_(0,0)),  cvImg);
-//		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
-//												robotdata_->x_pos_, view_matrix_eye_[0],
-//												robotdata_->y_pos_, view_matrix_eye_[1],
-//												robotdata_->psi_, asin(view_matrix_(0,0)), cvImg);
-//		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
-//														robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
-//														robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
-//														robotdata_->psi_, asin(view_matrix_(0,0)), localisation_->particles.at(0).psi, cvImg);
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
 												robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
 												robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,

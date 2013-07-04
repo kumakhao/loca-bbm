@@ -15,7 +15,7 @@ HUD::HUD() {
 	projectionMatrix = new osg::Projection();
 	textGeode = new osg::Geode();
 	text = new osgText::Text();
-
+	text->setDataVariance(osg::Object::DYNAMIC);
 	matrixTransform->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 
 	//Add the projection matrix to this transform
