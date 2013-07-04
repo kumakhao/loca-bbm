@@ -59,6 +59,7 @@ int main(){
 		mainSim.enablePadControl();
 		mainSim.Initialize();
 		mainSim.Realize();
+		mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectory.txt");
 		while(!mainSim.done()){
 			mainSim.Step();
 			usleep(10000);
@@ -69,6 +70,7 @@ int main(){
 //			std::cout<<"Y: "<<position.at(2)<<" | VAR: "<<position.at(3)<<std::endl;
 
 		}
+		mainSim.WriteRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectory.txt");
 		mainSim.CleanUp();
 		break;
 	case 2:

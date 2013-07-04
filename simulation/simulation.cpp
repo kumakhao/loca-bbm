@@ -24,6 +24,7 @@ Simulation::Simulation():
 	data_to_file_writer_("/home/josef/workspace/Loca-Projekt/pictures/","locaDatafile.txt"),
 	sixaxes_(NULL)
 {
+	trajectory_from_file_.clear();
 }
 
 void Simulation::Initialize() {
@@ -70,7 +71,6 @@ void Simulation::Initialize() {
 
 	}
 
-	// Declare a 'viewer'
 	if(pad_control_on_)
 		sixaxes_ = new cJoystick();
 	if( (!pad_control_on_) || (!sixaxes_->isActiv()) ){
@@ -84,87 +84,24 @@ void Simulation::Initialize() {
 	{
 		view_robot->setSceneData(root_);
 		view_robot->setUpViewInWindow(10,10,800,600);
-		osg::ref_ptr<osgGA::NodeTrackerManipulator> manipulator = new osgGA::NodeTrackerManipulator;
-		manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
-		manipulator->setTrackNode(robot_->getChild(0));
-		manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
-		view_robot->setCameraManipulator(manipulator);
+		osg::ref_ptr<osgGA::NodeTrackerManipulator> robot_camera_manipulator = new osgGA::NodeTrackerManipulator;
+		robot_camera_manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+		robot_camera_manipulator->setTrackNode(robot_->getChild(0));
+		robot_camera_manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
+		view_robot->setCameraManipulator(robot_camera_manipulator);
 		view_robot->getCamera()->setFinalDrawCallback(screen_shot_callback_);
 	}
-//	{
-//		osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
-//		traits->x = 0;
-//		traits->y = 0;
-//		traits->width = 800;
-//		traits->height = 600;
-//		traits->windowDecoration = true;
-//		traits->doubleBuffer = true;
-//		traits->sharedContext = 0;
-//
-//		osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
-//
-//		osg::ref_ptr<osg::Camera> camera = new osg::Camera;
-//		camera->setGraphicsContext(gc.get());
-//		camera->setViewport(new osg::Viewport(0,0, traits->width, traits->height));
-//		GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
-//		camera->setDrawBuffer(buffer);
-//		camera->setReadBuffer(buffer);
-//
-//		camera->setFinalDrawCallback(screen_shot_callback_);
-//
-//		// add this slave camera to the viewer, with a shift left of the projection matrix
-//		viewer_.addSlave(camera.get(), osg::Matrixd::translate(0.0,0.0,0.0), osg::Matrixd());
-//	}
-//
-//	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
-//	traits->x = 0;
-//	traits->y = 0;
-//	traits->width = 800;
-//	traits->height = 600;
-//	traits->windowDecoration = true;
-//	traits->doubleBuffer = true;
-//	traits->sharedContext = 0;
-//
-//	osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
-//
-//	viewer_.getCamera()->setDefaults();
-//	viewer_.getCamera()->setGraphicsContext(gc);
-//	viewer_.getCamera()->setViewport(0,0,traits->width,traits->height);
-//	GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
-//	viewer_.getCamera()->setDrawBuffer(buffer);
-//	viewer_.getCamera()->setReadBuffer(buffer);
-//
-//	viewer_.getCamera()->setFinalDrawCallback(screen_shot_callback_);
-//	viewer_.setSceneData( root_ );
-
 
     {
     	view_map->setSceneData(root_);
 		view_map->setUpViewInWindow(820,10,320,320);
-		osg::ref_ptr<osgGA::TrackballManipulator> track_mani = new osgGA::TrackballManipulator;
-		track_mani->setHomePosition(osg::Vec3(0, 0, 23), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+		osg::ref_ptr<osgGA::NodeTrackerManipulator> map_camera_manipulator = new osgGA::NodeTrackerManipulator;
+		//osg::ref_ptr<osgGA::TrackballManipulator> trackball_mani = new osgGA::TrackballManipulator;
+		map_camera_manipulator->setHomePosition(osg::Vec3(0, 0, 23), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+		map_camera_manipulator->setTrackNode(robot_->getChild(0));
+		map_camera_manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER);
 		//view_fix->getCameraManipulator()->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
-		view_map->setCameraManipulator( track_mani );
-//        osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
-//        traits->x = 800;
-//        traits->y = 100;
-//        traits->width = 320;
-//        traits->height = 200;
-//        traits->windowDecoration = true;
-//        traits->doubleBuffer = true;
-//        traits->sharedContext = 0;
-//
-//        osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
-//
-//        osg::ref_ptr<osg::Camera> camera = new osg::Camera;
-//        camera->setGraphicsContext(gc.get());
-//        camera->setViewport(new osg::Viewport(0,0, traits->width, traits->height));
-//        GLenum buffer = traits->doubleBuffer ? GL_BACK : GL_FRONT;
-//        camera->setDrawBuffer(buffer);
-//        camera->setReadBuffer(buffer);
-//
-//        // add this slave camera to the viewer, with a shift left of the projection matrix
-//        viewer_.addSlave(camera.get(), osg::Matrixd::translate(0.0,0.0,0.0), osg::Matrixd());
+		view_map->setCameraManipulator( map_camera_manipulator );
     }
 
 	// attach a trackball manipulator to all user control of the view
@@ -262,8 +199,6 @@ void Simulation::Step() {
 		observedImg_ = &cvCopyImg;
 
 		// Write position, orientation and image to log file.
-		//dataWriter->writeData(robotData->incrementeLeft, robotData->incrementeRight, robotData->posX,robotData->posY,robotData->psi, cvImg);
-		//data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_, view_matrix_eye_[0],view_matrix_eye_[1],asin(view_matrix_(0,0)),  cvImg);
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
 												robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
 												robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
@@ -283,15 +218,6 @@ void Simulation::Step() {
 			particle_view_->Update(localisation_->getParticles());
 		}
 		// writes the current position and orientation of the robot to file.
-		//dataWriter->writeData(robotData->incrementeLeft, robotData->incrementeRight, robotData->posX,robotData->posY,robotData->psi);
-//		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
-//										view_matrix_eye_[0],
-//										view_matrix_eye_[1],
-//										asin(view_matrix_(0,0)));
-//		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
-//										robotdata_->x_pos_, view_matrix_eye_[0],
-//										robotdata_->y_pos_, view_matrix_eye_[1],
-//										robotdata_->psi_, asin(view_matrix_(0,0)));
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
 														robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
 														robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
@@ -303,11 +229,11 @@ void Simulation::Step() {
 	UpdateHUD();
 
 	// without pad_control pictures are taken every 2sec
-	if(!pad_control_on_ && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>2000) ){
-		screen_shot_callback_->queueShot();
-		picture_processed_ = false;
-		take_picture_timer_ = cvGetTickCount();
-	}
+//	if(!pad_control_on_ && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>2000) ){
+//		screen_shot_callback_->queueShot();
+//		picture_processed_ = false;
+//		take_picture_timer_ = cvGetTickCount();
+//	}
 	if(pad_control_on_){
 		if(picture_processed_ && !take_picture_button_pressed_ && sixaxes_->buttonPressed(BUTTON_CIRCLE)){
 				// Every 2 sec a Shot is queued to get a picture form the scene.
@@ -330,7 +256,44 @@ void Simulation::Step() {
 			robotdata_->speed_ = 0.0;
 			robotdata_->psi_speed_ = 0.0;
 		}
+		if(sixaxes_->buttonPressed(BUTTON_TRIANGLE)){
+			while(viewer_.areThreadsRunning()){
+				viewer_.stopThreading();
+			}
+			viewer_.setDone(true);
+		}
 	}
+
+	if(!trajectory_from_file_.empty()){
+		double temp = trajectory_from_file_.front();
+		if(temp<1){
+			screen_shot_callback_->queueShot();
+			picture_processed_ = false;
+		}
+		trajectory_from_file_.erase(trajectory_from_file_.begin());
+
+		temp = trajectory_from_file_.front();
+		if(temp>0){
+			while(viewer_.areThreadsRunning()){
+				viewer_.stopThreading();
+			}
+			viewer_.setDone(true);
+		}
+		trajectory_from_file_.erase(trajectory_from_file_.begin());
+
+		temp = trajectory_from_file_.front();
+		robotdata_->speed_ = temp;
+		trajectory_from_file_.erase(trajectory_from_file_.begin());
+
+		temp = trajectory_from_file_.front();
+		robotdata_->psi_speed_ = temp;
+		trajectory_from_file_.erase(trajectory_from_file_.begin());
+	}
+	trajectory_buffer_ << screen_shot_callback_->isPicTaken() << std::endl;
+	trajectory_buffer_ << viewer_.done() << std::endl;
+	trajectory_buffer_ << robotdata_->speed_ << std::endl;
+	trajectory_buffer_ << robotdata_->psi_speed_ << std::endl;
+	//trajectory_buffer_ << "------------------" << std::endl;
 }
 
 double Simulation::getRobX() {
@@ -520,9 +483,9 @@ osg::Group* Simulation::SetupScene() {
 	leinwandFaceTexture03->setDataVariance(osg::Object::DYNAMIC);
 
 	// load an image by reading a file:
-	osg::Image* leinwandFace01 = osgDB::readImageFile("/home/josef/workspace/test/wall1.jpg");
-	osg::Image* leinwandFace02 = osgDB::readImageFile("/home/josef/workspace/test/wall2.jpg");
-	osg::Image* leinwandFace03 = osgDB::readImageFile("/home/josef/workspace/test/wall3.jpg");
+	osg::Image* leinwandFace01 = osgDB::readImageFile("/home/josef/workspace/test/wall1_1024.jpg");
+	osg::Image* leinwandFace02 = osgDB::readImageFile("/home/josef/workspace/test/wall2_1024.jpg");
+	osg::Image* leinwandFace03 = osgDB::readImageFile("/home/josef/workspace/test/wall3_1024.jpg");
 //		osg::Image* leinwandFace01 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_01.png");
 //		osg::Image* leinwandFace02 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_02.png");
 //		osg::Image* leinwandFace03 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_03.png");
@@ -601,6 +564,20 @@ void Simulation::CleanUp() {
 void Simulation::Dynamic() {
 }
 
+void Simulation::ReadRobotTrajectory(std::string path) {
+	std::ifstream datafile;
+	std::string line;
+	datafile.open(path.c_str(), std::ios_base::in);
+	if(datafile.is_open()){
+		trajectory_from_file_.clear();
+		while(datafile.good()){
+			getline(datafile,line);
+			trajectory_from_file_.push_back(std::atof(line.c_str()));
+		}
+		datafile.close();
+	}
+}
+
 void Simulation::UpdateHUD() {
 	std::stringstream hud_text;
 	hud_text <<    "True Position: (x "<<robotdata_->x_pos_<<
@@ -616,6 +593,14 @@ void Simulation::UpdateHUD() {
 					"   Observe Highscore: "<<localisation_->highscore<<"("<<localisation_->highscore_count<<")";
 	hud_.setText(hud_text.str());
 }
+
+void Simulation::WriteRobotTrajectory(std::string path) {
+	std::ofstream datafile;
+	datafile.open (path.c_str(), std::ios_base::out);
+	datafile << trajectory_buffer_.str();
+	datafile.close();
+}
+
 
 
 

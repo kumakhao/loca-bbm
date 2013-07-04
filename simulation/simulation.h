@@ -46,6 +46,8 @@ public:
 	void setLocalisation(localisation *loca);
 	void setObserveMode(ObserveMode mode);
 	void enablePadControl();
+	void WriteRobotTrajectory(std::string path);
+	void ReadRobotTrajectory(std::string path);
 	double getRobX();
 	double getRobY();
 	double getRobPsi();
@@ -74,25 +76,27 @@ private:
 	double step_counter_;
 	double view_matrix_distance_;
 
+	std::stringstream trajectory_buffer_;
+	std::vector<double> trajectory_from_file_;
 	int64 take_picture_timer_;
 
 	osg::Group *robot_;
 	osg::Group *root_;
-	HUD hud_;
 	osg::Matrix view_matrix_;
 //	osg::Matrixd projectionMatrix;
 	osg::Vec3d view_matrix_eye_, view_matrix_center_, view_matrix_up_;
 	osgViewer::CompositeViewer viewer_;
 
+	cv::Mat *observedImg_;
+
 	landmarkSet landmarks_;
+	HUD hud_;
 	ScreenShotCallback *screen_shot_callback_;
 	localisation *localisation_;
 	Particles *particle_view_;
 	DataWriter data_to_file_writer_;
 	RobotData *robotdata_;
 	cJoystick *sixaxes_;
-	cv::Mat *observedImg_;
-
 };
 
 
