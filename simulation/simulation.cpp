@@ -25,6 +25,7 @@ Simulation::Simulation():
 	sixaxes_(NULL)
 {
 	trajectory_from_file_.clear();
+	//viewer_.setThreadingModel(osgViewer::CompositeViewer::ThreadingModel::SingleThreaded);
 }
 
 void Simulation::Initialize() {
@@ -39,6 +40,19 @@ void Simulation::Initialize() {
 	osgViewer::View* view_map = new osgViewer::View;
 	viewer_.addView(view_robot);
 	viewer_.addView(view_map);
+
+	//TODO light test
+	{
+		mylightsource = new osg::LightSource();
+		osg::Light *mylight = new osg::Light();
+		mylight->setLightNum(0);
+		mylightsource->setLight(mylight);
+		root_->addChild(mylightsource);
+		mylightsource->setStateSetModes(*root_->getOrCreateStateSet(), osg::StateAttribute::ON);
+		mylight->setAmbient(osg::Vec4d(0.0, 0.0, 0.0, 1.0));
+		mylight->setDiffuse(osg::Vec4d(1.0, 1.0, 1.0, 1.0));
+		mylight->setPosition(osg::Vec4d(0.0, 0.0, 10.0, 1.0));
+	}
 
 	if(particles_on_){
 		particle_view_ = new Particles();
@@ -126,48 +140,6 @@ void Simulation::Realize() {
 	viewer_.realize();
 	take_picture_timer_ = cvGetTickCount();
 
-//	std::cout<<"Viewport.x: "<<viewer_.getCamera()->getViewport()->x()<<"  Viewport.y: "<<viewer_.getCamera()->getViewport()->y()<<std::endl;
-//
-//	std::cout<<"Traits: "<<std::endl;
-//	std::cout<<"   alpha: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->alpha<<std::endl;
-//	std::cout<<"   blue: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->blue<<std::endl;
-//	std::cout<<"   depth: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->depth<<std::endl;
-//	std::cout<<"   displayNum: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->displayNum<<std::endl;
-//	std::cout<<"   doubleBuffer: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->doubleBuffer<<std::endl;
-//	std::cout<<"   face: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->face<<std::endl;
-//	std::cout<<"   format: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->format<<std::endl;
-//	std::cout<<"   glContextFlags: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->glContextFlags<<std::endl;
-//	std::cout<<"   glContextProfileMask: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->glContextProfileMask<<std::endl;
-//	std::cout<<"   glContextVersion: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->glContextVersion<<std::endl;
-//	std::cout<<"   green: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->green<<std::endl;
-//	std::cout<<"   height: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->height<<std::endl;
-//	std::cout<<"   hostName: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->hostName<<std::endl;
-//	std::cout<<"   level: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->level<<std::endl;
-//	std::cout<<"   mipMapGeneration: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->mipMapGeneration<<std::endl;
-//	std::cout<<"   overrideRedirect: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->overrideRedirect<<std::endl;
-//	std::cout<<"   pbuffer: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->pbuffer<<std::endl;
-//	std::cout<<"   quadBufferStereo: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->quadBufferStereo<<std::endl;
-//	std::cout<<"   red: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->red<<std::endl;
-//	std::cout<<"   sampleBuffers: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->sampleBuffers<<std::endl;
-//	std::cout<<"   samples: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->samples<<std::endl;
-//	std::cout<<"   screenNum: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->screenNum<<std::endl;
-//	std::cout<<"   setInheritedWindowPixelFormat: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->setInheritedWindowPixelFormat<<std::endl;
-//	std::cout<<"   stencil: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->stencil<<std::endl;
-//	std::cout<<"   supportsResize: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->supportsResize<<std::endl;
-//	std::cout<<"   swapBarrier: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->swapBarrier<<std::endl;
-//	std::cout<<"   swapGroup: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->swapGroup<<std::endl;
-//	std::cout<<"   swapGroupEnabled: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->swapGroupEnabled<<std::endl;
-//	std::cout<<"   swapMethod: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->swapMethod<<std::endl;
-//	std::cout<<"   target: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->target<<std::endl;
-//	std::cout<<"   useCursor: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->useCursor<<std::endl;
-//	std::cout<<"   useMultiThreadedOpenGLEngine: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->useMultiThreadedOpenGLEngine<<std::endl;
-//	std::cout<<"   vsync: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->vsync<<std::endl;
-//	std::cout<<"   width: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->width<<std::endl;
-//	std::cout<<"   windowDecoration: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->windowDecoration<<std::endl;
-//	std::cout<<"   windowName: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->windowName<<std::endl;
-//	std::cout<<"   x: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->x<<std::endl;
-//	std::cout<<"   y: "<<viewer_.getCamera()->getGraphicsContext()->getTraits()->y<<std::endl;
-
 	//osg::Matrix MVPW = viewMatrix*projectionMatrix*windowMatrix;
 	setup_done_ = true;
 }
@@ -178,7 +150,12 @@ void Simulation::Step() {
 	//   eventTraversal() that collects events and passes them on to the event handlers and event callbacks
 	//   updateTraversal() to calls the update callbacks
 	//   renderingTraversals() that runs syncronizes all the rendering threads (if any) and dispatch cull, draw and swap buffers
-	viewer_.frame();
+	//viewer_.frame();
+	viewer_.advance();
+	viewer_.eventTraversal();
+	viewer_.updateTraversal();
+	viewer_.renderingTraversals();
+
 	step_counter_ ++;
 	robotdata_ = dynamic_cast<RobotData*> (robot_->getUserData());
 
@@ -229,11 +206,11 @@ void Simulation::Step() {
 	UpdateHUD();
 
 	// without pad_control pictures are taken every 2sec
-//	if(!pad_control_on_ && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>2000) ){
-//		screen_shot_callback_->queueShot();
-//		picture_processed_ = false;
-//		take_picture_timer_ = cvGetTickCount();
-//	}
+	if(!pad_control_on_ && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>2000) ){
+		screen_shot_callback_->queueShot();
+		picture_processed_ = false;
+		take_picture_timer_ = cvGetTickCount();
+	}
 	if(pad_control_on_){
 		if(picture_processed_ && !take_picture_button_pressed_ && sixaxes_->buttonPressed(BUTTON_CIRCLE)){
 				// Every 2 sec a Shot is queued to get a picture form the scene.

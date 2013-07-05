@@ -86,7 +86,7 @@ private:
 //	osg::Matrixd projectionMatrix;
 	osg::Vec3d view_matrix_eye_, view_matrix_center_, view_matrix_up_;
 	osgViewer::CompositeViewer viewer_;
-
+	osg::LightSource *mylightsource;
 	cv::Mat *observedImg_;
 
 	landmarkSet landmarks_;

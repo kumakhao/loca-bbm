@@ -232,8 +232,8 @@ osg::Group* SetupRobot()
 
 	// Declare and initialize a Vec3 instance to change the
 	// position of the robot model in the scene
-	osg::Vec3 tank_position(0,0,0);
-	robotXform->setPosition( tank_position );
+	osg::Vec3 robot_position(0,0,0);
+	robotXform->setPosition( robot_position );
 	robotXform->setAttitude(osg::Quat(0, osg::Vec3d(0.0, 0.0, 1.0)));
 
 	//set userData for the transformation used by a Callback

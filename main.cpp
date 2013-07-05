@@ -70,7 +70,7 @@ int main(){
 //			std::cout<<"Y: "<<position.at(2)<<" | VAR: "<<position.at(3)<<std::endl;
 
 		}
-		mainSim.WriteRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectory.txt");
+		//mainSim.WriteRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectory.txt");
 		mainSim.CleanUp();
 		break;
 	case 2:
