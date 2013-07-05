@@ -105,7 +105,7 @@ DataWriter::DataWriter(std::string pic_path, std::string file_path):
 				blank_entry_("BLANK")
 {
 
-	WriteData(Header());
+	Header();
 }
 
 void DataWriter::WriteData(double increment_left, double increment_right,
@@ -230,7 +230,7 @@ void DataWriter::SaveImages() {
 	}
 }
 
-std::string DataWriter::Header() {
+void DataWriter::Header() {
 	std::ostringstream header;
 	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incLeft" << delimiter_;
 	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incRight" << delimiter_;
@@ -249,8 +249,11 @@ std::string DataWriter::Header() {
 
 	header << "imageFile";
 
-	return header.str();
-
+	header << "\n";
+	std::ofstream datafile;
+	datafile.open (datafile_path_.c_str(),std::ios_base::out);
+	datafile << header.str();
+	datafile.close();
 }
 
 

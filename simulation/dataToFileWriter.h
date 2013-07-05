@@ -23,7 +23,7 @@ public:
 		delimiter_("; "),
 		blank_entry_("BLANK")
 	{
-		WriteData(Header());
+		Header();
 		imgBuffer.clear();
 		imgNameBuffer.clear();
 	}
@@ -57,7 +57,7 @@ protected:
 	std::string blank_entry_;
 	std::string WriteImg(cv::Mat img);
 	void WriteData(std::string imgName);
-	std::string Header();
+	void Header();
 	std::vector<cv::Mat> imgBuffer;
 	std::vector<std::string> imgNameBuffer;
 };
