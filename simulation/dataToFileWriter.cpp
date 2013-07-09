@@ -99,12 +99,12 @@ void DataWriter::WriteData(std::string text) {
 DataWriter::DataWriter(std::string pic_path, std::string file_path):
 				img_counter_(0),
 				width_numeric_entry_(11),
-				path_(pic_path),
-				datafile_path_(file_path),
+				plotfile_path_("/home/josef/workspace/Loca-Projekt/plotData.txt"),
 				delimiter_("; "),
 				blank_entry_("BLANK")
 {
-
+	datafile_path_ = file_path;
+	path_ = pic_path;
 	Header();
 }
 
@@ -230,30 +230,72 @@ void DataWriter::SaveImages() {
 	}
 }
 
+void DataWriter::WritePlotData(double trueRobX, double trueRobY,
+		double trueRobPsi, double meanX, double meanY, double varX,
+		double varY, bool observe) {
+	std::ostringstream text;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobPsi << delimiter_;
+
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << meanX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << meanY << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << varX << delimiter_;
+	text << std::setw(width_numeric_entry_) << std::setfill(' ') << varY << delimiter_;
+	if(observe)
+		text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobX << delimiter_;
+	else
+		text << std::setw(width_numeric_entry_) << std::setfill(' ') << "noimage" << delimiter_;
+
+	text << "\n";
+	std::ofstream datafile;
+	datafile.open (plotfile_path_.c_str(),std::ios_base::app);
+	datafile << text.str();
+	datafile.close();
+}
+
 void DataWriter::Header() {
-	std::ostringstream header;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incLeft" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "incRight" << delimiter_;
+	std::ostringstream dataHeader;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "incLeft" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "incRight" << delimiter_;
 
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosX" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPosX" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPosX" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosX" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPosX" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPosX" << delimiter_;
 
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosY" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPosY" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPosY" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPosY" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPosY" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPosY" << delimiter_;
 
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPsi" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPsi" << delimiter_;
-	header << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPsi" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "robPsi" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "camPsi" << delimiter_;
+	dataHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "partPsi" << delimiter_;
 
-	header << "imageFile";
+	dataHeader << "imageFile";
 
-	header << "\n";
+	dataHeader << "\n";
 	std::ofstream datafile;
 	datafile.open (datafile_path_.c_str(),std::ios_base::out);
-	datafile << header.str();
+	datafile << dataHeader.str();
 	datafile.close();
+
+	std::ostringstream plotHeader;
+	plotHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "trueRobX" << delimiter_;
+	plotHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "trueRobY" << delimiter_;
+	plotHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "trueRobPsi" << delimiter_;
+
+	plotHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "meanX" << delimiter_;
+	plotHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "meanY" << delimiter_;
+	plotHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "varX" << delimiter_;
+	plotHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "varY" << delimiter_;
+
+	plotHeader << std::setw(width_numeric_entry_) << std::setfill(' ') << "Observe" << delimiter_;
+
+	plotHeader << "\n";
+	std::ofstream plotfile;
+	plotfile.open (plotfile_path_.c_str(),std::ios_base::out);
+	plotfile << plotHeader.str();
+	plotfile.close();
 }
 
 

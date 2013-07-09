@@ -20,6 +20,7 @@ public:
 		width_numeric_entry_(11),
 		path_("/home/josef/workspace/Loca-Projekt/pictures/"),
 		datafile_path_("/home/josef/workspace/Loca-Projekt/locaDatafile.txt"),
+		plotfile_path_("/home/josef/workspace/Loca-Projekt/plotData.txt"),
 		delimiter_("; "),
 		blank_entry_("BLANK")
 	{
@@ -46,6 +47,8 @@ public:
 	void WriteData(double increment_left, double increment_right, 	double robX, double camX,
 																	double robY, double camY,
 																	double robPsi, double camPsi, cv::Mat img);
+	void WritePlotData(	double trueRobX, double trueRobY, double trueRobPsi,
+							double meanX, double meanY, double varX, double varY, bool observe = false);
 
 
 protected:
@@ -53,6 +56,7 @@ protected:
 	int width_numeric_entry_;
 	std::string path_;
 	std::string datafile_path_;
+	std::string plotfile_path_;
 	std::string delimiter_;
 	std::string blank_entry_;
 	std::string WriteImg(cv::Mat img);

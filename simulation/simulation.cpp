@@ -12,7 +12,7 @@
 Simulation::Simulation():
 	particles_on_(false),
 	setup_done_(false),
-	picture_processed_(false),
+	picture_processed_(true),
 	pad_control_on_(false),
 	take_picture_button_pressed_(false),
 	observe_mode_(noObserve),
@@ -177,11 +177,14 @@ void Simulation::Step() {
 
 		// Write position, orientation and image to log file.
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
-												robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
-												robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
-												robotdata_->psi_, view_matrix_(0,0), localisation_->particles.at(0).psi, cvCopyImg);
-		// observe for particle filter is done here.
+												robotdata_->x_pos_, view_matrix_eye_[0], localisation_->getPosition().at(0),
+												robotdata_->y_pos_, view_matrix_eye_[1], localisation_->getPosition().at(2),
+												robotdata_->psi_, view_matrix_(0,0), localisation_->getOrientation().at(1), cvCopyImg);
 		Observe();
+		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
+											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
+											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3, true);
+		// observe for particle filter is done here.
 		picture_processed_ = true;
 	}
 
@@ -196,9 +199,12 @@ void Simulation::Step() {
 		}
 		// writes the current position and orientation of the robot to file.
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
-														robotdata_->x_pos_, view_matrix_eye_[0], localisation_->particles.at(0).xPos,
-														robotdata_->y_pos_, view_matrix_eye_[1], localisation_->particles.at(0).yPos,
-														robotdata_->psi_, view_matrix_(0,0), localisation_->particles.at(0).psi);
+														robotdata_->x_pos_, view_matrix_eye_[0], localisation_->getPosition().at(0),
+														robotdata_->y_pos_, view_matrix_eye_[1], localisation_->getPosition().at(2),
+														robotdata_->psi_, view_matrix_(0,0), localisation_->getOrientation().at(1));
+		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
+											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
+											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3);
 		old_increments_left_ = robotdata_->incremente_left_;
 		old_increments_right_ = robotdata_->incremente_right_;
 	}

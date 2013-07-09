@@ -225,9 +225,11 @@ std::vector<double> localisation::getPosition() {
 			varXPos += pow(particles.at(i).xPos-meanXPos,2);
 			varYPos += pow(particles.at(i).yPos-meanYPos,2);
 	}
+	varXPos = varXPos/particles.size();
+	varYPos = varYPos/particles.size();
 	pos.push_back(meanXPos);
-	pos.push_back(varXPos);
+	pos.push_back(sqrt(varXPos));
 	pos.push_back(meanYPos);
-	pos.push_back(varYPos);
+	pos.push_back(sqrt(varYPos));
 	return pos;
 }

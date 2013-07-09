@@ -21,7 +21,7 @@ class ScreenShotCallback : public osg::Camera::DrawCallback
         ScreenShotMaker() :
             old_w_(-1),
             old_h_(-1),
-            do_capture_img_(true)
+            do_capture_img_(false)
         {
         }
         void queueShot() { do_capture_img_=true; }

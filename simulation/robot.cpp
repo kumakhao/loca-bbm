@@ -19,7 +19,7 @@ RobotData::RobotData(osg::Node* n)
 	parameter_.kPsiSpeed = 0.5;
 	parameter_.kImpulesProMeter = 57694;
 	parameter_.kDistanceWheels = 0.07;
-	parameter_.kSigmaIncrement = 0.0;
+	parameter_.kSigmaIncrement = 0.2;
 	incremente_left_ = 0;
 	incremente_right_ = 0;
 	x_pos_ = 0;
@@ -95,8 +95,8 @@ void RobotData::UpdateIncrements()
 	double errIncR = 	parameter_.kSigmaIncrement
 						*sqrt(abs(deltaIncL)+abs(deltaIncR))
 						*RandomGaussian();
-	incremente_left_ += deltaIncL + errIncL;
-	incremente_right_ += deltaIncR + errIncR;
+	incremente_left_ += round(deltaIncL + errIncL);
+	incremente_right_ += round(deltaIncR + errIncR);
 }
 
 double RobotData::RandomUniform()
