@@ -21,6 +21,8 @@ Simulation::Simulation():
 	step_counter_(0.0),
 	view_matrix_distance_(0.0),
 	take_picture_timer_(0),
+	loop_time_(0),
+	loop_target_time_(33333),
 	data_to_file_writer_("/home/josef/workspace/Loca-Projekt/pictures/","locaDatafile.txt"),
 	sixaxes_(NULL)
 {
@@ -38,6 +40,13 @@ void Simulation::Initialize() {
 	root_->addUpdateCallback(new Particles::ParticleNodeCallback());
 	osgViewer::View* view_robot = new osgViewer::View;
 	osgViewer::View* view_map = new osgViewer::View;
+	//osgViewer::Viewer::ThreadingModel test;
+	std::cout<<"ThreadingModelbefore: "<<viewer_.getThreadingModel()<<std::endl;
+	viewer_.setThreadingModel((osgViewer::ViewerBase::ThreadingModel) 0);
+	std::cout<<"ThreadingModelafter: "<<viewer_.getThreadingModel()<<std::endl;
+	viewer_.setUpThreading();
+
+	viewer_.setUpThreading();
 	viewer_.addView(view_robot);
 	viewer_.addView(view_map);
 
@@ -139,7 +148,7 @@ void Simulation::Realize() {
 	// create the windows and start the required threads.
 	viewer_.realize();
 	take_picture_timer_ = cvGetTickCount();
-
+	loop_time_ = take_picture_timer_;
 	//osg::Matrix MVPW = viewMatrix*projectionMatrix*windowMatrix;
 	setup_done_ = true;
 }
@@ -150,7 +159,16 @@ void Simulation::Step() {
 	//   eventTraversal() that collects events and passes them on to the event handlers and event callbacks
 	//   updateTraversal() to calls the update callbacks
 	//   renderingTraversals() that runs syncronizes all the rendering threads (if any) and dispatch cull, draw and swap buffers
-	//viewer_.frame();
+
+	int64 tmptime = cvGetTickCount();
+	int64 difftime = (tmptime-loop_time_)/cvGetTickFrequency();
+	if(difftime < loop_target_time_){
+		usleep(loop_target_time_-difftime);
+		std::cout<<"sleeping"<<std::endl;
+		return;
+	}
+	loop_time_ = tmptime;
+
 	viewer_.advance();
 	viewer_.eventTraversal();
 	viewer_.updateTraversal();
@@ -232,8 +250,8 @@ void Simulation::Step() {
 		// If Padcontrol is enabled, the inputs from the pad are written to the robotData.
 		// That way the callback will use the inputs to move the robot.
 		if(sixaxes_->buttonPressed(BUTTON_L1) && sixaxes_->buttonPressed(BUTTON_R1)){
-			robotdata_->speed_ = sixaxes_->axis(AXIS_LY)*-2;
-			robotdata_->psi_speed_ = sixaxes_->axis(AXIS_RX)*-0.5;
+			robotdata_->speed_ = sixaxes_->axis(AXIS_LY)*-0.2;
+			robotdata_->psi_speed_ = sixaxes_->axis(AXIS_RX)*-0.05;
 		}
 		else{
 			robotdata_->speed_ = 0.0;
@@ -272,10 +290,12 @@ void Simulation::Step() {
 		robotdata_->psi_speed_ = temp;
 		trajectory_from_file_.erase(trajectory_from_file_.begin());
 	}
-	trajectory_buffer_ << screen_shot_callback_->isPicTaken() << std::endl;
-	trajectory_buffer_ << viewer_.done() << std::endl;
-	trajectory_buffer_ << robotdata_->speed_ << std::endl;
-	trajectory_buffer_ << robotdata_->psi_speed_ << std::endl;
+	else{
+		trajectory_buffer_ << screen_shot_callback_->isPicTaken() << std::endl;
+		trajectory_buffer_ << viewer_.done() << std::endl;
+		trajectory_buffer_ << robotdata_->speed_ << std::endl;
+		trajectory_buffer_ << robotdata_->psi_speed_ << std::endl;
+	}
 	//trajectory_buffer_ << "------------------" << std::endl;
 }
 
@@ -578,6 +598,10 @@ void Simulation::UpdateHUD() {
 }
 
 void Simulation::WriteRobotTrajectory(std::string path) {
+	if(trajectory_buffer_.str().length() == 0){
+		std::cout<<"abord writeTrajectory"<<std::endl;
+		return;
+	}
 	std::ofstream datafile;
 	datafile.open (path.c_str(), std::ios_base::out);
 	datafile << trajectory_buffer_.str();

@@ -15,8 +15,8 @@
 
 RobotData::RobotData(osg::Node* n)
 {
-	parameter_.kSpeed = 2;
-	parameter_.kPsiSpeed = 0.5;
+	parameter_.kSpeed = 0.1;
+	parameter_.kPsiSpeed = 0.05;
 	parameter_.kImpulesProMeter = 57694;
 	parameter_.kDistanceWheels = 0.07;
 	parameter_.kSigmaIncrement = 0.2;
@@ -43,14 +43,14 @@ void RobotData::UpdatePosition()
 //		sehnenStrecke = bogenStrecke;
 //	x_pos_ += sehnenStrecke*cos(psi_+dPsi);
 //	y_pos_ += sehnenStrecke*sin(psi_+dPsi);
-	x_pos_ += cos(psi_)*speed_*timer_.last_step_time_*0.000001;
-	y_pos_ += sin(psi_)*speed_*timer_.last_step_time_*0.000001;
+	x_pos_ += cos(psi_)*speed_;//*timer_.last_step_time_*0.000001;
+	y_pos_ += sin(psi_)*speed_;//*timer_.last_step_time_*0.000001;
 	robotXform_->setPosition(osg::Vec3(x_pos_,y_pos_,0));
 }
 
 void RobotData::UpdateOrientation()
 {
-	psi_ += psi_speed_*timer_.last_step_time_*0.000001;
+	psi_ += psi_speed_;//*timer_.last_step_time_*0.000001;
 	robotXform_->setAttitude(osg::Quat(psi_, osg::Vec3d(0.0, 0.0, 1.0)));
 }
 
@@ -75,17 +75,17 @@ void RobotData::RemovePsiSpeed()
 }
 void RobotData::UpdateIncrements()
 {
-	double deltaIncL = speed_*timer_.last_step_time_*0.000001	// speed -> distance
+	double deltaIncL = speed_//*timer_.last_step_time_*0.000001	// speed -> distance
 						*parameter_.kImpulesProMeter 			// distance -> impluses
 						-
-						psi_speed_*timer_.last_step_time_*0.000001	// rotSpeed -> rotAngle
+						psi_speed_//*timer_.last_step_time_*0.000001	// rotSpeed -> rotAngle
 						*parameter_.kDistanceWheels					// rotAngle -> arcLength
 						*parameter_.kImpulesProMeter				// arcLength -> impluses
 						/2.0;										// total impulses -> impulses for one wheel
-	double deltaIncR = speed_*timer_.last_step_time_*0.000001
+	double deltaIncR = speed_//*timer_.last_step_time_*0.000001
 						*parameter_.kImpulesProMeter
 						+
-						psi_speed_*timer_.last_step_time_*0.000001
+						psi_speed_//*timer_.last_step_time_*0.000001
 						*parameter_.kDistanceWheels
 						*parameter_.kImpulesProMeter
 						/2.0;

@@ -79,6 +79,8 @@ private:
 	std::stringstream trajectory_buffer_;
 	std::vector<double> trajectory_from_file_;
 	int64 take_picture_timer_;
+	int64 loop_time_;
+	int loop_target_time_;
 
 	osg::Group *robot_;
 	osg::Group *root_;

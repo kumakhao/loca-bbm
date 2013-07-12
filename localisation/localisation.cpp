@@ -18,8 +18,8 @@ localisation::Parameters::Parameters() :
 		sigmaGPS(0.05),
 		sigmaLandmarke(0.1),
 		sigmaIncrement(0.1),
-		sigmaDistance(0.1),
-		sigmaAngle(0.1) {
+		sigmaDistance(0.2),
+		sigmaAngle(0.2) {
 }
 
 void localisation::Particle::observeImg(cv::Mat* img) {
