@@ -75,6 +75,8 @@ void RobotData::RemovePsiSpeed()
 }
 void RobotData::UpdateIncrements()
 {
+	//TODO: The angle of each wheel (true "physical" state)
+	//should be computed and then saved befor conversion to increments.
 	double deltaIncL = speed_//*timer_.last_step_time_*0.000001	// speed -> distance
 						*parameter_.kImpulesProMeter 			// distance -> impluses
 						-

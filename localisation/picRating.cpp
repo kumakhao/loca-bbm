@@ -180,6 +180,7 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 	 * einen Gewichtungsfaktor: 1 = gute Übereinstimmung
 	 * 							0 = keine Übereinstimmung
 	 */
+	//TODO: Need to improve the rating function.
 	int whiteCount = 0;
 	double avgWhite = 0.0;
 	int blackCount = 0;

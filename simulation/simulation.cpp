@@ -163,8 +163,8 @@ void Simulation::Step() {
 	int64 tmptime = cvGetTickCount();
 	int64 difftime = (tmptime-loop_time_)/cvGetTickFrequency();
 	if(difftime < loop_target_time_){
+		std::cout<<"sleeping: "<<loop_target_time_-difftime<<std::endl;
 		usleep(loop_target_time_-difftime);
-		std::cout<<"sleeping"<<std::endl;
 		return;
 	}
 	loop_time_ = tmptime;
