@@ -92,7 +92,19 @@ public:
 	std::vector<localisation::Particle> getParticles();
 	std::vector<double> getPosition();
 	std::vector<double> getOrientation();
+	class EstimatedRobotPose{
+	public:
+		double x;
+		double y;
+		double psi;
 
+		double sigmaPsi;
+
+		double sigmaXYLarge;
+		double sigmaXYSmall;
+		double sigmaXYAngle;
+	};
+	localisation::EstimatedRobotPose getEstimatedRobotPose();
 };
 
 

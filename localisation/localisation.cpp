@@ -214,7 +214,7 @@ std::vector<double> localisation::getOrientation() {
 std::vector<double> localisation::getPosition() {
 	std::vector<double> pos;
 	double meanXPos = 0, meanYPos = 0;
-	double varXPos = 0, varYPos = 0;
+	double varXPos = 0, varYPos = 0, varXYPos = 0;
 	for (unsigned int i = 0; i < particles.size(); i++) {
 		meanXPos += particles.at(i).xPos;
 		meanYPos += particles.at(i).yPos;
@@ -224,12 +224,70 @@ std::vector<double> localisation::getPosition() {
 	for (unsigned int i = 0; i < particles.size(); i++) {
 			varXPos += pow(particles.at(i).xPos-meanXPos,2);
 			varYPos += pow(particles.at(i).yPos-meanYPos,2);
+			varXYPos += (particles.at(i).xPos-meanXPos)*(particles.at(i).yPos-meanYPos);
 	}
 	varXPos = varXPos/particles.size();
 	varYPos = varYPos/particles.size();
+	varXYPos = varXYPos/particles.size();
 	pos.push_back(meanXPos);
 	pos.push_back(sqrt(varXPos));
 	pos.push_back(meanYPos);
 	pos.push_back(sqrt(varYPos));
+	pos.push_back(sqrt(varXYPos));
 	return pos;
 }
+
+localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
+	//TODO: untested!
+	EstimatedRobotPose es = new EstimatedRobotPose();
+
+	double sumSinPsi, sumCosPsi;
+	for (unsigned int i = 0; i < particles.size(); i++) {
+			es.x += particles.at(i).xPos;
+			es.y += particles.at(i).yPos;
+			sumSinPsi += sin(particles.at(i).psi);
+			sumCosPsi += cos(particles.at(i).psi);
+	}
+	es.x = es.x/particles.size();
+	es.y = es.y/particles.size();
+	sumSinPsi = sumSinPsi/particles.size();
+	sumCosPsi = sumCosPsi/particles.size();
+	es.sigmaPsi = sqrt(sumSinPsi*sumSinPsi+sumCosPsi*sumCosPsi);
+	if( (sumSinPsi == 0) && (sumCosPsi == 0) )
+		es.psi = 0;
+	else
+		es.psi = atan2(sumSinPsi,sumCosPsi);
+
+
+	double varXPos, varYPos, varXYPos;
+	for (unsigned int i = 0; i < particles.size(); i++) {
+			varXPos += pow(particles.at(i).xPos-es.x,2);
+			varYPos += pow(particles.at(i).yPos-es.y,2);
+			varXYPos += (particles.at(i).xPos-es.x)*(particles.at(i).yPos-es.y);
+	}
+	varXPos = varXPos/particles.size();
+	varYPos = varYPos/particles.size();
+	varXYPos = varXYPos/particles.size();
+
+	double eigen0, eigen1;
+	es.sigmaXYAngle = atan2(-2*varXYPos, varYPos-varXPos)/2;
+	if(isnan(es.sigmaXYAngle)) es.sigmaXYAngle = 0;
+	double c = cos(es.sigmaXYAngle);
+	double s = sin(es.sigmaXYAngle);
+	double c2 = c*c, s2=s*s, cs = c*s;
+
+	eigen0 = c2*varXPos+2*cs*varXYPos+s2*varYPos;
+	eigen1 = s2*varXPos+2*cs*varXYPos+c2*varYPos;
+	if(eigen0<eigen1){
+		if(es.sigmaXYAngle>0) es.sigmaXYAngle-=M_PI/2;
+		else es.sigmaXYAngle+=M_PI/2;
+		es.sigmaXYLarge = sqrt(eigen1);
+		es.sigmaXYSmall = sqrt(eigen0);
+	}
+	else{
+		es.sigmaXYLarge = sqrt(eigen0);
+		es.sigmaXYSmall = sqrt(eigen1);
+	}
+	return es;
+}
+
