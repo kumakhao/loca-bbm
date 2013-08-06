@@ -199,9 +199,15 @@ void Simulation::Step() {
 												robotdata_->y_pos_, view_matrix_eye_[1], localisation_->getPosition().at(2),
 												robotdata_->psi_, view_matrix_(0,0), localisation_->getOrientation().at(1), cvCopyImg);
 		Observe();
-		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
-											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
-											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3, true);
+		//		old version
+		//		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
+		//											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
+		//											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3);
+				localisation::EstimatedRobotPose es = localisation_->getEstimatedRobotPose();
+				data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_,
+													es.x, es.y,
+													es.sigmaXYLarge, es.sigmaXYSmall,
+													es.sigmaXYAngle/M_PI*180);
 		// observe for particle filter is done here.
 		picture_processed_ = true;
 	}
@@ -220,9 +226,15 @@ void Simulation::Step() {
 														robotdata_->x_pos_, view_matrix_eye_[0], localisation_->getPosition().at(0),
 														robotdata_->y_pos_, view_matrix_eye_[1], localisation_->getPosition().at(2),
 														robotdata_->psi_, view_matrix_(0,0), localisation_->getOrientation().at(1));
-		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
-											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
-											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3);
+//		old version
+//		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
+//											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
+//											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3);
+		localisation::EstimatedRobotPose es = localisation_->getEstimatedRobotPose();
+		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_,
+											es.x, es.y,
+											es.sigmaXYLarge, es.sigmaXYSmall,
+											es.sigmaXYAngle/M_PI*180);
 		old_increments_left_ = robotdata_->incremente_left_;
 		old_increments_right_ = robotdata_->incremente_right_;
 	}

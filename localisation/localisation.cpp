@@ -239,7 +239,7 @@ std::vector<double> localisation::getPosition() {
 
 localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
 	//TODO: untested!
-	EstimatedRobotPose es = new EstimatedRobotPose();
+	EstimatedRobotPose es;
 
 	double sumSinPsi, sumCosPsi;
 	for (unsigned int i = 0; i < particles.size(); i++) {
