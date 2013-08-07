@@ -188,6 +188,9 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 	double kontrast = 0.0;
 	double pSum = 0.0;
 
+	if(pattern.size()<10)
+		return 0.0;
+
 	// Berechnet mittlere Scharz- und Weißwerte auf
 	// Grundlage des Patterns.
 	for(unsigned int i=0;i<pattern.size();i++){
@@ -196,7 +199,7 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 		double value = 0;
 		for(int j=-grid;j<=grid;j++){
 			for(int u=-grid;u<=grid;u++)
-				value += pixel(img, x+j, y+u);
+				value += bw_pixel(img, x+j, y+u);
 		}
 		value = value / (grid+grid+1)*(grid+grid+1);
 		if(pattern.at(i).patternValue == 255){
@@ -265,4 +268,14 @@ int picRating::pixel(cv::Mat img, int x, int y) {
 			adr++;
 			ret += *adr;
 	return ret/3;
+}
+
+int picRating::bw_pixel(cv::Mat img, int x, int y){
+	if(x < 0) x = 0;
+	if(x >= img.cols) x = img.cols-1;
+	if(y < 0) y = 0;
+	if(y >= img.rows) y = img.rows-1;
+	unsigned char *adr = img.ptr<unsigned char>(y)+x;
+	int ret = *adr;
+	return ret;
 }

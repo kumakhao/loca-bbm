@@ -90,7 +90,8 @@ void localisation::Particle::dynamic(double dDistance, double dPsi) {
 	psi = psi + (dPsi + errPsi);
 }
 
-localisation::localisation() {
+localisation::localisation():
+	initilisation_done_(false){
 	Points_3D_ = locaUtil::getBit3Dlocations_all();
 
 }
@@ -105,13 +106,19 @@ void localisation::dynamic(double incLeft, double incRight) {
 }
 
 void localisation::observeImg(cv::Mat* img) {
-	//TODO changed for testing, needs reverting
-//	if(particles.size() > 0)
-//		particles.at(0).observeImg(img);
-	highscore = 0.0;
-	good_rating_count = 0;
-	for (unsigned int i = 0; i < particles.size(); i++) {
-			particles.at(i).observeImg(img);
+	if(!initilisation_done_)
+	{
+		initilisation_done_ = findInitialLocatio(img);
+	}
+	else{
+		//TODO changed for testing, needs reverting
+	//	if(particles.size() > 0)
+	//		particles.at(0).observeImg(img);
+		highscore = 0.0;
+		good_rating_count = 0;
+		for (unsigned int i = 0; i < particles.size(); i++) {
+				particles.at(i).observeImg(img);
+		}
 	}
 }
 
@@ -278,16 +285,56 @@ localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
 
 	eigen0 = c2*varXPos+2*cs*varXYPos+s2*varYPos;
 	eigen1 = s2*varXPos+2*cs*varXYPos+c2*varYPos;
+	/*
+	 * Multiplied by 3 to get 3 sigma
+	 * and multiplied by 2 to get diameter
+	 */
 	if(eigen0<eigen1){
 		if(es.sigmaXYAngle>0) es.sigmaXYAngle-=M_PI/2;
 		else es.sigmaXYAngle+=M_PI/2;
-		es.sigmaXYLarge = sqrt(eigen1);
-		es.sigmaXYSmall = sqrt(eigen0);
+		es.sigmaXYLarge = sqrt(eigen1)*3*2;
+		es.sigmaXYSmall = sqrt(eigen0)*3*2;
 	}
 	else{
-		es.sigmaXYLarge = sqrt(eigen0);
-		es.sigmaXYSmall = sqrt(eigen1);
+		es.sigmaXYLarge = sqrt(eigen0)*3*2;
+		es.sigmaXYSmall = sqrt(eigen1)*3*2;
 	}
 	return es;
 }
+
+bool localisation::findInitialLocatio(cv::Mat* img) {
+	std::vector<cv::Point2d> imagePoints;
+	std::vector<patternPoint> clipedImagePoints;
+	EstimatedRobotPose es;
+	cv::Mat gray_img;
+	cvtColor(*img,gray_img,CV_RGB2GRAY);
+	int grid = 0, hits = 0, cols = gray_img.cols, rows = gray_img.rows;
+	double sumX = 0, sumY = 0, sumPsi = 0;
+	double p;
+	unsigned char* pattern = locaUtil::getPatternCode93();
+	std::cout<<"Starting Initilisation ..."<<std::endl;
+	for(double psi= -3.141; psi <= 3.141; psi+=0.02){
+		std::cout<<"psi: "<<psi<<std::endl;
+		for(double xPos = -6; xPos <= 6; xPos+=0.2){
+			for(double yPos = -6; yPos <= 6; yPos+=0.2){
+				camera_model_.setExtr(psi,xPos,yPos);
+				camera_model_.projectTo2D(&(Points_3D_),&imagePoints);
+				p = picRating::rateImage(gray_img, picRating::clipANDmark(imagePoints, pattern, cols, rows), grid);
+				if(p>0.95){
+					sumX += xPos;
+					sumY += yPos;
+					sumPsi += psi;
+					hits++;
+					std::cout<<"found Position: "<<p<<"   X: "<<xPos<<" Y: "<<yPos<<std::endl;
+				}
+			}
+		}
+	}
+	sumX = sumX / hits;
+	sumY = sumY / hits;
+	sumPsi = sumPsi / hits;
+	std::cout<<"Ending Initilisation, Position: ("<<sumX<<" "<<sumY<<") Angle: "<<sumPsi<<std::endl;
+	return true;
+}
+
 

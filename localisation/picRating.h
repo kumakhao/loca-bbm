@@ -23,6 +23,7 @@ public:
 	static double rateImage_3x3(cv::Mat img, std::vector<patternPoint> pattern);
 	static double rateImage(cv::Mat img, std::vector<patternPoint> pattern, int grid);
 	static int pixel(cv::Mat img, int x, int y);
+	static int bw_pixel(cv::Mat img, int x, int y);
 };
 
 

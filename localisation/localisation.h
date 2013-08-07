@@ -69,7 +69,7 @@ public:
 	std::vector<Particle> particles;
 	landmarkSet landmarks;
 	cv::Mat Points_3D_;
-	//cameraParam camera_model_;
+	bool initilisation_done_;
 	cameraParam camera_model_;
 	double highscore;
 	int highscore_count;
@@ -105,6 +105,8 @@ public:
 		double sigmaXYAngle;
 	};
 	localisation::EstimatedRobotPose getEstimatedRobotPose();
+private:
+	bool findInitialLocatio(cv::Mat* img);
 };
 
 
