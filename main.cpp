@@ -33,15 +33,19 @@ int main(){
 
 	// 0=picTest  1=sim  2=framework
 
+	cv::Mat img1;
+	cv::Mat img2;
+	cv::Mat img3;
+
 	switch(1) {
 	case 0:
 		//unitTests::landmarkTest();
 		//unitTests::cvProjectTest();
-		unitTests::picTest();
+		//unitTests::picTest();
 
-//		cv::Mat img1 = locaUtil::makeWall(locaUtil::getPatternCode93(),0);
-//		cv::Mat img2 = locaUtil::makeWall(locaUtil::getPatternCode93(),1);
-//		cv::Mat img3 = locaUtil::makeWall(locaUtil::getPatternCode93(),2);
+//		img1 = locaUtil::makeWall(locaUtil::getPatternCode93(),0);
+//		img2 = locaUtil::makeWall(locaUtil::getPatternCode93(),1);
+//		img3 = locaUtil::makeWall(locaUtil::getPatternCode93(),2);
 //		cv::imwrite("wall1.jpg",img1);
 //		cv::imwrite("wall2.jpg",img2);
 //		cv::imwrite("wall3.jpg",img3);
@@ -70,7 +74,7 @@ int main(){
 //			std::cout<<"Y: "<<position.at(2)<<" | VAR: "<<position.at(3)<<std::endl;
 
 		}
-		mainSim.WriteRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectory.txt");
+		//mainSim.WriteRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectory.txt");
 		mainSim.CleanUp();
 		break;
 	case 2:

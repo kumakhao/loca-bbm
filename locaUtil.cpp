@@ -162,31 +162,31 @@ unsigned char* locaUtil::getPatternAlternate() {
 unsigned char* locaUtil::getPatternCode93() {
 	unsigned char *ret = new unsigned char[192];
 	unsigned char *start = ret;
-	ret = code93(ret,100);
 	ret = code93(ret,10);
 	ret = code93(ret,11);
 	ret = code93(ret,12);
 	ret = code93(ret,13);
 	ret = code93(ret,14);
-	ret = code93(ret,100);
+	ret = code93(ret,15);
+	ret = code93(ret,16);
 	ret[0] = 0;
 	ret++;
-	ret = code93(ret,100);
 	ret = code93(ret,20);
 	ret = code93(ret,21);
 	ret = code93(ret,22);
 	ret = code93(ret,23);
 	ret = code93(ret,24);
-	ret = code93(ret,100);
+	ret = code93(ret,25);
+	ret = code93(ret,26);
 	ret[0] = 0;
 	ret++;
-	ret = code93(ret,100);
 	ret = code93(ret,30);
 	ret = code93(ret,31);
 	ret = code93(ret,32);
 	ret = code93(ret,33);
 	ret = code93(ret,34);
-	ret = code93(ret,100);
+	ret = code93(ret,35);
+	ret = code93(ret,36);
 	ret[0] = 0;
 	return start;
 }
@@ -367,8 +367,28 @@ unsigned char* locaUtil::code93(unsigned char* arr, int a0) {
 		arr += 9;
 		break;
 	case 15:
+		arr[0] = 0;
+		arr[1] = 0;
+		arr[2] = 255;
+		arr[3] = 255;
+		arr[4] = 255;
+		arr[5] = 0;
+		arr[6] = 255;
+		arr[7] = 0;
+		arr[8] = 255;
+		arr += 9;
 		break;
 	case 16:
+		arr[0] = 0;
+		arr[1] = 255;
+		arr[2] = 0;
+		arr[3] = 0;
+		arr[4] = 255;
+		arr[5] = 0;
+		arr[6] = 255;
+		arr[7] = 255;
+		arr[8] = 255;
+		arr += 9;
 		break;
 	case 17:
 		break;
@@ -437,8 +457,28 @@ unsigned char* locaUtil::code93(unsigned char* arr, int a0) {
 		arr += 9;
 		break;
 	case 25:
+		arr[0] = 0;
+		arr[1] = 255;
+		arr[2] = 255;
+		arr[3] = 255;
+		arr[4] = 0;
+		arr[5] = 255;
+		arr[6] = 0;
+		arr[7] = 0;
+		arr[8] = 255;
+		arr += 9;
 		break;
 	case 26:
+		arr[0] = 0;
+		arr[1] = 0;
+		arr[2] = 255;
+		arr[3] = 0;
+		arr[4] = 0;
+		arr[5] = 255;
+		arr[6] = 0;
+		arr[7] = 255;
+		arr[8] = 255;
+		arr += 9;
 		break;
 	case 27:
 		break;
@@ -507,8 +547,28 @@ unsigned char* locaUtil::code93(unsigned char* arr, int a0) {
 		arr += 9;
 		break;
 	case 35:
+		arr[0] = 0;
+		arr[1] = 255;
+		arr[2] = 255;
+		arr[3] = 0;
+		arr[4] = 0;
+		arr[5] = 0;
+		arr[6] = 255;
+		arr[7] = 0;
+		arr[8] = 255;
+		arr += 9;
 		break;
 	case 36:
+		arr[0] = 0;
+		arr[1] = 255;
+		arr[2] = 255;
+		arr[3] = 0;
+		arr[4] = 255;
+		arr[5] = 0;
+		arr[6] = 0;
+		arr[7] = 0;
+		arr[8] = 255;
+		arr += 9;
 		break;
 	case 37:
 		break;

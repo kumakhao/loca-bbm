@@ -20,10 +20,10 @@ public:
 	public:
 		ParticleDataType(osg::Node*n, double x_pos, double y_pos, double orientation);
 		void Update();
-		void setPosition(double x, double y, double psi);
+		void setPosition(double x, double y, double psi, double z=0.01);
 	protected:
 		osg::PositionAttitudeTransform* particleXform_;
-		double x_pos_, y_pos_, orientation_;
+		double x_pos_, y_pos_, z_pos_, orientation_;
 	};
 
 	class ParticleNodeCallback : public osg::NodeCallback

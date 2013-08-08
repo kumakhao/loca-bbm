@@ -32,20 +32,24 @@ Particles::ParticleDataType::ParticleDataType(osg::Node*n, double x_pos, double 
 
 void Particles::ParticleDataType::Update()
 {
-	particleXform_->setPosition(osg::Vec3(x_pos_,y_pos_,0.01));
+	particleXform_->setPosition(osg::Vec3(x_pos_,y_pos_,z_pos_));
 	particleXform_->setAttitude(osg::Quat(orientation_, osg::Vec3d(0.0, 0.0, 1.0)));
 }
 
-void Particles::ParticleDataType::setPosition(double x, double y, double psi)
+void Particles::ParticleDataType::setPosition(double x, double y, double psi, double z)
 {
 	this->x_pos_ = x;
 	this->y_pos_ = y;
+	this->z_pos_ = z;
 	this->orientation_ = psi;
 }
 
 void Particles::Update(std::vector<localisation::Particle> particle_data)
 {
 	int nr_of_particles;
+	bool initilisationDone = false;
+	if(particle_data.size() > 0)
+		initilisationDone = particle_data.at(0).loca->initilisation_done_;
 	if(particles_group_.size()>=particle_data.size())
 		nr_of_particles = particle_data.size();
 	else
@@ -57,7 +61,10 @@ void Particles::Update(std::vector<localisation::Particle> particle_data)
 		//pointer
 		ParticleDataType* particleData =
 				dynamic_cast<ParticleDataType*> (particles_group_.at(i)->getUserData());
-		particleData->setPosition(particle_data.at(i).xPos, particle_data.at(i).yPos, particle_data.at(i).psi);
+		if(initilisationDone)
+			particleData->setPosition(particle_data.at(i).xPos, particle_data.at(i).yPos, particle_data.at(i).psi);
+		else
+			particleData->setPosition(0.0, 0.0, 0.0, -1.0);
 
 	}
 }

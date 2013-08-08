@@ -219,7 +219,7 @@ osg::Group* SetupRobot()
 {
 	//load the robot Model
 	osg::Node* robot_node = NULL;
-	robot_node = osgDB::readNodeFile("/home/josef/NPS_Tutorials_src/NPS_Data/Models/t72-tank/t72-tank_des.flt");
+	robot_node = osgDB::readNodeFile("models/t72-tank/t72-tank_des.flt");
 	osg::PositionAttitudeTransform* robot_model_turn = new osg::PositionAttitudeTransform();
 	robot_model_turn->addChild(robot_node);
 	robot_model_turn->setAttitude(osg::Quat(-M_PI/2, osg::Vec3d(0.0, 0.0, 1.0)));

@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <highgui/highgui_c.h>
 #include <iostream>
+//TODO: included for fileoutput.
+#include <fstream>
+#include <iomanip>
+
 #include "picRating.h"
 #include "../locaUtil.h"
 
@@ -106,9 +110,11 @@ void localisation::dynamic(double incLeft, double incRight) {
 }
 
 void localisation::observeImg(cv::Mat* img) {
+	cv::Mat gray_img;
+	cvtColor(*img,gray_img,CV_RGB2GRAY);
 	if(!initilisation_done_)
 	{
-		initilisation_done_ = findInitialLocatio(img);
+		initilisation_done_ = findInitialLocatio(&gray_img);
 	}
 	else{
 		//TODO changed for testing, needs reverting
@@ -117,7 +123,7 @@ void localisation::observeImg(cv::Mat* img) {
 		highscore = 0.0;
 		good_rating_count = 0;
 		for (unsigned int i = 0; i < particles.size(); i++) {
-				particles.at(i).observeImg(img);
+				particles.at(i).observeImg(&gray_img);
 		}
 	}
 }
@@ -142,6 +148,9 @@ void localisation::createSamples(int nrOfParticles) {
 	Particle tempPart(this, weight, x, y, psi);
 	for (int i = 1; i <= param.nrOfParticlesPerLenth; i++) {
 		for (int u = 1; u <= param.nrOfParticlesPerLenth; u++) {
+
+			//Seed equidistant over the hole ground plate, facing in "equidistant" angle steps
+
 			//the Origion is in the middle of the ground plate. to let particle koordiantes and GUIParticles koordiantes match its
 			//transformed here.
 			tempPart.xPos = this->param.fieldX
@@ -247,6 +256,16 @@ std::vector<double> localisation::getPosition() {
 localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
 	//TODO: untested!
 	EstimatedRobotPose es;
+	if(!initilisation_done_){
+		es.psi = INFINITY;
+		es.x = INFINITY;
+		es.y = INFINITY;
+		es.sigmaPsi = INFINITY;
+		es.sigmaXYAngle = INFINITY;
+		es.sigmaXYLarge = INFINITY;
+		es.sigmaXYSmall = INFINITY;
+		return es;
+	}
 
 	double sumSinPsi, sumCosPsi;
 	for (unsigned int i = 0; i < particles.size(); i++) {
@@ -305,22 +324,34 @@ localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
 bool localisation::findInitialLocatio(cv::Mat* img) {
 	std::vector<cv::Point2d> imagePoints;
 	std::vector<patternPoint> clipedImagePoints;
-	EstimatedRobotPose es;
-	cv::Mat gray_img;
-	cvtColor(*img,gray_img,CV_RGB2GRAY);
-	int grid = 0, hits = 0, cols = gray_img.cols, rows = gray_img.rows;
+	std::vector<Particle> pNew;
+	Particle pTemp(this,0,0,0,0);
+	int grid = 0, hits = -1, cols = img->cols, rows = img->rows;
 	double sumX = 0, sumY = 0, sumPsi = 0;
-	double p;
+	double p, inImagePoints = 0;
 	unsigned char* pattern = locaUtil::getPatternCode93();
+	std::ofstream datafile;
+	datafile.open ("test.txt",std::ios_base::app);
+
+
+
 	std::cout<<"Starting Initilisation ..."<<std::endl;
-	for(double psi= -3.141; psi <= 3.141; psi+=0.02){
-		std::cout<<"psi: "<<psi<<std::endl;
-		for(double xPos = -6; xPos <= 6; xPos+=0.2){
-			for(double yPos = -6; yPos <= 6; yPos+=0.2){
+	for(double xPos = -6; xPos <= 6; xPos+=0.1){
+		std::cout<<"x: "<<xPos<<std::endl;
+		for(double yPos = -6; yPos <= 6; yPos+=0.1){
+			inImagePoints = 0;
+			for(double psi= -0.1415; psi <= 0.1415; psi+=0.01){
 				camera_model_.setExtr(psi,xPos,yPos);
 				camera_model_.projectTo2D(&(Points_3D_),&imagePoints);
-				p = picRating::rateImage(gray_img, picRating::clipANDmark(imagePoints, pattern, cols, rows), grid);
-				if(p>0.95){
+				clipedImagePoints = picRating::clipANDmark(imagePoints, pattern, cols, rows);
+				inImagePoints += clipedImagePoints.size();
+				p = picRating::rateImage(*img, clipedImagePoints, grid);
+				if(p>0.5){
+					pTemp.psi = psi;
+					pTemp.xPos = xPos;
+					pTemp.yPos = yPos;
+					pTemp.weight = p;
+					pNew.push_back(pTemp);
 					sumX += xPos;
 					sumY += yPos;
 					sumPsi += psi;
@@ -328,13 +359,36 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 					std::cout<<"found Position: "<<p<<"   X: "<<xPos<<" Y: "<<yPos<<std::endl;
 				}
 			}
+//			std::ostringstream text;
+//			text << std::setw(11) << std::setfill(' ') << xPos << "; ";
+//			text << std::setw(11) << std::setfill(' ') << yPos << "; ";
+//			text << std::setw(11) << std::setfill(' ') << inImagePoints << "; ";
+//			text << "\n";
+//			datafile << text.str();
 		}
 	}
-	sumX = sumX / hits;
-	sumY = sumY / hits;
-	sumPsi = sumPsi / hits;
-	std::cout<<"Ending Initilisation, Position: ("<<sumX<<" "<<sumY<<") Angle: "<<sumPsi<<std::endl;
-	return true;
+	datafile.close();
+	std::cout<<"Ending Initilisation";
+	if(hits < 0){
+		std::cout<<" NO MATCH!"<<std::endl;
+		return false;
+	}
+	else{
+		int counter = 0;
+		while(pNew.size()<particles.size()){
+			pNew.push_back(pNew.at(counter));
+			counter++;
+			if(counter > hits)
+				counter = 0;
+		}
+		particles = pNew;
+		sumX = sumX / hits;
+		sumY = sumY / hits;
+		sumPsi = sumPsi / hits;
+		std::cout<<", Position: ("<<sumX<<" "<<sumY<<") Angle: "<<sumPsi<<std::endl;
+		std::cout<<"Nr of hits: "<<hits<<std::endl;
+		return true;
+	}
 }
 
 

@@ -498,9 +498,9 @@ osg::Group* Simulation::SetupScene() {
 	leinwandFaceTexture03->setDataVariance(osg::Object::DYNAMIC);
 
 	// load an image by reading a file:
-	osg::Image* leinwandFace01 = osgDB::readImageFile("/home/josef/workspace/test/wall1_1024.jpg");
-	osg::Image* leinwandFace02 = osgDB::readImageFile("/home/josef/workspace/test/wall2_1024.jpg");
-	osg::Image* leinwandFace03 = osgDB::readImageFile("/home/josef/workspace/test/wall3_1024.jpg");
+	osg::Image* leinwandFace01 = osgDB::readImageFile("textures/wall1_1024.jpg");
+	osg::Image* leinwandFace02 = osgDB::readImageFile("textures/wall2_1024.jpg");
+	osg::Image* leinwandFace03 = osgDB::readImageFile("textures/wall3_1024.jpg");
 //		osg::Image* leinwandFace01 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_01.png");
 //		osg::Image* leinwandFace02 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_02.png");
 //		osg::Image* leinwandFace03 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_03.png");
