@@ -215,11 +215,136 @@ public:
 	}
 };
 
+osg::Group* MakeRobot()
+{
+	osg::Geode* particle = new osg::Geode();
+	osg::Geometry* particle_geo = new osg::Geometry();
+	particle->addDrawable(particle_geo);
+	double left=-0.2, right=0.2;
+	double bottom=0.0, top=0.4;
+	double front=-0.2, back=0.2;
+
+	// Specify the vertices:
+	osg::Vec3Array* particle_vertices = new osg::Vec3Array;
+	particle_vertices->push_back( osg::Vec3(left, front, bottom) ); // front left bottom
+	particle_vertices->push_back( osg::Vec3(right, front, bottom) ); // front right bottom
+	particle_vertices->push_back( osg::Vec3(right, back, bottom) ); // back right bottom
+	particle_vertices->push_back( osg::Vec3(left, back, bottom) ); // back left bottom
+	particle_vertices->push_back( osg::Vec3(left, back, top) ); // back left top
+	particle_vertices->push_back( osg::Vec3(right, back, top) ); // back right top
+	particle_vertices->push_back( osg::Vec3(right, front, top) ); // front right top
+	particle_vertices->push_back( osg::Vec3(left, front, top) ); // front left top
+
+	particle_vertices->push_back( osg::Vec3(left, front, bottom) ); // front left bottom
+	particle_vertices->push_back( osg::Vec3(right, front, bottom) ); // front right bottom
+	particle_vertices->push_back( osg::Vec3(left, back, bottom) ); // back left bottom
+	particle_vertices->push_back( osg::Vec3(left, back, top) ); // back left top
+	particle_vertices->push_back( osg::Vec3(right, back, bottom) ); // back right bottom
+	particle_vertices->push_back( osg::Vec3(right, back, top) ); // back right top
+
+//	particle_vertices->push_back( osg::Vec3(0.1, 0.1, 0.0) ); // back right bottom
+//	particle_vertices->push_back( osg::Vec3(0.0, 0.1, 0.0) ); // back left bottom
+//	particle_vertices->push_back( osg::Vec3(0.0, 0.0, 0.0) ); // front left bottom
+//	particle_vertices->push_back( osg::Vec3(0.1, 0.0, 0.0) ); // front right bottom
+//	particle_vertices->push_back( osg::Vec3(0.1, 0.1, 0.1) ); // back right top
+//	particle_vertices->push_back( osg::Vec3(0.0, 0.1, 0.1) ); // back left top
+//	particle_vertices->push_back( osg::Vec3(0.0, 0.0, 0.1) ); // front left top
+//	particle_vertices->push_back( osg::Vec3(0.1, 0.0, 0.1) ); // front right top
+
+	particle_geo->setVertexArray( particle_vertices );
+
+	osg::DrawElementsUInt* quadrat_ground =
+			new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_ground->push_back(3); // front right bottom
+		quadrat_ground->push_back(2); // front left bottom
+		quadrat_ground->push_back(1); // back left bottom
+		quadrat_ground->push_back(0); // back right bottom
+		particle_geo->addPrimitiveSet(quadrat_ground);
+
+	osg::DrawElementsUInt* quadrat_back =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_back->push_back(5); // back right top
+		quadrat_back->push_back(4); // back left top
+		quadrat_back->push_back(3); // back left bottom
+		quadrat_back->push_back(2); // back right bottom
+		particle_geo->addPrimitiveSet(quadrat_back);
+
+	osg::DrawElementsUInt* quadrat_top =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_top->push_back(4); // back right top
+		quadrat_top->push_back(5); // back left top
+		quadrat_top->push_back(6); // front left top
+		quadrat_top->push_back(7); // front right top
+		particle_geo->addPrimitiveSet(quadrat_top);
+
+	osg::DrawElementsUInt* quadrat_right =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_right->push_back(6); // back right bottom
+		quadrat_right->push_back(9); // front right bottom
+		quadrat_right->push_back(12); // front right top
+		quadrat_right->push_back(13); // back right top
+		particle_geo->addPrimitiveSet(quadrat_right);
+
+	osg::DrawElementsUInt* quadrat_left =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_left->push_back(7); // back right bottom
+		quadrat_left->push_back(8); // front right bottom
+		quadrat_left->push_back(10); // front right top
+		quadrat_left->push_back(11); // back right top
+		particle_geo->addPrimitiveSet(quadrat_left);
+
+	osg::DrawElementsUInt* quadrat_front =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_front->push_back(6); // back right bottom
+		quadrat_front->push_back(7); // front right bottom
+		quadrat_front->push_back(8); // front right top
+		quadrat_front->push_back(9); // back right top
+		particle_geo->addPrimitiveSet(quadrat_front);
+
+	osg::Vec2Array* texcoords = new osg::Vec2Array(14);
+		(*texcoords)[0].set(0.4f,0.0f); // tex coord for vertex 0
+		(*texcoords)[1].set(0.6f,0.0f); // tex coord for vertex 1
+		(*texcoords)[2].set(0.6f,0.2f); // ""
+		(*texcoords)[3].set(0.4f,0.2f); // ""
+		(*texcoords)[4].set(0.4f,0.4f);
+		(*texcoords)[5].set(0.6f,0.4f);
+		(*texcoords)[6].set(0.6f,0.6f);
+		(*texcoords)[7].set(0.4f,0.6f);
+		(*texcoords)[8].set(0.4f,0.8f); // ""
+		(*texcoords)[9].set(0.6f,0.8f); // ""
+		(*texcoords)[10].set(0.2f,0.8f);
+		(*texcoords)[11].set(0.2f,0.6f);
+		(*texcoords)[12].set(0.8f,0.8f);
+		(*texcoords)[13].set(0.8f,0.6f);
+		particle_geo->setTexCoordArray(0,texcoords);
+
+	osg::Vec4Array* colors = new osg::Vec4Array;
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+	colors->push_back(osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f) );
+
+	particle_geo->setColorArray(colors);
+	particle_geo->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+
+	return (osg::Group*) particle;
+}
+
 osg::Group* SetupRobot()
 {
 	//load the robot Model
-	osg::Node* robot_node = NULL;
-	robot_node = osgDB::readNodeFile("models/t72-tank/t72-tank_des.flt");
+	osg::Node* robot_node = MakeRobot();
+	//robot_node = osgDB::readNodeFile("models/t72-tank/t72-tank_des.flt");
 	osg::PositionAttitudeTransform* robot_model_turn = new osg::PositionAttitudeTransform();
 	robot_model_turn->addChild(robot_node);
 	robot_model_turn->setAttitude(osg::Quat(-M_PI/2, osg::Vec3d(0.0, 0.0, 1.0)));
@@ -230,7 +355,7 @@ osg::Group* SetupRobot()
 	//add the roboter to the tranformation
 	robotXform->addChild(robot_model_turn);
 	//scale the model down
-	robotXform->setScale(osg::Vec3d(0.2,0.2,0.2));
+	//robotXform->setScale(osg::Vec3d(4,4,4));
 
 	// Declare and initialize a Vec3 instance to change the
 	// position of the robot model in the scene

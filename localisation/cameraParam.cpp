@@ -21,9 +21,9 @@ cameraParam::cameraParam() {
 	rotMat4x4 = cv::Mat(4, 4, CV_64FC1);
 	rotMat_World2Robot = cv::Mat(4, 4, CV_64FC1);
 	rotMat_Robot2CameraCV = cv::Mat(4, 4, CV_64FC1);
-			rotMat_Robot2CameraCV.at<double>(0,0) = 0;	rotMat_Robot2CameraCV.at<double>(0,1) = -1;rotMat_Robot2CameraCV.at<double>(0,2) = 0;	rotMat_Robot2CameraCV.at<double>(0,3) = -0.093889;
-			rotMat_Robot2CameraCV.at<double>(1,0) = 0;	rotMat_Robot2CameraCV.at<double>(1,1) = 0;	rotMat_Robot2CameraCV.at<double>(1,2) = -1;rotMat_Robot2CameraCV.at<double>(1,3) = 0.260804;
-			rotMat_Robot2CameraCV.at<double>(2,0) = 1; rotMat_Robot2CameraCV.at<double>(2,1) = 0;	rotMat_Robot2CameraCV.at<double>(2,2) = 0;	rotMat_Robot2CameraCV.at<double>(2,3) = 2.83599;
+			rotMat_Robot2CameraCV.at<double>(0,0) = 0;	rotMat_Robot2CameraCV.at<double>(0,1) = -1;rotMat_Robot2CameraCV.at<double>(0,2) = 0;	rotMat_Robot2CameraCV.at<double>(0,3) = 0;// view_matrix_eye_.y()
+			rotMat_Robot2CameraCV.at<double>(1,0) = 0;	rotMat_Robot2CameraCV.at<double>(1,1) = 0;	rotMat_Robot2CameraCV.at<double>(1,2) = -1;rotMat_Robot2CameraCV.at<double>(1,3) = 0.2; // view_matrix_eye_.z()
+			rotMat_Robot2CameraCV.at<double>(2,0) = 1; rotMat_Robot2CameraCV.at<double>(2,1) = 0;	rotMat_Robot2CameraCV.at<double>(2,2) = 0;	rotMat_Robot2CameraCV.at<double>(2,3) = 3;  // - view_matrix_eye_.x()
 			rotMat_Robot2CameraCV.at<double>(3,0) = 0;	rotMat_Robot2CameraCV.at<double>(3,1) = 0;	rotMat_Robot2CameraCV.at<double>(3,2) = 0;	rotMat_Robot2CameraCV.at<double>(3,3) = 1;
 	transMat = cv::Mat(3, 1, CV_64FC1);
 	distCoeffsVec = cv::Mat(4, 1, CV_64FC1);

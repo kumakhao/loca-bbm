@@ -108,7 +108,7 @@ void Simulation::Initialize() {
 		view_robot->setSceneData(root_);
 		view_robot->setUpViewInWindow(10,10,800,600);
 		osg::ref_ptr<osgGA::NodeTrackerManipulator> robot_camera_manipulator = new osgGA::NodeTrackerManipulator;
-		robot_camera_manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+		robot_camera_manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,-1.0,0));
 		robot_camera_manipulator->setTrackNode(robot_->getChild(0));
 		robot_camera_manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
 		view_robot->setCameraManipulator(robot_camera_manipulator);
@@ -126,6 +126,7 @@ void Simulation::Initialize() {
 		//view_fix->getCameraManipulator()->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
 		view_map->setCameraManipulator( map_camera_manipulator );
     }
+
 
 	// attach a trackball manipulator to all user control of the view
 //	osgGA::TrackballManipulator *trackballMani = new osgGA::TrackballManipulator;
@@ -183,6 +184,7 @@ void Simulation::Step() {
 //	osg::Matrix projectionMatrix = viewer_.getView(0)->getCamera()->getProjectionMatrix();
 //	osg::Matrix mat = projectionMatrix*windowMatrix;
 //	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
+	std::cout<<"eye: "<<view_matrix_eye_.x()<<" "<<view_matrix_eye_.y()<<" "<<view_matrix_eye_.z()<<std::endl;
 
 	//Picture handling
 	if(screen_shot_callback_->isPicTaken() && !picture_processed_){
@@ -218,6 +220,7 @@ void Simulation::Step() {
 		if(particles_on_){
 			// The dynamic update of the particle filter.
 			localisation_->dynamic(robotdata_->incremente_left_-old_increments_left_,robotdata_->incremente_right_-old_increments_right_);
+
 			// Update of simulations view of particles.
 			particle_view_->Update(localisation_->getParticles());
 		}
@@ -595,6 +598,7 @@ void Simulation::ReadRobotTrajectory(std::string path) {
 
 void Simulation::UpdateHUD() {
 	std::stringstream hud_text;
+	//TODO: getPosition() is still used here, I might need to change to getEstimatedRobotPose()
 	hud_text <<    "True Position: (x "<<robotdata_->x_pos_<<
 								" / y "<<robotdata_->y_pos_<<
 									" )"<<std::endl;
