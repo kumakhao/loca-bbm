@@ -151,6 +151,7 @@ void Simulation::Realize() {
 	take_picture_timer_ = cvGetTickCount();
 	loop_time_ = take_picture_timer_;
 	//osg::Matrix MVPW = viewMatrix*projectionMatrix*windowMatrix;
+	//localisation_->initilisation_done_ = true;
 	setup_done_ = true;
 }
 
@@ -184,7 +185,7 @@ void Simulation::Step() {
 //	osg::Matrix projectionMatrix = viewer_.getView(0)->getCamera()->getProjectionMatrix();
 //	osg::Matrix mat = projectionMatrix*windowMatrix;
 //	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
-	std::cout<<"eye: "<<view_matrix_eye_.x()<<" "<<view_matrix_eye_.y()<<" "<<view_matrix_eye_.z()<<std::endl;
+//	std::cout<<"eye: "<<view_matrix_eye_.x()<<" "<<view_matrix_eye_.y()<<" "<<view_matrix_eye_.z()<<std::endl;
 
 	//Picture handling
 	if(screen_shot_callback_->isPicTaken() && !picture_processed_){

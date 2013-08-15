@@ -335,9 +335,10 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 
 
 
-	std::cout<<"Starting Initilisation ..."<<std::endl;
+	std::cout<<"Starting Initilisation Step 1 ..."<<std::endl;
 	for(double xPos = -6; xPos <= 6; xPos+=0.1){
-		std::cout<<"x: "<<xPos<<std::endl;
+		std::cout<<"#";
+		std::flush(std::cout);
 		for(double yPos = -6; yPos <= 6; yPos+=0.1){
 			inImagePoints = 0;
 			for(double psi= -0.1415; psi <= 0.1415; psi+=0.01){
@@ -346,7 +347,7 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 				clipedImagePoints = picRating::clipANDmark(imagePoints, pattern, cols, rows);
 				inImagePoints += clipedImagePoints.size();
 				p = picRating::rateImage(*img, clipedImagePoints, grid);
-				if(p>0.5){
+				if(p>0.9){
 					pTemp.psi = psi;
 					pTemp.xPos = xPos;
 					pTemp.yPos = yPos;
@@ -356,6 +357,23 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 					sumY += yPos;
 					sumPsi += psi;
 					hits++;
+					{
+						std::stringstream imgName;
+						int grid = 1;
+						imgName << "/home/josef/workspace/Loca-Projekt/initPics/initImage_";
+						imgName << hits;
+						imgName <<".jpg";
+						cv::Mat tmpImg = img->clone();
+						std::cout<<"Path:  "<<imgName.str()<<std::endl;
+						for(unsigned int i=0; i<imagePoints.size(); i++)
+							//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
+							cv::rectangle(tmpImg,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(255,255,255),1,8,0);
+						std::ostringstream s;
+						s<<"Gewichtung: "<<p<<std::endl<<"Pos: ("<<xPos<<" "<<yPos<<")   "<<psi;
+						cv::putText(tmpImg, s.str(), cvPoint(30,500),
+								cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
+						cv::imwrite(imgName.str(), tmpImg);
+					}
 					std::cout<<"found Position: "<<p<<"   X: "<<xPos<<" Y: "<<yPos<<std::endl;
 				}
 			}
@@ -366,6 +384,63 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 //			text << "\n";
 //			datafile << text.str();
 		}
+	}
+	std::cout<<std::endl;
+	if(hits < 5)
+	{
+		std::cout<<"Step1 was not sufficient ... starting Step2"<<std::endl;
+		for(double xPos = -6+0.05; xPos <= 6; xPos+=0.1){
+			std::cout<<"#";
+			std::flush(std::cout);
+			for(double yPos = -6+0.05; yPos <= 6; yPos+=0.1){
+				inImagePoints = 0;
+				for(double psi= -0.1415; psi <= 0.1415; psi+=0.01){
+					camera_model_.setExtr(psi,xPos,yPos);
+					camera_model_.projectTo2D(&(Points_3D_),&imagePoints);
+					clipedImagePoints = picRating::clipANDmark(imagePoints, pattern, cols, rows);
+					inImagePoints += clipedImagePoints.size();
+					p = picRating::rateImage(*img, clipedImagePoints, grid);
+					if(p>0.9){
+						pTemp.psi = psi;
+						pTemp.xPos = xPos;
+						pTemp.yPos = yPos;
+						pTemp.weight = p;
+						pNew.push_back(pTemp);
+						sumX += xPos;
+						sumY += yPos;
+						sumPsi += psi;
+						hits++;
+						{
+							std::stringstream imgName;
+							int grid = 1;
+							imgName << "/home/josef/workspace/Loca-Projekt/initPics/initImage_";
+							imgName << hits;
+							imgName <<".jpg";
+							cv::Mat tmpImg = img->clone();
+							std::cout<<"Path:  "<<imgName.str()<<std::endl;
+							for(unsigned int i=0; i<imagePoints.size(); i++)
+								//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
+								cv::rectangle(tmpImg,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(255,255,255),1,8,0);
+							std::ostringstream s;
+							s<<"Gewichtung: "<<p<<std::endl<<"Pos: ("<<xPos<<" "<<yPos<<")   "<<psi;
+							cv::putText(tmpImg, s.str(), cvPoint(30,500),
+									cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
+							cv::imwrite(imgName.str(), tmpImg);
+						}
+						std::cout<<"found Position: "<<p<<"   X: "<<xPos<<" Y: "<<yPos<<std::endl;
+					}
+				}
+	//			std::ostringstream text;
+	//			text << std::setw(11) << std::setfill(' ') << xPos << "; ";
+	//			text << std::setw(11) << std::setfill(' ') << yPos << "; ";
+	//			text << std::setw(11) << std::setfill(' ') << inImagePoints << "; ";
+	//			text << "\n";
+	//			datafile << text.str();
+			}
+		}
+		std::cout<<std::endl;
+
+
 	}
 	datafile.close();
 	std::cout<<"Ending Initilisation";
