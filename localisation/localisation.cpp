@@ -118,8 +118,8 @@ void localisation::observeImg(cv::Mat* img) {
 	}
 	else{
 		//TODO changed for testing, needs reverting
-	//	if(particles.size() > 0)
-	//		particles.at(0).observeImg(img);
+//		if(particles.size() > 0)
+//			particles.at(0).observeImg(img);
 		highscore = 0.0;
 		good_rating_count = 0;
 		for (unsigned int i = 0; i < particles.size(); i++) {
@@ -347,7 +347,7 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 				clipedImagePoints = picRating::clipANDmark(imagePoints, pattern, cols, rows);
 				inImagePoints += clipedImagePoints.size();
 				p = picRating::rateImage(*img, clipedImagePoints, grid);
-				if(p>0.9){
+				if(p>0.5){
 					pTemp.psi = psi;
 					pTemp.xPos = xPos;
 					pTemp.yPos = yPos;
@@ -400,7 +400,7 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 					clipedImagePoints = picRating::clipANDmark(imagePoints, pattern, cols, rows);
 					inImagePoints += clipedImagePoints.size();
 					p = picRating::rateImage(*img, clipedImagePoints, grid);
-					if(p>0.9){
+					if(p>0.5){
 						pTemp.psi = psi;
 						pTemp.xPos = xPos;
 						pTemp.yPos = yPos;

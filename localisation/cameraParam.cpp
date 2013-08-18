@@ -22,8 +22,8 @@ cameraParam::cameraParam() {
 	rotMat_World2Robot = cv::Mat(4, 4, CV_64FC1);
 	rotMat_Robot2CameraCV = cv::Mat(4, 4, CV_64FC1);
 			rotMat_Robot2CameraCV.at<double>(0,0) = 0;	rotMat_Robot2CameraCV.at<double>(0,1) = -1;rotMat_Robot2CameraCV.at<double>(0,2) = 0;	rotMat_Robot2CameraCV.at<double>(0,3) = 0;// view_matrix_eye_.y()
-			rotMat_Robot2CameraCV.at<double>(1,0) = 0;	rotMat_Robot2CameraCV.at<double>(1,1) = 0;	rotMat_Robot2CameraCV.at<double>(1,2) = -1;rotMat_Robot2CameraCV.at<double>(1,3) = 0.2; // view_matrix_eye_.z()
-			rotMat_Robot2CameraCV.at<double>(2,0) = 1; rotMat_Robot2CameraCV.at<double>(2,1) = 0;	rotMat_Robot2CameraCV.at<double>(2,2) = 0;	rotMat_Robot2CameraCV.at<double>(2,3) = 3;  // - view_matrix_eye_.x()
+			rotMat_Robot2CameraCV.at<double>(1,0) = 0;	rotMat_Robot2CameraCV.at<double>(1,1) = 0;	rotMat_Robot2CameraCV.at<double>(1,2) = -1;rotMat_Robot2CameraCV.at<double>(1,3) = 0.5; // view_matrix_eye_.z()
+			rotMat_Robot2CameraCV.at<double>(2,0) = 1; rotMat_Robot2CameraCV.at<double>(2,1) = 0;	rotMat_Robot2CameraCV.at<double>(2,2) = 0;	rotMat_Robot2CameraCV.at<double>(2,3) = 0;  // - view_matrix_eye_.x()
 			rotMat_Robot2CameraCV.at<double>(3,0) = 0;	rotMat_Robot2CameraCV.at<double>(3,1) = 0;	rotMat_Robot2CameraCV.at<double>(3,2) = 0;	rotMat_Robot2CameraCV.at<double>(3,3) = 1;
 	transMat = cv::Mat(3, 1, CV_64FC1);
 	distCoeffsVec = cv::Mat(4, 1, CV_64FC1);
@@ -51,18 +51,28 @@ void cameraParam::setCy(double cy) {
 
 void cameraParam::setExtr(double psi, double x, double y, double z) {
 
-	cv::Mat testTranslMatr = cv::Mat(4, 4, CV_64FC1);
-	testTranslMatr.at<double>(0,0) = 1; testTranslMatr.at<double>(0,1) = 0; testTranslMatr.at<double>(0,2) = 0; testTranslMatr.at<double>(0,3) = -x;//-x-2.83599;//cos(psi)*x+sin(psi)*y;
-	testTranslMatr.at<double>(1,0) = 0; testTranslMatr.at<double>(1,1) = 1; testTranslMatr.at<double>(1,2) = 0; testTranslMatr.at<double>(1,3) = -y;//-y-0.093889;//sin(psi)*x+cos(psi)*y;
-	testTranslMatr.at<double>(2,0) = 0; testTranslMatr.at<double>(2,1) = 0; testTranslMatr.at<double>(2,2) = 1; testTranslMatr.at<double>(2,3) = 0;
-	testTranslMatr.at<double>(3,0) = 0; testTranslMatr.at<double>(3,1) = 0; testTranslMatr.at<double>(3,2) = 0; testTranslMatr.at<double>(3,3) = 1;
+	cv::Mat TranslMatr = cv::Mat(4, 4, CV_64FC1);
+	TranslMatr.at<double>(0,0) = 1; TranslMatr.at<double>(0,1) = 0; TranslMatr.at<double>(0,2) = 0; TranslMatr.at<double>(0,3) = -x;//-x-2.83599;//cos(psi)*x+sin(psi)*y;
+	TranslMatr.at<double>(1,0) = 0; TranslMatr.at<double>(1,1) = 1; TranslMatr.at<double>(1,2) = 0; TranslMatr.at<double>(1,3) = -y;//-y-0.093889;//sin(psi)*x+cos(psi)*y;
+	TranslMatr.at<double>(2,0) = 0; TranslMatr.at<double>(2,1) = 0; TranslMatr.at<double>(2,2) = 1; TranslMatr.at<double>(2,3) = 0;
+	TranslMatr.at<double>(3,0) = 0; TranslMatr.at<double>(3,1) = 0; TranslMatr.at<double>(3,2) = 0; TranslMatr.at<double>(3,3) = 1;
 
-	rotMat_World2Robot.at<double>(0,0) = cos(-psi);	rotMat_World2Robot.at<double>(0,1) = -sin(-psi);rotMat_World2Robot.at<double>(0,2) = 0;rotMat_World2Robot.at<double>(0,3) = 0;//cos(psi)*x+sin(psi)*y;
-	rotMat_World2Robot.at<double>(1,0) = sin(-psi);	rotMat_World2Robot.at<double>(1,1) =  cos(-psi);rotMat_World2Robot.at<double>(1,2) = 0;rotMat_World2Robot.at<double>(1,3) = 0;//sin(psi)*x+cos(psi)*y;
-	rotMat_World2Robot.at<double>(2,0) = 0; 		rotMat_World2Robot.at<double>(2,1) =  0; 		rotMat_World2Robot.at<double>(2,2) = 1; rotMat_World2Robot.at<double>(2,3) = 0;
-	rotMat_World2Robot.at<double>(3,0) = 0;		rotMat_World2Robot.at<double>(3,1) =  0; 		rotMat_World2Robot.at<double>(3,2) = 0; rotMat_World2Robot.at<double>(3,3) = 1;
+	double pitch = -M_PI*(20.0/180.0);
+	cv::Mat cameraPitch = cv::Mat(4, 4, CV_64FC1);
+	cameraPitch.at<double>(0,0) = 1; cameraPitch.at<double>(0,1) = 0; 			cameraPitch.at<double>(0,2) = 0;			cameraPitch.at<double>(0,3) = 0;
+	cameraPitch.at<double>(1,0) = 0; cameraPitch.at<double>(1,1) = cos(pitch);	cameraPitch.at<double>(1,2) = -sin(pitch); cameraPitch.at<double>(1,3) = 0;
+	cameraPitch.at<double>(2,0) = 0; cameraPitch.at<double>(2,1) = sin(pitch);	cameraPitch.at<double>(2,2) = cos(pitch);	cameraPitch.at<double>(2,3) = 0;
+	cameraPitch.at<double>(3,0) = 0; cameraPitch.at<double>(3,1) = 0;				cameraPitch.at<double>(3,2) = 0;			cameraPitch.at<double>(3,3) = 1;
 
-	rotMat4x4 = rotMat_Robot2CameraCV*rotMat_World2Robot*testTranslMatr;
+	rotMat_World2Robot.at<double>(0,0) = cos(-psi);	rotMat_World2Robot.at<double>(0,1) = -sin(-psi);	rotMat_World2Robot.at<double>(0,2) = 0; rotMat_World2Robot.at<double>(0,3) = 0;//cos(psi)*x+sin(psi)*y;
+	rotMat_World2Robot.at<double>(1,0) = sin(-psi);	rotMat_World2Robot.at<double>(1,1) =  cos(-psi);	rotMat_World2Robot.at<double>(1,2) = 0; rotMat_World2Robot.at<double>(1,3) = 0;//sin(psi)*x+cos(psi)*y;
+	rotMat_World2Robot.at<double>(2,0) = 0; 			rotMat_World2Robot.at<double>(2,1) =  0; 			rotMat_World2Robot.at<double>(2,2) = 1; rotMat_World2Robot.at<double>(2,3) = 0;
+	rotMat_World2Robot.at<double>(3,0) = 0;			rotMat_World2Robot.at<double>(3,1) =  0; 			rotMat_World2Robot.at<double>(3,2) = 0; rotMat_World2Robot.at<double>(3,3) = 1;
+
+
+
+
+	rotMat4x4 = cameraPitch*rotMat_Robot2CameraCV*rotMat_World2Robot*TranslMatr;
 	transMat.at<double>(0,0) = rotMat4x4.at<double>(0,3);
 	transMat.at<double>(1,0) = rotMat4x4.at<double>(1,3);
 	transMat.at<double>(2,0) = rotMat4x4.at<double>(2,3);

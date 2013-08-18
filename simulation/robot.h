@@ -13,6 +13,7 @@
 #include <osgSim/DOFTransform>
 #include <osgDB/ReadFile>
 #include <osgGA/GUIEventHandler>
+#include <osgGA/CameraManipulator>
 #include <osg/ref_ptr>
 #include "util/msTimer.h"
 
@@ -26,10 +27,10 @@ public:
 		double kDistanceWheels; //m
 		double kSigmaIncrement;
 	};
-	explicit RobotData(osg::Node*n);
-	void UpdateTimer();
+	explicit RobotData(osg::Node*n, osgGA::CameraManipulator* cam);
 	void UpdatePosition();
 	void UpdateOrientation();
+	void UpdateCamTransformation();
 	void AddSpeed();
 	void RemoveSpeed();
 	void AddPsiSpeed();
@@ -46,6 +47,7 @@ protected:
 	osg::PositionAttitudeTransform* robotXform_;
 private:
 	msTimer timer_;
+	osgGA::CameraManipulator* cam_on_robot_;
 };
 
 class KeyboardEventHandler : public osgGA::GUIEventHandler
@@ -59,7 +61,7 @@ protected:
 };
 
 
-osg::Group* SetupRobot();
+osg::Group* SetupRobot(osgGA::CameraManipulator* cam);
 
 
 #endif /* ROBOT_H_ */

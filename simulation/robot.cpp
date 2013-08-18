@@ -13,13 +13,13 @@
 #include "robot.h"
 
 
-RobotData::RobotData(osg::Node* n)
+RobotData::RobotData(osg::Node* n, osgGA::CameraManipulator* cam)
 {
 	parameter_.kSpeed = 0.1;
 	parameter_.kPsiSpeed = 0.05;
 	parameter_.kImpulesProMeter = 57694;
 	parameter_.kDistanceWheels = 0.07;
-	parameter_.kSigmaIncrement = 0.2;
+	parameter_.kSigmaIncrement = 0.0;
 	incremente_left_ = 0;
 	incremente_right_ = 0;
 	x_pos_ = 0;
@@ -30,6 +30,7 @@ RobotData::RobotData(osg::Node* n)
 	timer_.Start();
 	robotXform_ =
 	 dynamic_cast <osg::PositionAttitudeTransform*> (n);
+	cam_on_robot_ = cam;
 }
 
 void RobotData::UpdatePosition()
@@ -106,8 +107,20 @@ double RobotData::RandomUniform()
 	return ((double) rand())/RAND_MAX;
 }
 
-void RobotData::UpdateTimer() {
-	timer_.getTimeStep();
+void RobotData::UpdateCamTransformation() {
+	osg::Matrix transMat = cam_on_robot_->getMatrix();
+	double x1 = -M_PI*(110.0/180.0);
+	double c1 = cos(x1);
+	double c2 = cos(-psi_+(M_PI/2));
+	double c3 = 1;//cos(x3);
+	double s1 = sin(x1);
+	double s2 = sin(-psi_+(M_PI/2));
+	double s3 = 0;//sin(x3);
+	transMat(0,0) =  c2; 				transMat(0,1) = -c3*s2; 			transMat(0,2) = s2*s3; 				transMat(0,3) =  0;
+	transMat(1,0) =  c1*s2; 			transMat(1,1) = c1*c2*c3-s1*s3;		transMat(1,2) = -c3*s1-c1*c2*s3;	transMat(1,3) =  0;
+	transMat(2,0) =  s1*s2;				transMat(2,1) = c1*s3+c2*c3*s1;		transMat(2,2) = c1*c3-c2*s1*s3;		transMat(2,3) =  0;
+	transMat(3,0) =  x_pos_;			transMat(3,1) = y_pos_;				transMat(3,2) = 0.5;				transMat(3,3) =  1;
+	cam_on_robot_->setByMatrix(transMat);
 }
 
 double RobotData::RandomGaussian()
@@ -206,9 +219,9 @@ public:
 				dynamic_cast<RobotData*> (node->getUserData());
 		if(robotdata)
 		{
-			robotdata->UpdateTimer();
 			robotdata->UpdatePosition();
 			robotdata->UpdateOrientation();
+			robotdata->UpdateCamTransformation();
 			robotdata->UpdateIncrements();
 		}
 		traverse(node, nv);
@@ -340,7 +353,7 @@ osg::Group* MakeRobot()
 	return (osg::Group*) particle;
 }
 
-osg::Group* SetupRobot()
+osg::Group* SetupRobot(osgGA::CameraManipulator* cam)
 {
 	//load the robot Model
 	osg::Node* robot_node = MakeRobot();
@@ -364,7 +377,7 @@ osg::Group* SetupRobot()
 	robotXform->setAttitude(osg::Quat(0, osg::Vec3d(0.0, 0.0, 1.0)));
 
 	//set userData for the transformation used by a Callback
-	RobotData* robotdata = new RobotData(robotXform);
+	RobotData* robotdata = new RobotData(robotXform, cam);
 	robotXform->setUserData(robotdata);
 	//create and add a Callback for the robot movement
 	robotXform->setUpdateCallback(new RobotNodeCallback);

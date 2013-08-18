@@ -32,14 +32,17 @@ Simulation::Simulation():
 
 void Simulation::Initialize() {
 
+	osgGA::TrackballManipulator* cam_on_rob_mani = new osgGA::TrackballManipulator;
+
 	root_ = SetupScene();
-	robot_ = SetupRobot();
+	robot_ = SetupRobot(cam_on_rob_mani);
 	root_->addChild(robot_);
 	root_->addChild(hud_.getGroup());
 	screen_shot_callback_ = new ScreenShotCallback();
 	root_->addUpdateCallback(new Particles::ParticleNodeCallback());
 	osgViewer::View* view_robot = new osgViewer::View;
 	osgViewer::View* view_map = new osgViewer::View;
+	osgViewer::View* test_view = new osgViewer::View;
 	//osgViewer::Viewer::ThreadingModel test;
 	std::cout<<"ThreadingModelbefore: "<<viewer_.getThreadingModel()<<std::endl;
 	viewer_.setThreadingModel((osgViewer::ViewerBase::ThreadingModel) 0);
@@ -49,6 +52,7 @@ void Simulation::Initialize() {
 	viewer_.setUpThreading();
 	viewer_.addView(view_robot);
 	viewer_.addView(view_map);
+	viewer_.addView(test_view);
 
 	//TODO light test
 	{
@@ -112,7 +116,7 @@ void Simulation::Initialize() {
 		robot_camera_manipulator->setTrackNode(robot_->getChild(0));
 		robot_camera_manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
 		view_robot->setCameraManipulator(robot_camera_manipulator);
-		view_robot->getCamera()->setFinalDrawCallback(screen_shot_callback_);
+		//view_robot->getCamera()->setFinalDrawCallback(screen_shot_callback_);
 	}
 
     {
@@ -127,7 +131,33 @@ void Simulation::Initialize() {
 		view_map->setCameraManipulator( map_camera_manipulator );
     }
 
-
+    {
+    	test_view->setSceneData(root_);
+    	//test_view->setUpViewInWindow(820,350,320,320);
+    	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
+    	traits->x = 0;
+    	traits->y = 0;
+    	traits->width = 800;
+    	traits->height = 600;
+    	traits->red = 8;
+    	traits->green = 8;
+    	traits->blue = 8;
+    	traits->alpha = 0;
+    	traits->depth = 0;
+    	traits->windowDecoration = false;
+    	traits->pbuffer = true;
+    	traits->doubleBuffer = true;
+    	traits->sharedContext = 0;
+    	osg::ref_ptr<osg::GraphicsContext> pbuffer = osg::GraphicsContext::createGraphicsContext(traits.get());
+    	osg::ref_ptr<osg::Camera> camera = test_view->getCamera();
+    	camera->setGraphicsContext(pbuffer.get());
+    	camera->setViewport(new osg::Viewport(0,0,800,600));
+    	camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
+    	camera->setDrawBuffer(GL_BACK);
+    	camera->setReadBuffer(GL_BACK);
+    	camera->setFinalDrawCallback(screen_shot_callback_);
+    	test_view->setCameraManipulator(cam_on_rob_mani);
+    }
 	// attach a trackball manipulator to all user control of the view
 //	osgGA::TrackballManipulator *trackballMani = new osgGA::TrackballManipulator;
 //	trackballMani->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
@@ -179,13 +209,13 @@ void Simulation::Step() {
 	step_counter_ ++;
 	robotdata_ = dynamic_cast<RobotData*> (robot_->getUserData());
 
-	viewer_.getView(0)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
-	view_matrix_ = viewer_.getView(0)->getCamera()->getViewMatrix();
-//	osg::Matrix windowMatrix = viewer_.getView(0)->getCamera()->getViewport()->computeWindowMatrix();
-//	osg::Matrix projectionMatrix = viewer_.getView(0)->getCamera()->getProjectionMatrix();
-//	osg::Matrix mat = projectionMatrix*windowMatrix;
-//	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
-//	std::cout<<"eye: "<<view_matrix_eye_.x()<<" "<<view_matrix_eye_.y()<<" "<<view_matrix_eye_.z()<<std::endl;
+	viewer_.getView(2)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
+	view_matrix_ = viewer_.getView(2)->getCamera()->getViewMatrix();
+	osg::Matrix windowMatrix = viewer_.getView(2)->getCamera()->getViewport()->computeWindowMatrix();
+	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
+	osg::Matrix mat = projectionMatrix*windowMatrix;
+	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
+	std::cout<<"eye: "<<view_matrix_eye_.x()<<" "<<view_matrix_eye_.y()<<" "<<view_matrix_eye_.z()<<std::endl;
 
 	//Picture handling
 	if(screen_shot_callback_->isPicTaken() && !picture_processed_){
