@@ -22,8 +22,6 @@ Simulation::Simulation():
 	view_matrix_distance_(0.0),
 	take_picture_timer_(0),
 	loop_time_(0),
-	loop_target_time_(33333),
-	data_to_file_writer_("/home/josef/workspace/Loca-Projekt/pictures/","locaDatafile.txt"),
 	sixaxes_(NULL)
 {
 	trajectory_from_file_.clear();
@@ -32,10 +30,18 @@ Simulation::Simulation():
 
 void Simulation::Initialize() {
 
+	{//apply settings_
+		data_to_file_writer_.path_ 			= settings_.picture_path_;
+		data_to_file_writer_.datafile_path_ = settings_.datafile_name_;
+		data_to_file_writer_.plotfile_path_ = settings_.plotfile_;
+		data_to_file_writer_.Header();
+		takepicture_intervall_				= settings_.takepicture_intervall_;
+		loop_target_time_					= settings_.loop_target_time_;
+	}
 	osgGA::TrackballManipulator* cam_on_rob_mani = new osgGA::TrackballManipulator;
 
 	root_ = SetupScene();
-	robot_ = SetupRobot(cam_on_rob_mani);
+	robot_ = SetupRobot(cam_on_rob_mani, settings_.robParameter_);
 	root_->addChild(robot_);
 	root_->addChild(hud_.getGroup());
 	screen_shot_callback_ = new ScreenShotCallback();
@@ -211,11 +217,11 @@ void Simulation::Step() {
 
 	viewer_.getView(2)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
 	view_matrix_ = viewer_.getView(2)->getCamera()->getViewMatrix();
-	osg::Matrix windowMatrix = viewer_.getView(2)->getCamera()->getViewport()->computeWindowMatrix();
-	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
-	osg::Matrix mat = projectionMatrix*windowMatrix;
-	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
-	std::cout<<"eye: "<<view_matrix_eye_.x()<<" "<<view_matrix_eye_.y()<<" "<<view_matrix_eye_.z()<<std::endl;
+//	osg::Matrix windowMatrix = viewer_.getView(2)->getCamera()->getViewport()->computeWindowMatrix();
+//	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
+//	osg::Matrix mat = projectionMatrix*windowMatrix;
+//	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
+//	std::cout<<"eye: "<<view_matrix_eye_.x()<<" "<<view_matrix_eye_.y()<<" "<<view_matrix_eye_.z()<<std::endl;
 
 	//Picture handling
 	if(screen_shot_callback_->isPicTaken() && !picture_processed_){
@@ -275,8 +281,8 @@ void Simulation::Step() {
 
 	UpdateHUD();
 
-	// without pad_control pictures are taken every 2sec
-	if(!pad_control_on_ && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>2000) ){
+	// without pad_control pictures are taken every takepicture_intervall_ ms
+	if( (!pad_control_on_) && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>takepicture_intervall_) ){
 		screen_shot_callback_->queueShot();
 		picture_processed_ = false;
 		take_picture_timer_ = cvGetTickCount();
@@ -314,8 +320,8 @@ void Simulation::Step() {
 	if(!trajectory_from_file_.empty()){
 		double temp = trajectory_from_file_.front();
 		if(temp<1){
-			screen_shot_callback_->queueShot();
-			picture_processed_ = false;
+			//screen_shot_callback_->queueShot();
+			//picture_processed_ = false;
 		}
 		trajectory_from_file_.erase(trajectory_from_file_.begin());
 
@@ -617,7 +623,9 @@ void Simulation::ReadRobotTrajectory(std::string path) {
 	std::ifstream datafile;
 	std::string line;
 	datafile.open(path.c_str(), std::ios_base::in);
+	std::cout<<"reading trajectory from file"<<std::endl;
 	if(datafile.is_open()){
+		std::cout<<"file opend"<<std::endl;
 		trajectory_from_file_.clear();
 		while(datafile.good()){
 			getline(datafile,line);
@@ -642,6 +650,26 @@ void Simulation::UpdateHUD() {
 	hud_text <<    "Nr of Particles: "<<localisation_->param.nrOfParticles<<"("<<localisation_->good_rating_count<<")"<<
 					"   Observe Highscore: "<<localisation_->highscore<<"("<<localisation_->highscore_count<<")";
 	hud_.setText(hud_text.str());
+}
+
+void Simulation::WriteRobotTrajectory() {
+	std::stringstream filename;
+    time_t t = time(0);   // get time now
+    struct tm * now = localtime( & t );
+    filename << "/home/josef/workspace/Loca-Projekt/trajectorys/"
+		<< (now->tm_year + 1900) << '-'
+		<< std::setw(2) << std::setfill('0') <<(now->tm_mon + 1) << '-'
+		<< std::setw(2) << std::setfill('0') << now->tm_mday << '_'
+		<< std::setw(2) << std::setfill('0') << now->tm_hour
+		<< std::setw(2) << std::setfill('0') << now->tm_min;
+	if(trajectory_buffer_.str().length() == 0){
+		std::cout<<"abord writeTrajectory"<<std::endl;
+		return;
+	}
+	std::ofstream datafile;
+	datafile.open (filename.str().c_str(), std::ios_base::out);
+	datafile << trajectory_buffer_.str();
+	datafile.close();
 }
 
 void Simulation::WriteRobotTrajectory(std::string path) {

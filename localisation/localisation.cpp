@@ -330,8 +330,8 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 	double sumX = 0, sumY = 0, sumPsi = 0;
 	double p, inImagePoints = 0;
 	unsigned char* pattern = locaUtil::getPatternCode93();
-	std::ofstream datafile;
-	datafile.open ("test.txt",std::ios_base::app);
+	//std::ofstream datafile;
+	//datafile.open ("test.txt",std::ios_base::app);
 
 
 
@@ -442,7 +442,7 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 
 
 	}
-	datafile.close();
+	//datafile.close();
 	std::cout<<"Ending Initilisation";
 	if(hits < 0){
 		std::cout<<" NO MATCH!"<<std::endl;

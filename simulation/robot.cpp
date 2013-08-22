@@ -13,13 +13,9 @@
 #include "robot.h"
 
 
-RobotData::RobotData(osg::Node* n, osgGA::CameraManipulator* cam)
+RobotData::RobotData(osg::Node* n, osgGA::CameraManipulator* cam, RobotData::RobotParameter robotParameter)
 {
-	parameter_.kSpeed = 0.1;
-	parameter_.kPsiSpeed = 0.05;
-	parameter_.kImpulesProMeter = 57694;
-	parameter_.kDistanceWheels = 0.07;
-	parameter_.kSigmaIncrement = 0.0;
+	parameter_ = robotParameter;
 	incremente_left_ = 0;
 	incremente_right_ = 0;
 	x_pos_ = 0;
@@ -353,7 +349,7 @@ osg::Group* MakeRobot()
 	return (osg::Group*) particle;
 }
 
-osg::Group* SetupRobot(osgGA::CameraManipulator* cam)
+osg::Group* SetupRobot(osgGA::CameraManipulator* cam, RobotData::RobotParameter robotParameter)
 {
 	//load the robot Model
 	osg::Node* robot_node = MakeRobot();
@@ -377,7 +373,7 @@ osg::Group* SetupRobot(osgGA::CameraManipulator* cam)
 	robotXform->setAttitude(osg::Quat(0, osg::Vec3d(0.0, 0.0, 1.0)));
 
 	//set userData for the transformation used by a Callback
-	RobotData* robotdata = new RobotData(robotXform, cam);
+	RobotData* robotdata = new RobotData(robotXform, cam, robotParameter);
 	robotXform->setUserData(robotdata);
 	//create and add a Callback for the robot movement
 	robotXform->setUpdateCallback(new RobotNodeCallback);

@@ -222,7 +222,9 @@ bool unitTests::ratingEval(double x, double y, double psi, std::string imgPath) 
 	std::ostringstream path;
 	path<<"/home/josef/workspace/Loca-Projekt/ratingEvalData_"<<imgPath.substr(44,4)<<".txt";
 	if(true){
-		DataWriter evalRatingFile("/home/josef/workspace/Loca-Projekt/test/",path.str());
+		DataWriter evalRatingFile;
+		evalRatingFile.path_ = "/home/josef/workspace/Loca-Projekt/test/";
+		evalRatingFile.datafile_path_ = path.str();
 		for(double j=-0.5;j<=+0.5;j+=0.01){
 			for(double i=-0.5;i<=+0.5;i+=0.01){
 				std::vector<patternPoint> clipedImagePointsEval;

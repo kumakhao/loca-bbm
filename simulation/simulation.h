@@ -37,6 +37,41 @@ public:
 		Landmarks,
 		Pictures
 	};
+	class Settings{
+	public:
+		std::string plotfile_;
+		std::string picture_path_;
+		std::string datafile_name_;
+		int takepicture_intervall_;
+		int loop_target_time_;
+
+		RobotData::RobotParameter robParameter_;
+
+		Settings():
+		picture_path_("/home/josef/workspace/Loca-Projekt/pictures/"),
+		datafile_name_("locaDatafile.txt"),
+		takepicture_intervall_(3000),
+		loop_target_time_(33333)
+		{
+			std::ostringstream filename;
+			time_t t = time(0);   // get time now
+			struct tm * now = localtime( & t );
+			filename << "/home/josef/workspace/Loca-Projekt/plots/"
+				<< (now->tm_year + 1900) << '-'
+				<< std::setw(2) << std::setfill('0') <<(now->tm_mon + 1) << '-'
+				<< std::setw(2) << std::setfill('0') << now->tm_mday << '_'
+				<< std::setw(2) << std::setfill('0') << now->tm_hour
+				<< std::setw(2) << std::setfill('0') << now->tm_min;
+			plotfile_ = filename.str();
+
+			robParameter_.kDistanceWheels	= 0.07;
+			robParameter_.kImpulesProMeter	= 57694;
+			robParameter_.kPsiSpeed			= 0.05;
+			robParameter_.kSigmaIncrement	= 0.2;
+			robParameter_.kSpeed			= 0.1;
+		}
+	};
+	Settings settings_;
 	Simulation();
 	~Simulation();
 	void Initialize();
@@ -47,6 +82,7 @@ public:
 	void setObserveMode(ObserveMode mode);
 	void enablePadControl();
 	void WriteRobotTrajectory(std::string path);
+	void WriteRobotTrajectory();
 	void ReadRobotTrajectory(std::string path);
 	double getRobX();
 	double getRobY();
@@ -63,6 +99,7 @@ private:
 	void Observe();
 	void Dynamic();
 	void UpdateHUD();
+
 	bool particles_on_;
 	bool setup_done_;
 	bool picture_processed_;
@@ -75,12 +112,13 @@ private:
 	double old_increments_left_;
 	double step_counter_;
 	double view_matrix_distance_;
+	int takepicture_intervall_;
+	int loop_target_time_;
 
 	std::stringstream trajectory_buffer_;
 	std::vector<double> trajectory_from_file_;
 	int64 take_picture_timer_;
 	int64 loop_time_;
-	int loop_target_time_;
 
 	osg::Group *robot_;
 	osg::Group *root_;

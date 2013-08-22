@@ -31,7 +31,7 @@ int main(){
 	std::vector<double> orientaion, position;
 
 
-	// 0=picTest  1=sim  2=framework
+	// 0=picTest  1=sim  2=framework 3=multipass Simulations
 
 	cv::Mat img1;
 	cv::Mat img2;
@@ -63,7 +63,7 @@ int main(){
 		mainSim.enablePadControl();
 		mainSim.Initialize();
 		mainSim.Realize();
-		mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectory.txt");
+		//mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/picsEvery500ms_2013-08-22_1112");
 		while(!mainSim.done()){
 			mainSim.Step();
 			//usleep(10000);
@@ -74,12 +74,40 @@ int main(){
 //			std::cout<<"Y: "<<position.at(2)<<" | VAR: "<<position.at(3)<<std::endl;
 
 		}
-		//mainSim.WriteRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectory.txt");
+		mainSim.WriteRobotTrajectory();
 		mainSim.CleanUp();
 		break;
 	case 2:
 		expoBot_test();
 		;
+		break;
+	case 3:
+		for(int pic_time = 500; pic_time <= 1000; pic_time += 500){
+			Simulation mainSim;
+			localisation *mainLoca = new localisation;
+			mainSim.setLocalisation(mainLoca);
+			//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
+			mainSim.setObserveMode(Simulation::Pictures);
+			mainSim.enablePadControl();
+			std::stringstream datafilename;
+			datafilename << "/home/josef/Desktop/hallowelt_"<<pic_time<<".txt";
+			mainSim.settings_.datafile_name_ = datafilename.str();
+			mainSim.settings_.picture_path_ = "/home/josef/Desktop/";
+			mainSim.settings_.takepicture_intervall_ = pic_time;
+			std::stringstream plotfile;
+			plotfile << "/home/josef/Desktop/plotfile_"<<pic_time;
+			mainSim.settings_.plotfile_ = plotfile.str();
+			mainSim.Initialize();
+			mainSim.Realize();
+			mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/picsEvery500ms_2013-08-22_1112");
+			while(!mainSim.done()){
+				mainSim.Step();
+			}
+			std::stringstream trajectoryfile;
+			trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
+			mainSim.WriteRobotTrajectory(trajectoryfile.str());
+			mainSim.CleanUp();
+		}
 		break;
 	default:
 		;

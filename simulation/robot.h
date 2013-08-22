@@ -27,7 +27,7 @@ public:
 		double kDistanceWheels; //m
 		double kSigmaIncrement;
 	};
-	explicit RobotData(osg::Node*n, osgGA::CameraManipulator* cam);
+	explicit RobotData(osg::Node*n, osgGA::CameraManipulator* cam, RobotData::RobotParameter robotParameter);
 	void UpdatePosition();
 	void UpdateOrientation();
 	void UpdateCamTransformation();
@@ -61,7 +61,7 @@ protected:
 };
 
 
-osg::Group* SetupRobot(osgGA::CameraManipulator* cam);
+osg::Group* SetupRobot(osgGA::CameraManipulator* cam, RobotData::RobotParameter robotParameter);
 
 
 #endif /* ROBOT_H_ */

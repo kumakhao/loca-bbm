@@ -15,20 +15,7 @@
 class DataWriter
 {
 public:
-	DataWriter():
-		img_counter_(0),
-		width_numeric_entry_(11),
-		path_("/home/josef/workspace/Loca-Projekt/pictures/"),
-		datafile_path_("/home/josef/workspace/Loca-Projekt/locaDatafile.txt"),
-		plotfile_path_("/home/josef/workspace/Loca-Projekt/plotData.txt"),
-		delimiter_("; "),
-		blank_entry_("BLANK")
-	{
-		Header();
-		imgBuffer.clear();
-		imgNameBuffer.clear();
-	}
-	DataWriter(std::string picPath, std::string filePath);
+	DataWriter();
 	void SaveImages();
 
 	void WriteData(double increment_left, double increment_right);
@@ -51,7 +38,6 @@ public:
 							double meanX, double meanY, double varX, double varY, bool observe = false);
 
 
-protected:
 	int img_counter_;
 	int width_numeric_entry_;
 	std::string path_;

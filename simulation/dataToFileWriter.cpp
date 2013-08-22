@@ -96,16 +96,26 @@ void DataWriter::WriteData(std::string text) {
 	datafile.close();
 }
 
-DataWriter::DataWriter(std::string pic_path, std::string file_path):
+DataWriter::DataWriter():
 				img_counter_(0),
 				width_numeric_entry_(11),
-				plotfile_path_("/home/josef/workspace/Loca-Projekt/plotData.txt"),
+				path_("/home/josef/workspace/Loca-Projekt/pictures/"),
+				datafile_path_("/home/josef/workspace/Loca-Projekt/locaDatafile.txt"),
 				delimiter_("; "),
 				blank_entry_("BLANK")
 {
-	datafile_path_ = file_path;
-	path_ = pic_path;
-	Header();
+	std::ostringstream filename;
+	time_t t = time(0);   // get time now
+	struct tm * now = localtime( & t );
+	filename << "/home/josef/workspace/Loca-Projekt/plots/"
+		<< (now->tm_year + 1900) << '-'
+		<< std::setw(2) << std::setfill('0') <<(now->tm_mon + 1) << '-'
+		<< std::setw(2) << std::setfill('0') << now->tm_mday << '_'
+		<< std::setw(2) << std::setfill('0') << now->tm_hour
+		<< std::setw(2) << std::setfill('0') << now->tm_min;
+	plotfile_path_ = filename.str();
+	imgBuffer.clear();
+	imgNameBuffer.clear();
 }
 
 void DataWriter::WriteData(double increment_left, double increment_right,
@@ -234,20 +244,20 @@ void DataWriter::WritePlotData(double trueRobX, double trueRobY,
 		double trueRobPsi, double meanX, double meanY, double varX,
 		double varY, bool observe) {
 	std::ostringstream text;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobX << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobY << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobPsi << delimiter_;
-
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << meanX << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << meanY << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << varX << delimiter_;
-	text << std::setw(width_numeric_entry_) << std::setfill(' ') << varY << delimiter_;
-	if(observe)
 		text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobX << delimiter_;
-	else
-		text << std::setw(width_numeric_entry_) << std::setfill(' ') << "noimage" << delimiter_;
+		text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobY << delimiter_;
+		text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobPsi << delimiter_;
 
-	text << "\n";
+		text << std::setw(width_numeric_entry_) << std::setfill(' ') << meanX << delimiter_;
+		text << std::setw(width_numeric_entry_) << std::setfill(' ') << meanY << delimiter_;
+		text << std::setw(width_numeric_entry_) << std::setfill(' ') << varX << delimiter_;
+		text << std::setw(width_numeric_entry_) << std::setfill(' ') << varY << delimiter_;
+		if(observe)
+			text << std::setw(width_numeric_entry_) << std::setfill(' ') << trueRobX << delimiter_;
+		else
+			text << std::setw(width_numeric_entry_) << std::setfill(' ') << "noimage" << delimiter_;
+
+		text << "\n";
 	std::ofstream datafile;
 	datafile.open (plotfile_path_.c_str(),std::ios_base::app);
 	datafile << text.str();
