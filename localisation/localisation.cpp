@@ -97,6 +97,8 @@ void localisation::Particle::dynamic(double dDistance, double dPsi) {
 localisation::localisation():
 	initilisation_done_(false){
 	Points_3D_ = locaUtil::getBit3Dlocations_all();
+	highscore = 0;
+	highscore_count = 0;
 
 }
 
@@ -121,6 +123,7 @@ void localisation::observeImg(cv::Mat* img) {
 //		if(particles.size() > 0)
 //			particles.at(0).observeImg(img);
 		highscore = 0.0;
+		highscore_count = 0;
 		good_rating_count = 0;
 		for (unsigned int i = 0; i < particles.size(); i++) {
 				particles.at(i).observeImg(&gray_img);
@@ -254,7 +257,6 @@ std::vector<double> localisation::getPosition() {
 }
 
 localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
-	//TODO: untested!
 	EstimatedRobotPose es;
 	if(!initilisation_done_){
 		es.psi = INFINITY;

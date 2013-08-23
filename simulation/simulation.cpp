@@ -37,6 +37,7 @@ void Simulation::Initialize() {
 		data_to_file_writer_.Header();
 		takepicture_intervall_				= settings_.takepicture_intervall_;
 		loop_target_time_					= settings_.loop_target_time_;
+		croud_size_							= settings_.crowd_size_;
 	}
 	osgGA::TrackballManipulator* cam_on_rob_mani = new osgGA::TrackballManipulator;
 
@@ -48,8 +49,7 @@ void Simulation::Initialize() {
 	root_->addUpdateCallback(new Particles::ParticleNodeCallback());
 	osgViewer::View* view_robot = new osgViewer::View;
 	osgViewer::View* view_map = new osgViewer::View;
-	osgViewer::View* test_view = new osgViewer::View;
-	//osgViewer::Viewer::ThreadingModel test;
+	osgViewer::View* view_camera_on_robot = new osgViewer::View;
 	std::cout<<"ThreadingModelbefore: "<<viewer_.getThreadingModel()<<std::endl;
 	viewer_.setThreadingModel((osgViewer::ViewerBase::ThreadingModel) 0);
 	std::cout<<"ThreadingModelafter: "<<viewer_.getThreadingModel()<<std::endl;
@@ -58,10 +58,9 @@ void Simulation::Initialize() {
 	viewer_.setUpThreading();
 	viewer_.addView(view_robot);
 	viewer_.addView(view_map);
-	viewer_.addView(test_view);
+	viewer_.addView(view_camera_on_robot);
 
-	//TODO light test
-	{
+	{//light
 		mylightsource = new osg::LightSource();
 		osg::Light *mylight = new osg::Light();
 		mylight->setLightNum(0);
@@ -71,6 +70,188 @@ void Simulation::Initialize() {
 		mylight->setAmbient(osg::Vec4d(0.0, 0.0, 0.0, 1.0));
 		mylight->setDiffuse(osg::Vec4d(1.0, 1.0, 1.0, 1.0));
 		mylight->setPosition(osg::Vec4d(0.0, 0.0, 10.0, 1.0));
+	}
+
+	//Seed human doubles into the simulation.
+
+	switch (croud_size_){
+	case 25:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(0,0,0) );
+			root_->addChild(human_transform);
+		}
+	case 24:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(2.5,0,0) );
+			root_->addChild(human_transform);
+		}
+	case 23:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(0,5,0) );
+			root_->addChild(human_transform);
+		}
+	case 22:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-2.5,-5,0) );
+			root_->addChild(human_transform);
+		}
+	case 21:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-2.5,0,0) );
+			root_->addChild(human_transform);
+		}
+	case 20:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-5,2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 19:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(2.5,-5,0) );
+			root_->addChild(human_transform);
+		}
+	case 18:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(0,2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 17:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-5,-2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 16:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(5,2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 15:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-5,5,0) );
+			root_->addChild(human_transform);
+		}
+	case 14:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(2.5,-2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 13:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-2.5,-2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 12:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(5,-5,0) );
+			root_->addChild(human_transform);
+		}
+	case 11:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(2.5,5,0) );
+			root_->addChild(human_transform);
+		}
+	case 10:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(5,0,0) );
+			root_->addChild(human_transform);
+		}
+	case 9:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-2.5,2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 8:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(0,-2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 7:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-5,-5,0) );
+			root_->addChild(human_transform);
+		}
+	case 6:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(5,5,0) );
+			root_->addChild(human_transform);
+		}
+	case 5:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-2.5,5,0) );
+			root_->addChild(human_transform);
+		}
+	case 4:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(-5,0,0) );
+			root_->addChild(human_transform);
+		}
+	case 3:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(0,-5,0) );
+			root_->addChild(human_transform);
+		}
+	case 2:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(5,-2.5,0) );
+			root_->addChild(human_transform);
+		}
+	case 1:
+		{
+			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+			human_transform->addChild(HumanDouble());
+			human_transform->setPosition( osg::Vec3d(2.5,2.5,0) );
+			root_->addChild(human_transform);
+		}
+	default:
+		break;
 	}
 
 	if(particles_on_){
@@ -114,7 +295,7 @@ void Simulation::Initialize() {
 	}
 
 
-	{
+	{//Setup view from behind the robot
 		view_robot->setSceneData(root_);
 		view_robot->setUpViewInWindow(10,10,800,600);
 		osg::ref_ptr<osgGA::NodeTrackerManipulator> robot_camera_manipulator = new osgGA::NodeTrackerManipulator;
@@ -125,7 +306,7 @@ void Simulation::Initialize() {
 		//view_robot->getCamera()->setFinalDrawCallback(screen_shot_callback_);
 	}
 
-    {
+    {//Setup view strait down on the robot.
     	view_map->setSceneData(root_);
 		view_map->setUpViewInWindow(820,10,320,320);
 		osg::ref_ptr<osgGA::NodeTrackerManipulator> map_camera_manipulator = new osgGA::NodeTrackerManipulator;
@@ -137,9 +318,9 @@ void Simulation::Initialize() {
 		view_map->setCameraManipulator( map_camera_manipulator );
     }
 
-    {
-    	test_view->setSceneData(root_);
-    	//test_view->setUpViewInWindow(820,350,320,320);
+    {//Setup view for the camera on the robot.
+    	view_camera_on_robot->setSceneData(root_);
+    	//view_camera_on_robot->setUpViewInWindow(820,350,320,320);
     	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     	traits->x = 0;
     	traits->y = 0;
@@ -149,35 +330,21 @@ void Simulation::Initialize() {
     	traits->green = 8;
     	traits->blue = 8;
     	traits->alpha = 0;
-    	traits->depth = 0;
+    	traits->depth = 16;
     	traits->windowDecoration = false;
     	traits->pbuffer = true;
     	traits->doubleBuffer = true;
     	traits->sharedContext = 0;
     	osg::ref_ptr<osg::GraphicsContext> pbuffer = osg::GraphicsContext::createGraphicsContext(traits.get());
-    	osg::ref_ptr<osg::Camera> camera = test_view->getCamera();
+    	osg::ref_ptr<osg::Camera> camera = view_camera_on_robot->getCamera();
     	camera->setGraphicsContext(pbuffer.get());
     	camera->setViewport(new osg::Viewport(0,0,800,600));
     	camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
     	camera->setDrawBuffer(GL_BACK);
     	camera->setReadBuffer(GL_BACK);
     	camera->setFinalDrawCallback(screen_shot_callback_);
-    	test_view->setCameraManipulator(cam_on_rob_mani);
+    	view_camera_on_robot->setCameraManipulator(cam_on_rob_mani);
     }
-	// attach a trackball manipulator to all user control of the view
-//	osgGA::TrackballManipulator *trackballMani = new osgGA::TrackballManipulator;
-//	trackballMani->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
-//	viewer_.setCameraManipulator(trackballMani);
-	//viewer_.getCamera()->setViewMatrix(osg::Matrix::lookAt(osg::Vec3(0, -30, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0)));
-
-	// A manipulator to follow the robot node.
-//	osg::ref_ptr<osgGA::NodeTrackerManipulator> manipulator = new osgGA::NodeTrackerManipulator;
-//	manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
-//	manipulator->setTrackNode(robot_->getChild(0));
-//	manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
-//	viewer_.setCameraManipulator(manipulator);
-
-
 }
 
 void Simulation::Realize() {
@@ -533,17 +700,15 @@ osg::Group* Simulation::SetupScene() {
 	osg::Texture2D* leinwandFaceTexture03 = new osg::Texture2D;
 
 	// protect from being optimized away as static state:
-	leinwandFaceTexture01->setDataVariance(osg::Object::DYNAMIC);
-	leinwandFaceTexture02->setDataVariance(osg::Object::DYNAMIC);
-	leinwandFaceTexture03->setDataVariance(osg::Object::DYNAMIC);
+	leinwandFaceTexture01->setDataVariance(osg::Object::STATIC);
+	leinwandFaceTexture02->setDataVariance(osg::Object::STATIC);
+	leinwandFaceTexture03->setDataVariance(osg::Object::STATIC);
 
 	// load an image by reading a file:
 	osg::Image* leinwandFace01 = osgDB::readImageFile("textures/wall1_1024.jpg");
 	osg::Image* leinwandFace02 = osgDB::readImageFile("textures/wall2_1024.jpg");
 	osg::Image* leinwandFace03 = osgDB::readImageFile("textures/wall3_1024.jpg");
-//		osg::Image* leinwandFace01 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_01.png");
-//		osg::Image* leinwandFace02 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_02.png");
-//		osg::Image* leinwandFace03 = osgDB::readImageFile("/home/josef/workspace/test/Checkerboard_pattern_03.png");
+
 	if (!leinwandFace01) std::cout << " couldn't find texture." << std::endl;
 	if (!leinwandFace02) std::cout << " couldn't find texture." << std::endl;
 	if (!leinwandFace03) std::cout << " couldn't find texture." << std::endl;
@@ -572,18 +737,6 @@ osg::Group* Simulation::SetupScene() {
 	leinwand02_transform->setStateSet(state_leinwand02);
 	leinwand03_transform->setStateSet(state_leinwand03);
 
-/*osg::PositionAttitudeTransform *lightPos = new osg::PositionAttitudeTransform();
-
-	osg::LightSource* testLight = new osg::LightSource();
-	osg::StateSet *lightStateSet;
-	lightStateSet = root->getOrCreateStateSet();
-	testLight->setLight(createLight(1));
-	testLight->setLocalStateSetModes(osg::StateAttribute::ON);
-	testLight->setStateSetModes(*lightStateSet, osg::StateAttribute::ON);
-
-	lightPos->addChild(testLight);
-	lightPos->setPosition(osg::Vec3(-6, 0, 4));
-	root->addChild(lightPos);*/
 	return root;
 }
 
@@ -633,6 +786,123 @@ void Simulation::ReadRobotTrajectory(std::string path) {
 		}
 		datafile.close();
 	}
+}
+
+osg::Geode* Simulation::HumanDouble() {
+
+	osg::Geode* human_double = new osg::Geode();
+	osg::Geometry* human_geo = new osg::Geometry();
+	human_double->addDrawable(human_geo);
+	double left=-0.2, right=0.2;
+	double bottom=0.0, top=1.8;
+	double front=-0.2, back=0.2;
+
+	// Specify the vertices:
+	osg::Vec3Array* human_vertices = new osg::Vec3Array;
+	human_vertices->push_back( osg::Vec3(left, front, bottom) ); // front left bottom
+	human_vertices->push_back( osg::Vec3(right, front, bottom) ); // front right bottom
+	human_vertices->push_back( osg::Vec3(right, back, bottom) ); // back right bottom
+	human_vertices->push_back( osg::Vec3(left, back, bottom) ); // back left bottom
+	human_vertices->push_back( osg::Vec3(left, back, top) ); // back left top
+	human_vertices->push_back( osg::Vec3(right, back, top) ); // back right top
+	human_vertices->push_back( osg::Vec3(right, front, top) ); // front right top
+	human_vertices->push_back( osg::Vec3(left, front, top) ); // front left top
+
+	human_vertices->push_back( osg::Vec3(left, front, bottom) ); // front left bottom
+	human_vertices->push_back( osg::Vec3(right, front, bottom) ); // front right bottom
+	human_vertices->push_back( osg::Vec3(left, back, bottom) ); // back left bottom
+	human_vertices->push_back( osg::Vec3(left, back, top) ); // back left top
+	human_vertices->push_back( osg::Vec3(right, back, bottom) ); // back right bottom
+	human_vertices->push_back( osg::Vec3(right, back, top) ); // back right top
+
+	human_geo->setVertexArray( human_vertices );
+
+	osg::DrawElementsUInt* quadrat_ground =
+			new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_ground->push_back(3); // front right bottom
+		quadrat_ground->push_back(2); // front left bottom
+		quadrat_ground->push_back(1); // back left bottom
+		quadrat_ground->push_back(0); // back right bottom
+		human_geo->addPrimitiveSet(quadrat_ground);
+
+	osg::DrawElementsUInt* quadrat_back =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_back->push_back(5); // back right top
+		quadrat_back->push_back(4); // back left top
+		quadrat_back->push_back(3); // back left bottom
+		quadrat_back->push_back(2); // back right bottom
+		human_geo->addPrimitiveSet(quadrat_back);
+
+	osg::DrawElementsUInt* quadrat_top =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_top->push_back(4); // back right top
+		quadrat_top->push_back(5); // back left top
+		quadrat_top->push_back(6); // front left top
+		quadrat_top->push_back(7); // front right top
+		human_geo->addPrimitiveSet(quadrat_top);
+
+	osg::DrawElementsUInt* quadrat_right =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_right->push_back(6); // back right bottom
+		quadrat_right->push_back(9); // front right bottom
+		quadrat_right->push_back(12); // front right top
+		quadrat_right->push_back(13); // back right top
+		human_geo->addPrimitiveSet(quadrat_right);
+
+	osg::DrawElementsUInt* quadrat_left =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_left->push_back(7); // back right bottom
+		quadrat_left->push_back(8); // front right bottom
+		quadrat_left->push_back(10); // front right top
+		quadrat_left->push_back(11); // back right top
+		human_geo->addPrimitiveSet(quadrat_left);
+
+	osg::DrawElementsUInt* quadrat_front =
+				new osg::DrawElementsUInt(osg::PrimitiveSet::QUADS, 0);
+		quadrat_front->push_back(6); // back right bottom
+		quadrat_front->push_back(7); // front right bottom
+		quadrat_front->push_back(8); // front right top
+		quadrat_front->push_back(9); // back right top
+		human_geo->addPrimitiveSet(quadrat_front);
+
+	osg::Vec2Array* texcoords = new osg::Vec2Array(14);
+		(*texcoords)[0].set(0.4f,0.0f); // tex coord for vertex 0
+		(*texcoords)[1].set(0.6f,0.0f); // tex coord for vertex 1
+		(*texcoords)[2].set(0.6f,0.2f); // ""
+		(*texcoords)[3].set(0.4f,0.2f); // ""
+		(*texcoords)[4].set(0.4f,0.4f);
+		(*texcoords)[5].set(0.6f,0.4f);
+		(*texcoords)[6].set(0.6f,0.6f);
+		(*texcoords)[7].set(0.4f,0.6f);
+		(*texcoords)[8].set(0.4f,0.8f); // ""
+		(*texcoords)[9].set(0.6f,0.8f); // ""
+		(*texcoords)[10].set(0.2f,0.8f);
+		(*texcoords)[11].set(0.2f,0.6f);
+		(*texcoords)[12].set(0.8f,0.8f);
+		(*texcoords)[13].set(0.8f,0.6f);
+		human_geo->setTexCoordArray(0,texcoords);
+
+	osg::Vec4Array* colors = new osg::Vec4Array;
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+	colors->push_back(osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f) );
+
+	human_geo->setColorArray(colors);
+	human_geo->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+
+	return human_double;
+
 }
 
 void Simulation::UpdateHUD() {

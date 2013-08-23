@@ -31,7 +31,11 @@ int main(){
 	std::vector<double> orientaion, position;
 
 
-	// 0=picTest  1=sim  2=framework 3=multipass Simulations
+	// 0 = picTest
+	// 1 = sim
+	// 2 = framework
+	// 3 = pic frequency Simulation
+	// 4 = croud Simulation
 
 	cv::Mat img1;
 	cv::Mat img2;
@@ -56,7 +60,7 @@ int main(){
 		mainLoca->landmarks.addLandmark(3,-5.0,5.0);
 		mainLoca->landmarks.addLandmark(4,5.0,5.0);
 
-
+		mainLoca->initilisation_done_ = true;
 		mainSim.setLocalisation(mainLoca);
 		//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
 		mainSim.setObserveMode(Simulation::Pictures);
@@ -105,6 +109,35 @@ int main(){
 			}
 			std::stringstream trajectoryfile;
 			trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
+			mainSim.WriteRobotTrajectory(trajectoryfile.str());
+			mainSim.CleanUp();
+		}
+		break;
+	case 4:
+		for(int croud_size = 0; croud_size <= 23; croud_size++){
+			Simulation mainSim;
+			localisation *mainLoca = new localisation;
+			mainSim.setLocalisation(mainLoca);
+			//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
+			mainSim.setObserveMode(Simulation::Pictures);
+			mainSim.enablePadControl();
+			std::stringstream datafilename;
+			datafilename << "/home/josef/workspace/Loca-Projekt/plots/croudEffect/LocaData_"<<croud_size<<".txt";
+			mainSim.settings_.crowd_size_ = croud_size;
+			mainSim.settings_.takepicture_intervall_ = 1000;
+			mainSim.settings_.datafile_name_ = datafilename.str();
+			mainSim.settings_.picture_path_ = "/home/josef/workspace/Loca-Projekt/pics/croudEffect/";
+			std::stringstream plotfile;
+			plotfile << "/home/josef/workspace/Loca-Projekt/plots/croudEffect/plotfile_"<<croud_size;
+			mainSim.settings_.plotfile_ = plotfile.str();
+			mainSim.Initialize();
+			mainSim.Realize();
+			mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/picsEvery500ms_2013-08-22_1112");
+			while(!mainSim.done()){
+				mainSim.Step();
+			}
+			std::stringstream trajectoryfile;
+			trajectoryfile << "/home/josef/Desktop/trajectory_"<<croud_size;
 			mainSim.WriteRobotTrajectory(trajectoryfile.str());
 			mainSim.CleanUp();
 		}

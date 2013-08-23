@@ -39,19 +39,28 @@ public:
 	};
 	class Settings{
 	public:
+		//Where the file for plots is stored.
 		std::string plotfile_;
+		//Where pictures, that have been used for Localization, are stored.
 		std::string picture_path_;
+		//Where the basic datafile is stored.
 		std::string datafile_name_;
+		//Time between pictures, when no Pad is used.
 		int takepicture_intervall_;
+		//Minimum time for one frame loop
 		int loop_target_time_;
+		//how many human models for the simulation are created
+		int crowd_size_;
 
+		//Robot hardware paramerters including sensor nois!
 		RobotData::RobotParameter robParameter_;
 
 		Settings():
 		picture_path_("/home/josef/workspace/Loca-Projekt/pictures/"),
 		datafile_name_("locaDatafile.txt"),
 		takepicture_intervall_(3000),
-		loop_target_time_(33333)
+		loop_target_time_(33333),
+		crowd_size_(0)
 		{
 			std::ostringstream filename;
 			time_t t = time(0);   // get time now
@@ -71,6 +80,8 @@ public:
 			robParameter_.kSpeed			= 0.1;
 		}
 	};
+	// Controles how the simulation behaves
+	// will only be applyed during Simulation::Initialize()
 	Settings settings_;
 	Simulation();
 	~Simulation();
@@ -96,6 +107,7 @@ private:
 	osg::Geode* Leinwand();
 	osg::Geode* Ground();
 	osg::Group* SetupScene();
+	osg::Geode* HumanDouble();
 	void Observe();
 	void Dynamic();
 	void UpdateHUD();
@@ -114,6 +126,7 @@ private:
 	double view_matrix_distance_;
 	int takepicture_intervall_;
 	int loop_target_time_;
+	int croud_size_;
 
 	std::stringstream trajectory_buffer_;
 	std::vector<double> trajectory_from_file_;

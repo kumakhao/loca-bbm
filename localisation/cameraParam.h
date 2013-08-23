@@ -48,7 +48,6 @@ public:
 		return transMat;
 	}
 protected:
-	double test;
 	cv::Mat rotX(double angle);
 	cv::Mat rotY(double angle);
 	cv::Mat rotZ(double angle);
