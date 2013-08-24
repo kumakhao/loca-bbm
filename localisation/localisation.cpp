@@ -82,15 +82,12 @@ void localisation::Particle::observeGPS(double x, double y, double psi) {
 }
 
 void localisation::Particle::dynamic(double dDistance, double dPsi) {
-	//TODO: randomGaussian
 	double errDistance = dDistance * locaUtil::randomGaussian()
-			* loca->param.sigmaDistance;
+									* loca->param.sigmaDistance;
 	//TODO auch bei geradeausfahrt winkelfehler möglich
 	double errPsi = dPsi * locaUtil::randomGaussian() * loca->param.sigmaAngle;
-	xPos = xPos + cos(psi + errPsi) * (dDistance + errDistance);
-	yPos = yPos + sin(psi + errPsi) * (dDistance + errDistance);
-//	xPos = xPos + cos(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
-//	yPos = yPos + sin(psi + (dPsi + errPsi) / 2) * (dDistance + errDistance);
+	xPos = xPos + cos(psi + errPsi) * (dDistance + errDistance); //TODO errPsi hier löschen?
+	yPos = yPos + sin(psi + errPsi) * (dDistance + errDistance); //      sonst wirkt es 2x
 	psi = psi + (dPsi + errPsi);
 }
 

@@ -18,6 +18,8 @@ RobotData::RobotData(osg::Node* n, osgGA::CameraManipulator* cam, RobotData::Rob
 	parameter_ = robotParameter;
 	incremente_left_ = 0;
 	incremente_right_ = 0;
+	wheel_angle_left_ = 0;
+	wheel_angle_right_ = 0;
 	x_pos_ = 0;
 	y_pos_ = 0;
 	psi_ = 0.0;
@@ -72,6 +74,22 @@ void RobotData::RemovePsiSpeed()
 }
 void RobotData::UpdateIncrements()
 {
+	{
+		double old_wheel_angle_left = wheel_angle_left_;
+		double old_wheel_angle_right = wheel_angle_right_;
+		wheel_angle_left_ += 	speed_/parameter_.kRadiusWheels
+								-
+								psi_speed_
+								*parameter_.kDistanceWheels
+								/2
+								/parameter_.kRadiusWheels;
+		wheel_angle_right_+= 	speed_/parameter_.kRadiusWheels
+								+
+								psi_speed_
+								*parameter_.kDistanceWheels
+								/2
+								/parameter_.kRadiusWheels;
+	}
 	//TODO: The angle of each wheel (true "physical" state)
 	//should be computed and then saved befor conversion to increments.
 	double deltaIncL = speed_//*timer_.last_step_time_*0.000001	// speed -> distance

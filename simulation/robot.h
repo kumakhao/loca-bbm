@@ -25,6 +25,9 @@ public:
 		double kPsiSpeed; // ?/s
 		int kImpulesProMeter; //impulse / m
 		double kDistanceWheels; //m
+		double kRadiusWheels;
+		int kImpulePerTurn; //impulse pro geberUmdrehung
+		double kTransmissionKoefficent; //geberdrehung : Raddrehung
 		double kSigmaIncrement;
 	};
 	explicit RobotData(osg::Node*n, osgGA::CameraManipulator* cam, RobotData::RobotParameter robotParameter);
@@ -41,6 +44,8 @@ public:
 	RobotParameter parameter_;
 	double incremente_left_;
 	double incremente_right_;
+	double wheel_angle_left_;
+	double wheel_angle_right_;
 	double speed_, psi_speed_;
 	double x_pos_, y_pos_, psi_;
 protected:

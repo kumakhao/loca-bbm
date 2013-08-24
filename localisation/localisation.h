@@ -40,23 +40,16 @@ public:
 	public:
 		localisation* loca;
 		double weight;
-		enum State{UNDEFINED, POSITIONDEFINED, FULLDEFINED};
-		State state;
 		double xPos;
 		double yPos;
 		double psi;
-		double time;
-		double timeOfLastObservation;
 
 		Particle(localisation* loca, double weight, double xPos, double yPos, double psi)
 			:loca(loca),
 			 weight(weight),
-			 state(UNDEFINED),
 			 xPos(xPos),
 			 yPos(yPos),
-			 psi(psi),
-			 time(0),
-			 timeOfLastObservation(0)
+			 psi(psi)
 		{}
 
 		void observeImg (cv::Mat* img);

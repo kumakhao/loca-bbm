@@ -73,11 +73,14 @@ public:
 				<< std::setw(2) << std::setfill('0') << now->tm_min;
 			plotfile_ = filename.str();
 
-			robParameter_.kDistanceWheels	= 0.07;
-			robParameter_.kImpulesProMeter	= 57694;
-			robParameter_.kPsiSpeed			= 0.05;
-			robParameter_.kSigmaIncrement	= 0.2;
-			robParameter_.kSpeed			= 0.1;
+			robParameter_.kDistanceWheels			= 0.07;
+			robParameter_.kRadiusWheels				= 0.008;
+			robParameter_.kImpulesProMeter			= 57694;
+			robParameter_.kImpulePerTurn			= 2000;
+			robParameter_.kTransmissionKoefficent	= 14.5;
+			robParameter_.kPsiSpeed					= 0.05;
+			robParameter_.kSigmaIncrement			= 0.2;
+			robParameter_.kSpeed					= 0.1;
 		}
 	};
 	// Controles how the simulation behaves
