@@ -99,6 +99,8 @@ public:
 	};
 	localisation::EstimatedRobotPose getEstimatedRobotPose();
 private:
+	double old_increment_left_;
+	double old_increment_right_;
 	bool findInitialLocatio(cv::Mat* img);
 };
 

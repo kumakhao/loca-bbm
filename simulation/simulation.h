@@ -123,8 +123,6 @@ private:
 
 	ObserveMode observe_mode_;
 
-	double old_increments_right_;
-	double old_increments_left_;
 	double step_counter_;
 	double view_matrix_distance_;
 	int takepicture_intervall_;

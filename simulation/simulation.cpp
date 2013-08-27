@@ -16,8 +16,6 @@ Simulation::Simulation():
 	pad_control_on_(false),
 	take_picture_button_pressed_(false),
 	observe_mode_(noObserve),
-	old_increments_right_(0.0),
-	old_increments_left_(0.0),
 	step_counter_(0.0),
 	view_matrix_distance_(0.0),
 	take_picture_timer_(0),
@@ -423,7 +421,7 @@ void Simulation::Step() {
 		step_counter_ = 0;
 		if(particles_on_){
 			// The dynamic update of the particle filter.
-			localisation_->dynamic(robotdata_->incremente_left_-old_increments_left_,robotdata_->incremente_right_-old_increments_right_);
+			localisation_->dynamic(robotdata_->incremente_left_,robotdata_->incremente_right_);
 
 			// Update of simulations view of particles.
 			particle_view_->Update(localisation_->getParticles());
@@ -442,8 +440,6 @@ void Simulation::Step() {
 											es.x, es.y,
 											es.sigmaXYLarge, es.sigmaXYSmall,
 											es.sigmaXYAngle/M_PI*180);
-		old_increments_left_ = robotdata_->incremente_left_;
-		old_increments_right_ = robotdata_->incremente_right_;
 	}
 
 	UpdateHUD();
@@ -535,9 +531,7 @@ double Simulation::getLandmarkObservation(int ID) {
 }
 
 double Simulation::getLeftInc() {
-	double value = robotdata_->incremente_left_-old_increments_left_;
-	old_increments_left_ = robotdata_->incremente_left_;
-	return value;
+	return robotdata_->incremente_left_;
 }
 
 void Simulation::setLocalisation(localisation* loca) {
@@ -572,9 +566,7 @@ void Simulation::setObserveMode(ObserveMode mode) {
 }
 
 double Simulation::getRightInc() {
-	double value = robotdata_->incremente_right_-old_increments_right_;
-	old_increments_right_ = robotdata_->incremente_right_;
-	return value;
+	return robotdata_->incremente_right_;
 }
 
 void Simulation::enablePadControl() {

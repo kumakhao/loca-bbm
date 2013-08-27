@@ -96,12 +96,18 @@ localisation::localisation():
 	Points_3D_ = locaUtil::getBit3Dlocations_all();
 	highscore = 0;
 	highscore_count = 0;
+	old_increment_left_ = 0;
+	old_increment_right_ = 0;
 
 }
 
 void localisation::dynamic(double incLeft, double incRight) {
-	double dPsi = (incRight - incLeft) / param.impulesProMeter	/ param.distanceWheels;
-	double dDistance = (incLeft + incRight) / 2.0 / param.impulesProMeter;
+	double diffLeft = incLeft-old_increment_left_;
+	double diffRight = incRight-old_increment_right_;
+	old_increment_left_ = incLeft;
+	old_increment_right_ = incRight;
+	double dPsi = (diffRight - diffLeft) / param.impulesProMeter	/ param.distanceWheels;
+	double dDistance = (diffLeft + diffRight) / 2.0 / param.impulesProMeter;
 	//std::cout<<"dPsi: "<<dPsi<<"    dDistance: "<<dDistance<<endl;
 	for (unsigned int i = 0; i < particles.size(); i++) {
 		particles.at(i).dynamic(dDistance, dPsi);
