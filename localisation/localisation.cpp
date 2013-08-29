@@ -18,12 +18,12 @@ localisation::Parameters::Parameters() :
 		fieldY(12),
 		fieldX(12),
 		impulesProMeter(57694),
-		distanceWheels(0.07),
+		distanceWheels(0.7),
 		sigmaGPS(0.05),
 		sigmaLandmarke(0.1),
 		sigmaIncrement(0.1),
-		sigmaDistance(0.2),
-		sigmaAngle(0.2) {
+		sigmaDistance(0.0),
+		sigmaAngle(0.0) {
 }
 
 void localisation::Particle::observeImg(cv::Mat* img) {

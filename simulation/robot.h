@@ -25,7 +25,8 @@ public:
 		double kPsiSpeed; // ?/s
 		int kImpulesProMeter; //impulse / m
 		double kDistanceWheels; //m
-		double kRadiusWheels;
+		double kRadiusWheelRight;
+		double kRadiusWheelLeft;
 		int kImpulePerTurn; //impulse pro geberUmdrehung
 		double kTransmissionKoefficent; //geberdrehung : Raddrehung
 		double kSigmaIncrement;
@@ -39,8 +40,6 @@ public:
 	void AddPsiSpeed();
 	void RemovePsiSpeed();
 	void UpdateIncrements();
-	double RandomUniform();
-	double RandomGaussian();
 	RobotParameter parameter_;
 	double incremente_left_;
 	double incremente_right_;

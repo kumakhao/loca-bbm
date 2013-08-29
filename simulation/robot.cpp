@@ -10,6 +10,7 @@
 #include <osgDB/ReadFile>
 #include <osgGA/GUIEventHandler>
 #include <assert.h>
+#include "../locaUtil.h"
 #include "robot.h"
 
 
@@ -75,50 +76,48 @@ void RobotData::RemovePsiSpeed()
 void RobotData::UpdateIncrements()
 {
 	{
-		double old_wheel_angle_left = wheel_angle_left_;
-		double old_wheel_angle_right = wheel_angle_right_;
-		wheel_angle_left_ += 	speed_/parameter_.kRadiusWheels
-								-
-								psi_speed_
-								*parameter_.kDistanceWheels
-								/2
-								/parameter_.kRadiusWheels;
-		wheel_angle_right_+= 	speed_/parameter_.kRadiusWheels
-								+
-								psi_speed_
-								*parameter_.kDistanceWheels
-								/2
-								/parameter_.kRadiusWheels;
-	}
-	//TODO: The angle of each wheel (true "physical" state)
-	//should be computed and then saved befor conversion to increments.
-	double deltaIncL = speed_//*timer_.last_step_time_*0.000001	// speed -> distance
-						*parameter_.kImpulesProMeter 			// distance -> impluses
-						-
-						psi_speed_//*timer_.last_step_time_*0.000001	// rotSpeed -> rotAngle
-						*parameter_.kDistanceWheels					// rotAngle -> arcLength
-						*parameter_.kImpulesProMeter				// arcLength -> impluses
-						/2.0;										// total impulses -> impulses for one wheel
-	double deltaIncR = speed_//*timer_.last_step_time_*0.000001
-						*parameter_.kImpulesProMeter
-						+
-						psi_speed_//*timer_.last_step_time_*0.000001
-						*parameter_.kDistanceWheels
-						*parameter_.kImpulesProMeter
-						/2.0;
-	double errIncL = 	parameter_.kSigmaIncrement
-						*sqrt(abs(deltaIncL)+abs(deltaIncR))
-						*RandomGaussian();
-	double errIncR = 	parameter_.kSigmaIncrement
-						*sqrt(abs(deltaIncL)+abs(deltaIncR))
-						*RandomGaussian();
-	incremente_left_ += round(deltaIncL + errIncL);
-	incremente_right_ += round(deltaIncR + errIncR);
-}
+		double angle2Increment = parameter_.kTransmissionKoefficent*parameter_.kImpulePerTurn/(2*M_PI);
 
-double RobotData::RandomUniform()
-{
-	return ((double) rand())/RAND_MAX;
+		double old_wheel_angle_left = wheel_angle_left_;
+		wheel_angle_left_ += 	speed_/parameter_.kRadiusWheelLeft
+								-psi_speed_
+								*parameter_.kDistanceWheels
+								/2
+								/parameter_.kRadiusWheelLeft;
+		//the error is just a noise based on the last increase of the angle. So
+		double errLeft = 		(wheel_angle_left_-old_wheel_angle_left)
+								*parameter_.kSigmaIncrement
+								*angle2Increment
+								*locaUtil::randomGaussian();
+		//because the error is 0 when there is no change in the wheel angel,
+		//the increments only get updated, when there is movement.
+		if(wheel_angle_left_ != old_wheel_angle_left){
+		incremente_left_ = 		round(wheel_angle_left_*angle2Increment
+								+errLeft);
+		}
+
+
+		double old_wheel_angle_right = wheel_angle_right_;
+		wheel_angle_right_+= 	speed_/parameter_.kRadiusWheelRight
+								+psi_speed_
+								*parameter_.kDistanceWheels
+								/2
+								/parameter_.kRadiusWheelRight;
+		double errRight = 		(wheel_angle_right_-old_wheel_angle_right)
+								*parameter_.kSigmaIncrement
+								*angle2Increment
+								*locaUtil::randomGaussian();
+		if(wheel_angle_right_ != old_wheel_angle_right){
+		incremente_right_ = 	round(wheel_angle_right_*angle2Increment
+								+errRight);
+		}
+	}
+//	double inc_left = wheel_angle_left_*parameter_.kTransmissionKoefficent*parameter_.kImpulePerTurn/(2*M_PI);
+//	double inc_right = wheel_angle_right_*parameter_.kTransmissionKoefficent*parameter_.kImpulePerTurn/(2*M_PI);
+//	std::cout<<"left_angle: "<<wheel_angle_left_<<"  right: "<<wheel_angle_right_<<std::endl;
+//	std::cout<<"left_true_: "<<inc_left<<"  right: "<<inc_right<<std::endl;
+//	std::cout<<"left_err__: "<<incremente_left_<<"  right: "<<incremente_right_<<std::endl;
+//	std::cout<<"--------------------------------------------------"<<std::endl;
 }
 
 void RobotData::UpdateCamTransformation() {
@@ -135,12 +134,6 @@ void RobotData::UpdateCamTransformation() {
 	transMat(2,0) =  s1*s2;				transMat(2,1) = c1*s3+c2*c3*s1;		transMat(2,2) = c1*c3-c2*s1*s3;		transMat(2,3) =  0;
 	transMat(3,0) =  x_pos_;			transMat(3,1) = y_pos_;				transMat(3,2) = 0.5;				transMat(3,3) =  1;
 	cam_on_robot_->setByMatrix(transMat);
-}
-
-double RobotData::RandomGaussian()
-{
-	double u = RandomUniform(), v = RandomUniform();
-	return sqrt(-2*log(u))*cos(2*M_PI*v);
 }
 
 bool KeyboardEventHandler::handle(const osgGA::GUIEventAdapter& ea,osgGA::GUIActionAdapter&)
