@@ -32,7 +32,7 @@ RobotData::RobotData(osg::Node* n, osgGA::CameraManipulator* cam, RobotData::Rob
 	cam_on_robot_ = cam;
 }
 
-void RobotData::UpdatePosition()
+void RobotData::UpdatePose()
 {
 //	double bogenStrecke = speed_*timer_.last_step_time_*0.000001;
 //	double dPsi = psi_speed_*timer_.last_step_time_*0.000001;
@@ -43,14 +43,11 @@ void RobotData::UpdatePosition()
 //		sehnenStrecke = bogenStrecke;
 //	x_pos_ += sehnenStrecke*cos(psi_+dPsi);
 //	y_pos_ += sehnenStrecke*sin(psi_+dPsi);
+	psi_ += psi_speed_/2;
 	x_pos_ += cos(psi_)*speed_;//*timer_.last_step_time_*0.000001;
 	y_pos_ += sin(psi_)*speed_;//*timer_.last_step_time_*0.000001;
 	robotXform_->setPosition(osg::Vec3(x_pos_,y_pos_,0));
-}
-
-void RobotData::UpdateOrientation()
-{
-	psi_ += psi_speed_;//*timer_.last_step_time_*0.000001;
+	psi_ += psi_speed_/2;
 	robotXform_->setAttitude(osg::Quat(psi_, osg::Vec3d(0.0, 0.0, 1.0)));
 }
 
@@ -92,8 +89,8 @@ void RobotData::UpdateIncrements()
 		//because the error is 0 when there is no change in the wheel angel,
 		//the increments only get updated, when there is movement.
 		if(wheel_angle_left_ != old_wheel_angle_left){
-		incremente_left_ = 		round(wheel_angle_left_*angle2Increment
-								+errLeft);
+		incremente_left_ = 		wheel_angle_left_*angle2Increment
+								+errLeft;
 		}
 
 
@@ -108,8 +105,8 @@ void RobotData::UpdateIncrements()
 								*angle2Increment
 								*locaUtil::randomGaussian();
 		if(wheel_angle_right_ != old_wheel_angle_right){
-		incremente_right_ = 	round(wheel_angle_right_*angle2Increment
-								+errRight);
+		incremente_right_ = 	wheel_angle_right_*angle2Increment
+								+errRight;
 		}
 	}
 //	double inc_left = wheel_angle_left_*parameter_.kTransmissionKoefficent*parameter_.kImpulePerTurn/(2*M_PI);
@@ -226,8 +223,7 @@ public:
 				dynamic_cast<RobotData*> (node->getUserData());
 		if(robotdata)
 		{
-			robotdata->UpdatePosition();
-			robotdata->UpdateOrientation();
+			robotdata->UpdatePose();
 			robotdata->UpdateCamTransformation();
 			robotdata->UpdateIncrements();
 		}

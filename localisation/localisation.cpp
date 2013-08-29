@@ -17,7 +17,7 @@ localisation::Parameters::Parameters() :
 		nrOfParticles(nrOfInitialOrientations * nrOfParticlesPerLenth * nrOfParticlesPerLenth),
 		fieldY(12),
 		fieldX(12),
-		impulesProMeter(57694),
+		impulesProMeter(57693.66687),
 		distanceWheels(0.7),
 		sigmaGPS(0.05),
 		sigmaLandmarke(0.1),
@@ -86,8 +86,8 @@ void localisation::Particle::dynamic(double dDistance, double dPsi) {
 									* loca->param.sigmaDistance;
 	//TODO auch bei geradeausfahrt winkelfehler möglich
 	double errPsi = dPsi * locaUtil::randomGaussian() * loca->param.sigmaAngle;
-	xPos = xPos + cos(psi + errPsi) * (dDistance + errDistance); //TODO errPsi hier löschen?
-	yPos = yPos + sin(psi + errPsi) * (dDistance + errDistance); //      sonst wirkt es 2x
+	xPos = xPos + cos(psi + (errPsi + dPsi)/2) * (dDistance + errDistance);
+	yPos = yPos + sin(psi + (errPsi + dPsi)/2) * (dDistance + errDistance);
 	psi = psi + (dPsi + errPsi);
 }
 
@@ -108,7 +108,7 @@ void localisation::dynamic(double incLeft, double incRight) {
 	old_increment_right_ = incRight;
 	double dPsi = (diffRight - diffLeft) / param.impulesProMeter	/ param.distanceWheels;
 	double dDistance = (diffLeft + diffRight) / 2.0 / param.impulesProMeter;
-	//std::cout<<"dPsi: "<<dPsi<<"    dDistance: "<<dDistance<<endl;
+	//std::cout<<"dPsi: "<<dPsi<<"    dDistance: "<<dDistance<<std::endl;
 	for (unsigned int i = 0; i < particles.size(); i++) {
 		particles.at(i).dynamic(dDistance, dPsi);
 	}

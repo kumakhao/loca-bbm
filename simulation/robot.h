@@ -32,8 +32,7 @@ public:
 		double kSigmaIncrement;
 	};
 	explicit RobotData(osg::Node*n, osgGA::CameraManipulator* cam, RobotData::RobotParameter robotParameter);
-	void UpdatePosition();
-	void UpdateOrientation();
+	void UpdatePose();
 	void UpdateCamTransformation();
 	void AddSpeed();
 	void RemoveSpeed();
