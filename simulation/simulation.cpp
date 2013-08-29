@@ -48,12 +48,11 @@ void Simulation::Initialize() {
 	osgViewer::View* view_robot = new osgViewer::View;
 	osgViewer::View* view_map = new osgViewer::View;
 	osgViewer::View* view_camera_on_robot = new osgViewer::View;
-	std::cout<<"ThreadingModelbefore: "<<viewer_.getThreadingModel()<<std::endl;
+	//std::cout<<"ThreadingModelbefore: "<<viewer_.getThreadingModel()<<std::endl;
 	viewer_.setThreadingModel((osgViewer::ViewerBase::ThreadingModel) 0);
-	std::cout<<"ThreadingModelafter: "<<viewer_.getThreadingModel()<<std::endl;
+	//std::cout<<"ThreadingModelafter: "<<viewer_.getThreadingModel()<<std::endl;
 	viewer_.setUpThreading();
 
-	viewer_.setUpThreading();
 	viewer_.addView(view_robot);
 	viewer_.addView(view_map);
 	viewer_.addView(view_camera_on_robot);
@@ -256,12 +255,6 @@ void Simulation::Initialize() {
 		particle_view_ = new Particles();
 		particle_view_->Populate(localisation_->param.nrOfParticles);
 		localisation_->createSamples(localisation_->param.nrOfParticles);
-//			particle_view_->Populate(1);
-//			localisation_->createOneParticle();
-
-
-		particle_view_->Update(localisation_->getParticles());
-		particle_view_->AddToThis(root_);
 
 		std::vector<int> landmark_IDs;
 		switch (observe_mode_){
@@ -277,9 +270,15 @@ void Simulation::Initialize() {
 			}
 			break;
 
+		case OneParticle:
+			particle_view_->Populate(1);
+			localisation_->createOneParticle();
+			break;
 		default:
 			break;
 		}
+		particle_view_->Update(localisation_->getParticles());
+		particle_view_->AddToThis(root_);
 
 	}
 
@@ -366,7 +365,7 @@ void Simulation::Step() {
 	int64 tmptime = cvGetTickCount();
 	int64 difftime = (tmptime-loop_time_)/cvGetTickFrequency();
 	if(difftime < loop_target_time_){
-		std::cout<<"sleeping: "<<loop_target_time_-difftime<<std::endl;
+		//std::cout<<"sleeping: "<<loop_target_time_-difftime<<std::endl;
 		usleep(loop_target_time_-difftime);
 		return;
 	}
@@ -560,6 +559,12 @@ void Simulation::setObserveMode(ObserveMode mode) {
 		observe_mode_ = mode;
 		break;
 
+	case OneParticle:
+		if(localisation_){
+			;//TODO: set up one particle mode
+		}
+		observe_mode_ = mode;
+		break;
 	default:
 		break;
 	}
@@ -752,7 +757,12 @@ void Simulation::Observe() {
 		localisation_->observeImg(observedImg_);
 		localisation_->resample(localisation_->param.nrOfParticles);
 		break;
+	case OneParticle:
+		localisation_->observeImgOneParticle(observedImg_);
+		localisation_->resample(1);
+		break;
 	default:
+		;
 		break;
 	}
 }

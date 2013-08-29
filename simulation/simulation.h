@@ -35,7 +35,8 @@ public:
 		noObserve,
 		GPS,
 		Landmarks,
-		Pictures
+		Pictures,
+		OneParticle
 	};
 	class Settings{
 	public:
@@ -74,8 +75,8 @@ public:
 			plotfile_ = filename.str();
 
 			robParameter_.kDistanceWheels			= 0.7;
-			robParameter_.kRadiusWheelRight			= 0.08;//+locaUtil::randomGaussian()*0.08*0.001;
-			robParameter_.kRadiusWheelLeft			= 0.08;//+locaUtil::randomGaussian()*0.08*0.001;
+			robParameter_.kRadiusWheelRight			= 0.08+locaUtil::randomGaussian()*0.08*0.005;
+			robParameter_.kRadiusWheelLeft			= 0.08+locaUtil::randomGaussian()*0.08*0.005;
 			robParameter_.kImpulesProMeter			= 57694;
 			robParameter_.kImpulePerTurn			= 2000;
 			robParameter_.kTransmissionKoefficent	= 14.5;

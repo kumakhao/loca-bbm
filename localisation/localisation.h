@@ -70,6 +70,7 @@ public:
 
 	localisation();
 	void observeImg(cv::Mat* img);
+	void observeImgOneParticle(cv::Mat* img);
 	void observeLandmark(int ID, double angle);
 	void observeGPS(double x, double y, double psi);
 	//TODO changed from int -> double 27.06

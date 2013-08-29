@@ -71,7 +71,8 @@ void Particles::Update(std::vector<localisation::Particle> particle_data)
 
 void Particles::Populate(int size)
 {
-	for(int i=0;i<(size/1);i++)
+	particles_group_.clear();
+	for(int i=0;i<(size);i++)
 	{
 		particles_group_.push_back(MakeParticle());
 	}

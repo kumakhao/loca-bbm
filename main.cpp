@@ -23,7 +23,34 @@
 #include "localisation/localisation.h"
 #include "framework_expobot/expoBot_test.h"
 
-int main(){
+int main(int argc, char** argv){
+	osg::setNotifyLevel(osg::WARN);
+	std::string mode_argument = "NULL";
+	int mode = 1;
+	if(argc > 1)
+		mode_argument = argv[1];
+	if(mode_argument == "0"){
+		std::cout<<"OneParticleMode chosen."<<std::endl;
+		mode = 0;
+	}
+	if(mode_argument == "1"){
+		std::cout<<"Standard Simulation chosen."<<std::endl;
+		mode = 1;
+	}
+	if(mode_argument == "2"){
+		std::cout<<"framework Mode chosen."<<std::endl;
+		mode = 2;
+	}
+	if(mode_argument == "3"){
+		std::cout<<"pic frequency Simulation chosen."<<std::endl;
+		mode = 3;
+	}
+	if(mode_argument == "4"){
+		std::cout<<"croud Simulation chosen."<<std::endl;
+		mode = 4;
+	}
+	std::cout<<""<<std::endl;
+
 	Simulation mainSim;
 	localisation *mainLoca = new localisation;
 
@@ -41,18 +68,26 @@ int main(){
 	cv::Mat img2;
 	cv::Mat img3;
 
-	switch(1) {
+	switch(mode) {
 	case 0:
-		//unitTests::landmarkTest();
-		//unitTests::cvProjectTest();
-		//unitTests::picTest();
 
-//		img1 = locaUtil::makeWall(locaUtil::getPatternCode93(),0);
-//		img2 = locaUtil::makeWall(locaUtil::getPatternCode93(),1);
-//		img3 = locaUtil::makeWall(locaUtil::getPatternCode93(),2);
-//		cv::imwrite("wall1.jpg",img1);
-//		cv::imwrite("wall2.jpg",img2);
-//		cv::imwrite("wall3.jpg",img3);
+		mainSim.settings_.robParameter_.kSigmaIncrement = 0;
+		mainSim.settings_.robParameter_.kRadiusWheelLeft = 0.08;
+		mainSim.settings_.robParameter_.kRadiusWheelRight = 0.08;
+		mainLoca->param.sigmaAngle = 0;
+		mainLoca->param.sigmaDistance = 0;
+		mainLoca->initilisation_done_ = true;
+		mainSim.setLocalisation(mainLoca);
+		mainSim.setObserveMode(Simulation::OneParticle);
+		mainSim.enablePadControl();
+		mainSim.Initialize();
+		mainSim.Realize();
+
+		while(!mainSim.done()){
+			mainSim.Step();
+		}
+		//mainSim.WriteRobotTrajectory();
+		mainSim.CleanUp();
 		break;
 	case 1:
 		mainLoca->landmarks.addLandmark(1,-5.0,-5.0);
