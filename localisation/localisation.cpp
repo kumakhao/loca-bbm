@@ -139,27 +139,26 @@ void localisation::observeImgOneParticle(cv::Mat* img) {
 	cvtColor(*img,gray_img,CV_RGB2GRAY);
 	localisation::Particle oneParticle = particles.at(0);
 
-
 	std::vector<cv::Point2d> imagePoints, imagePointsCliped;
 	std::vector<patternPoint> clipedImagePoints;
-	int grid = 1;
+	int grid = 3;
 	camera_model_.setExtr(oneParticle.psi,oneParticle.xPos,oneParticle.yPos);
+	std::cout<<"pos: "<<oneParticle.xPos<<" "<<oneParticle.yPos<<std::endl;
 	camera_model_.projectTo2D(&Points_3D_,&imagePoints);
-	clipedImagePoints = picRating::clipANDmark(imagePoints,locaUtil::getPatternCode93(), img->cols, img->rows);
-	double p = picRating::rateImage(*img, clipedImagePoints, grid);
-	//std::cout<<"Particle::observeImg: "<<p<<std::endl;
+	clipedImagePoints = picRating::clipANDmark(imagePoints,locaUtil::getPatternCode93(), gray_img.cols, gray_img.rows);
+	double p = picRating::rateImage(gray_img, clipedImagePoints, grid);
+	std::cout<<"Particle::observeImg: "<<p<<std::endl;
 	if(p>0.001){
 		oneParticle.weight *= p;
 	}
 	else
 		oneParticle.weight *= 0.001;
 	for(unsigned int i=0; i<imagePoints.size(); i++)
-		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
 		cv::rectangle(*img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
 	std::ostringstream s;
 	s<<"Gewichtung: "<<p;
 	cv::putText(*img, s.str(), cvPoint(30,500),
-		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
+			cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
 }
 
 void localisation::observeLandmark(int ID, double angle) {

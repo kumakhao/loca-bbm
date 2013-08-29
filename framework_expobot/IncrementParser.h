@@ -15,7 +15,7 @@
 #include <sstream>
 #include <queue>
 #include <pthread.h>
-#include "util/msTimer.h"
+#include "../util/msTimer.h"
 
 class IncrementParser{
 private:

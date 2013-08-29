@@ -9,7 +9,7 @@
 #include <opencv.hpp>
 #include <highgui/highgui_c.h>
 #include <calib3d/calib3d.hpp>
-#include "local_settings.h"
+#include "../local_settings.h"
 
 cameraParam::cameraParam() {
 	intrMat = cv::Mat(3, 3, CV_64FC1);

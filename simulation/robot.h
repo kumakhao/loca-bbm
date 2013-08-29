@@ -15,7 +15,7 @@
 #include <osgGA/GUIEventHandler>
 #include <osgGA/CameraManipulator>
 #include <osg/ref_ptr>
-#include "util/msTimer.h"
+#include "../util/msTimer.h"
 
 class RobotData : public osg::Referenced
 {

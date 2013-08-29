@@ -7,7 +7,7 @@
 
 
 
-#include "util/msTimer.h"
+#include "msTimer.h"
 #include <stdlib.h>
 
 /**

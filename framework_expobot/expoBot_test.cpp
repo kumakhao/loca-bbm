@@ -9,10 +9,10 @@
 #include <iostream>
 #include "IncrementParser.h"
 #include <sys/time.h>
-#include "util/msTimer.h"
-#include "util/BbmRS232Commands.h"
-#include "util/SIXAXIS_Interface.h"
-#include "util/cjoystick.h"
+#include "../util/msTimer.h"
+#include "../util/BbmRS232Commands.h"
+#include "../util/SIXAXIS_Interface.h"
+#include "../util/cjoystick.h"
 
 
 

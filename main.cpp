@@ -95,7 +95,7 @@ int main(int argc, char** argv){
 		mainLoca->landmarks.addLandmark(3,-5.0,5.0);
 		mainLoca->landmarks.addLandmark(4,5.0,5.0);
 
-		mainLoca->initilisation_done_ = true;
+		mainLoca->initilisation_done_ = false;
 		mainSim.setLocalisation(mainLoca);
 		//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
 		mainSim.setObserveMode(Simulation::Pictures);
