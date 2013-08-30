@@ -98,7 +98,7 @@ public:
 		double sigmaXYSmall;
 		double sigmaXYAngle;
 	};
-	localisation::EstimatedRobotPose getEstimatedRobotPose();
+	localisation::EstimatedRobotPose* getEstimatedRobotPose();
 private:
 	double old_increment_left_;
 	double old_increment_right_;

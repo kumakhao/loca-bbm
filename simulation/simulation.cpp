@@ -406,11 +406,11 @@ void Simulation::Step() {
 		//		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
 		//											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
 		//											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3, true);
-				localisation::EstimatedRobotPose es = localisation_->getEstimatedRobotPose();
+				es_ = localisation_->getEstimatedRobotPose();
 				data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_,
-													es.x, es.y,
-													es.sigmaXYLarge, es.sigmaXYSmall,
-													es.sigmaXYAngle/M_PI*180, true);
+													es_->x, es_->y,
+													es_->sigmaXYLarge, es_->sigmaXYSmall,
+													es_->sigmaXYAngle/M_PI*180, true);
 		// observe for particle filter is done here.
 		picture_processed_ = true;
 	}
@@ -434,11 +434,11 @@ void Simulation::Step() {
 //		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
 //											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
 //											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3);
-		localisation::EstimatedRobotPose es = localisation_->getEstimatedRobotPose();
+		es_ = localisation_->getEstimatedRobotPose();
 		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_,
-											es.x, es.y,
-											es.sigmaXYLarge, es.sigmaXYSmall,
-											es.sigmaXYAngle/M_PI*180);
+											es_->x, es_->y,
+											es_->sigmaXYLarge, es_->sigmaXYSmall,
+											es_->sigmaXYAngle/M_PI*180);
 	}
 
 	UpdateHUD();

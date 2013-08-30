@@ -286,7 +286,7 @@ std::vector<double> localisation::getPosition() {
 	return pos;
 }
 
-localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
+localisation::EstimatedRobotPose* localisation::getEstimatedRobotPose() {
 	EstimatedRobotPose es;
 	if(!initilisation_done_){
 		es.psi = INFINITY;
@@ -296,7 +296,7 @@ localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
 		es.sigmaXYAngle = INFINITY;
 		es.sigmaXYLarge = INFINITY;
 		es.sigmaXYSmall = INFINITY;
-		return es;
+		return &es;
 	}
 
 	double sumSinPsi, sumCosPsi;
@@ -350,7 +350,7 @@ localisation::EstimatedRobotPose localisation::getEstimatedRobotPose() {
 		es.sigmaXYLarge = sqrt(eigen0)*3*2;
 		es.sigmaXYSmall = sqrt(eigen1)*3*2;
 	}
-	return es;
+	return &es;
 }
 
 bool localisation::findInitialLocatio(cv::Mat* img) {

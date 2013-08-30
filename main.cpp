@@ -100,9 +100,11 @@ int main(int argc, char** argv){
 		//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
 		mainSim.setObserveMode(Simulation::Pictures);
 		mainSim.enablePadControl();
+		mainSim.settings_.takepicture_intervall_ = 2000;
+		mainSim.settings_.robParameter_.kSpeed = 0.05;
 		mainSim.Initialize();
 		mainSim.Realize();
-		//mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/picsEvery500ms_2013-08-22_1112");
+		//mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/2013-08-30_0757");
 		while(!mainSim.done()){
 			mainSim.Step();
 			//usleep(10000);
@@ -161,7 +163,7 @@ int main(int argc, char** argv){
 			mainSim.settings_.crowd_size_ = croud_size;
 			mainSim.settings_.takepicture_intervall_ = 1000;
 			mainSim.settings_.datafile_name_ = datafilename.str();
-			mainSim.settings_.picture_path_ = "/home/josef/workspace/Loca-Projekt/pics/croudEffect/";
+			mainSim.settings_.picture_path_ = "/home/josef/workspace/Loca-Projekt/pictures/croudEffect/";
 			std::stringstream plotfile;
 			plotfile << "/home/josef/workspace/Loca-Projekt/plots/croudEffect/plotfile_"<<croud_size;
 			mainSim.settings_.plotfile_ = plotfile.str();

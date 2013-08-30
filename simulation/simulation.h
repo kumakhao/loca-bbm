@@ -153,6 +153,7 @@ private:
 	DataWriter data_to_file_writer_;
 	RobotData *robotdata_;
 	cJoystick *sixaxes_;
+	localisation::EstimatedRobotPose* es_;
 };
 
 
