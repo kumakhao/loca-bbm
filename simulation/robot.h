@@ -24,7 +24,10 @@ public:
 		double kSpeed; // m/s
 		double kPsiSpeed; // ?/s
 		int kImpulesProMeter; //impulse / m
-		double kDistanceWheels; //m
+		double kLeftWheelWidth;
+		double kRightWheelWidth;
+		double kDistanceLeftWheel; //m
+		double kDistanceRightWheel;
 		double kRadiusWheelRight;
 		double kRadiusWheelLeft;
 		int kImpulePerTurn; //impulse pro geberUmdrehung

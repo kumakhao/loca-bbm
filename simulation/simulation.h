@@ -74,9 +74,12 @@ public:
 				<< std::setw(2) << std::setfill('0') << now->tm_min;
 			plotfile_ = filename.str();
 
-			robParameter_.kDistanceWheels			= 0.7;
-			robParameter_.kRadiusWheelRight			= 0.08+locaUtil::randomGaussian()*0.08*0.005;
-			robParameter_.kRadiusWheelLeft			= 0.08+locaUtil::randomGaussian()*0.08*0.005;
+			robParameter_.kDistanceLeftWheel		= 0.35;
+			robParameter_.kDistanceRightWheel		= 0.35;
+			robParameter_.kLeftWheelWidth			= 0.05;
+			robParameter_.kRightWheelWidth			= 0.05;
+			robParameter_.kRadiusWheelRight			= 0.08;
+			robParameter_.kRadiusWheelLeft			= 0.08;
 			robParameter_.kImpulesProMeter			= 57694;
 			robParameter_.kImpulePerTurn			= 2000;
 			robParameter_.kTransmissionKoefficent	= 14.5;

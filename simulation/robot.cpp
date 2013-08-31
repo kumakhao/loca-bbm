@@ -78,8 +78,7 @@ void RobotData::UpdateIncrements()
 		double old_wheel_angle_left = wheel_angle_left_;
 		wheel_angle_left_ += 	speed_/parameter_.kRadiusWheelLeft
 								-psi_speed_
-								*parameter_.kDistanceWheels
-								/2
+								*parameter_.kDistanceLeftWheel
 								/parameter_.kRadiusWheelLeft;
 		//the error is just a noise based on the last increase of the angle. So
 		double errLeft = 		(wheel_angle_left_-old_wheel_angle_left)
@@ -97,8 +96,7 @@ void RobotData::UpdateIncrements()
 		double old_wheel_angle_right = wheel_angle_right_;
 		wheel_angle_right_+= 	speed_/parameter_.kRadiusWheelRight
 								+psi_speed_
-								*parameter_.kDistanceWheels
-								/2
+								*parameter_.kDistanceRightWheel
 								/parameter_.kRadiusWheelRight;
 		double errRight = 		(wheel_angle_right_-old_wheel_angle_right)
 								*parameter_.kSigmaIncrement

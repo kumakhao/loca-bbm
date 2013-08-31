@@ -28,6 +28,17 @@ Simulation::Simulation():
 
 void Simulation::Initialize() {
 
+	{//random systematic errors
+		settings_.robParameter_.kDistanceLeftWheel += 	locaUtil::randomUniform()*settings_.robParameter_.kLeftWheelWidth
+														-(settings_.robParameter_.kLeftWheelWidth/2);
+		//std::cout<<"leftWidth: "<<settings_.robParameter_.kDistanceLeftWheel-0.35<<std::endl;
+		settings_.robParameter_.kDistanceRightWheel+= 	locaUtil::randomUniform()*settings_.robParameter_.kRightWheelWidth
+														-(settings_.robParameter_.kRightWheelWidth/2);
+		//std::cout<<"RightWidth: "<<settings_.robParameter_.kDistanceRightWheel-0.35<<std::endl;
+		settings_.robParameter_.kRadiusWheelLeft += settings_.robParameter_.kRadiusWheelLeft*0.00*locaUtil::randomGaussian();
+		settings_.robParameter_.kRadiusWheelRight += settings_.robParameter_.kRadiusWheelRight*0.00*locaUtil::randomGaussian();
+	}
+
 	{//apply settings_
 		data_to_file_writer_.path_ 			= settings_.picture_path_;
 		data_to_file_writer_.datafile_path_ = settings_.datafile_name_;
@@ -37,8 +48,8 @@ void Simulation::Initialize() {
 		loop_target_time_					= settings_.loop_target_time_;
 		croud_size_							= settings_.crowd_size_;
 	}
-	osgGA::TrackballManipulator* cam_on_rob_mani = new osgGA::TrackballManipulator;
 
+	osgGA::TrackballManipulator* cam_on_rob_mani = new osgGA::TrackballManipulator;
 	root_ = SetupScene();
 	robot_ = SetupRobot(cam_on_rob_mani, settings_.robParameter_);
 	root_->addChild(robot_);

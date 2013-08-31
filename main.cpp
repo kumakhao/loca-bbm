@@ -25,6 +25,8 @@
 
 int main(int argc, char** argv){
 	osg::setNotifyLevel(osg::WARN);
+	srand(time(NULL));
+
 	std::string mode_argument = "NULL";
 	int mode = 1;
 	if(argc > 1)
@@ -74,6 +76,8 @@ int main(int argc, char** argv){
 		mainSim.settings_.robParameter_.kSigmaIncrement = 0;
 		mainSim.settings_.robParameter_.kRadiusWheelLeft = 0.08;
 		mainSim.settings_.robParameter_.kRadiusWheelRight = 0.08;
+		mainSim.settings_.robParameter_.kLeftWheelWidth = 0.05;
+		mainSim.settings_.robParameter_.kRightWheelWidth = 0.05;
 		mainLoca->param.sigmaAngle = 0;
 		mainLoca->param.sigmaDistance = 0;
 		mainLoca->initilisation_done_ = true;
@@ -102,6 +106,7 @@ int main(int argc, char** argv){
 		mainSim.enablePadControl();
 		mainSim.settings_.takepicture_intervall_ = 2000;
 		mainSim.settings_.robParameter_.kSpeed = 0.05;
+		mainSim.settings_.crowd_size_ = 3;
 		mainSim.Initialize();
 		mainSim.Realize();
 		//mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/2013-08-30_0757");
