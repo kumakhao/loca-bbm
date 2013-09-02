@@ -396,7 +396,7 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 						imgName << hits;
 						imgName <<".jpg";
 						cv::Mat tmpImg = img->clone();
-						std::cout<<"Path:  "<<imgName.str()<<std::endl;
+						//std::cout<<"Path:  "<<imgName.str()<<std::endl;
 						for(unsigned int i=0; i<imagePoints.size(); i++)
 							//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
 							cv::rectangle(tmpImg,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(255,255,255),1,8,0);
@@ -406,7 +406,7 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 								cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
 						cv::imwrite(imgName.str(), tmpImg);
 					}
-					std::cout<<"found Position: "<<p<<"   X: "<<xPos<<" Y: "<<yPos<<std::endl;
+					//std::cout<<"found Position: "<<p<<"   X: "<<xPos<<" Y: "<<yPos<<std::endl;
 				}
 			}
 //			std::ostringstream text;
@@ -449,7 +449,7 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 							imgName << hits;
 							imgName <<".jpg";
 							cv::Mat tmpImg = img->clone();
-							std::cout<<"Path:  "<<imgName.str()<<std::endl;
+							//std::cout<<"Path:  "<<imgName.str()<<std::endl;
 							for(unsigned int i=0; i<imagePoints.size(); i++)
 								//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
 								cv::rectangle(tmpImg,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(255,255,255),1,8,0);
@@ -459,7 +459,7 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 									cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
 							cv::imwrite(imgName.str(), tmpImg);
 						}
-						std::cout<<"found Position: "<<p<<"   X: "<<xPos<<" Y: "<<yPos<<std::endl;
+						//std::cout<<"found Position: "<<p<<"   X: "<<xPos<<" Y: "<<yPos<<std::endl;
 					}
 				}
 	//			std::ostringstream text;
@@ -492,8 +492,8 @@ bool localisation::findInitialLocatio(cv::Mat* img) {
 		sumX = sumX / hits;
 		sumY = sumY / hits;
 		sumPsi = sumPsi / hits;
-		std::cout<<", Position: ("<<sumX<<" "<<sumY<<") Angle: "<<sumPsi<<std::endl;
-		std::cout<<"Nr of hits: "<<hits<<std::endl;
+		//std::cout<<", Position: ("<<sumX<<" "<<sumY<<") Angle: "<<sumPsi<<std::endl;
+		//std::cout<<"Nr of hits: "<<hits<<std::endl;
 		return true;
 	}
 }

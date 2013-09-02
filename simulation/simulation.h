@@ -52,6 +52,8 @@ public:
 		int loop_target_time_;
 		//how many human models for the simulation are created
 		int crowd_size_;
+		//how many particels are visable in the simulation 1=1:1, 2=1:2, 3=1:3 usw
+		int particle_visibility_ratio_;
 
 		//Robot hardware paramerters including sensor nois!
 		RobotData::RobotParameter robParameter_;
@@ -61,7 +63,8 @@ public:
 		datafile_name_("locaDatafile.txt"),
 		takepicture_intervall_(3000),
 		loop_target_time_(33333),
-		crowd_size_(0)
+		crowd_size_(0),
+		particle_visibility_ratio_(1)
 		{
 			std::ostringstream filename;
 			time_t t = time(0);   // get time now
@@ -133,6 +136,7 @@ private:
 	int takepicture_intervall_;
 	int loop_target_time_;
 	int croud_size_;
+	int particle_visibility_ratio_;
 
 	std::stringstream trajectory_buffer_;
 	std::vector<double> trajectory_from_file_;

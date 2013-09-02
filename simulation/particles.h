@@ -42,7 +42,7 @@ public:
 	};
 
 	std::vector<osg::Group*> particles_group_;
-	void Update(std::vector<localisation::Particle> particle_data);
+	void Update(std::vector<localisation::Particle> particle_data, int visibleRatio = 1);
 	void Populate(int size);
 	void AddToThis(osg::Group* root) {
 		for (unsigned int i = 0; i < particles_group_.size(); i++) {

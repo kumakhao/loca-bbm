@@ -35,8 +35,8 @@ void Simulation::Initialize() {
 		settings_.robParameter_.kDistanceRightWheel+= 	locaUtil::randomUniform()*settings_.robParameter_.kRightWheelWidth
 														-(settings_.robParameter_.kRightWheelWidth/2);
 		//std::cout<<"RightWidth: "<<settings_.robParameter_.kDistanceRightWheel-0.35<<std::endl;
-		settings_.robParameter_.kRadiusWheelLeft += settings_.robParameter_.kRadiusWheelLeft*0.00*locaUtil::randomGaussian();
-		settings_.robParameter_.kRadiusWheelRight += settings_.robParameter_.kRadiusWheelRight*0.00*locaUtil::randomGaussian();
+		settings_.robParameter_.kRadiusWheelLeft += settings_.robParameter_.kRadiusWheelLeft*0.005*locaUtil::randomGaussian();
+		settings_.robParameter_.kRadiusWheelRight += settings_.robParameter_.kRadiusWheelRight*0.005*locaUtil::randomGaussian();
 	}
 
 	{//apply settings_
@@ -47,6 +47,7 @@ void Simulation::Initialize() {
 		takepicture_intervall_				= settings_.takepicture_intervall_;
 		loop_target_time_					= settings_.loop_target_time_;
 		croud_size_							= settings_.crowd_size_;
+		particle_visibility_ratio_			= settings_.particle_visibility_ratio_;
 	}
 
 	osgGA::TrackballManipulator* cam_on_rob_mani = new osgGA::TrackballManipulator;
@@ -264,7 +265,7 @@ void Simulation::Initialize() {
 
 	if(particles_on_){
 		particle_view_ = new Particles();
-		particle_view_->Populate(localisation_->param.nrOfParticles);
+		particle_view_->Populate(localisation_->param.nrOfParticles/particle_visibility_ratio_);
 		localisation_->createSamples(localisation_->param.nrOfParticles);
 
 		std::vector<int> landmark_IDs;
@@ -288,7 +289,7 @@ void Simulation::Initialize() {
 		default:
 			break;
 		}
-		particle_view_->Update(localisation_->getParticles());
+		particle_view_->Update(localisation_->getParticles(), particle_visibility_ratio_);
 		particle_view_->AddToThis(root_);
 
 	}
@@ -434,7 +435,7 @@ void Simulation::Step() {
 			localisation_->dynamic(robotdata_->incremente_left_,robotdata_->incremente_right_);
 
 			// Update of simulations view of particles.
-			particle_view_->Update(localisation_->getParticles());
+			particle_view_->Update(localisation_->getParticles(), particle_visibility_ratio_);
 		}
 		// writes the current position and orientation of the robot to file.
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,

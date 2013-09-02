@@ -58,7 +58,7 @@ int main(int argc, char** argv){
 
 
 	std::vector<double> orientaion, position;
-
+	std::vector<double> meanErrors;
 
 	// 0 = picTest
 	// 1 = sim
@@ -107,6 +107,8 @@ int main(int argc, char** argv){
 		mainSim.settings_.takepicture_intervall_ = 2000;
 		mainSim.settings_.robParameter_.kSpeed = 0.05;
 		mainSim.settings_.crowd_size_ = 3;
+		mainSim.settings_.particle_visibility_ratio_ = 10;
+		mainLoca->param.nrOfParticles = 2500;
 		mainSim.Initialize();
 		mainSim.Realize();
 		//mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/2013-08-30_0757");
@@ -128,31 +130,47 @@ int main(int argc, char** argv){
 		;
 		break;
 	case 3:
-		for(int pic_time = 500; pic_time <= 1000; pic_time += 500){
-			Simulation mainSim;
-			localisation *mainLoca = new localisation;
-			mainSim.setLocalisation(mainLoca);
-			//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
-			mainSim.setObserveMode(Simulation::Pictures);
-			mainSim.enablePadControl();
-			std::stringstream datafilename;
-			datafilename << "/home/josef/Desktop/hallowelt_"<<pic_time<<".txt";
-			mainSim.settings_.datafile_name_ = datafilename.str();
-			mainSim.settings_.picture_path_ = "/home/josef/Desktop/";
-			mainSim.settings_.takepicture_intervall_ = pic_time;
-			std::stringstream plotfile;
-			plotfile << "/home/josef/Desktop/plotfile_"<<pic_time;
-			mainSim.settings_.plotfile_ = plotfile.str();
-			mainSim.Initialize();
-			mainSim.Realize();
-			mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/picsEvery500ms_2013-08-22_1112");
-			while(!mainSim.done()){
-				mainSim.Step();
+		for(int pic_time = 500; pic_time <= 1500; pic_time += 500){
+			double counter = 0;
+			double square_distance_sum = 0;
+			for(int x=0; x<11;x++){
+				Simulation mainSim;
+				localisation *mainLoca = new localisation;
+				mainSim.setLocalisation(mainLoca);
+				//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
+				mainSim.setObserveMode(Simulation::Pictures);
+				mainSim.enablePadControl();
+				std::stringstream datafilename;
+				datafilename << "/home/josef/Desktop/hallowelt_"<<pic_time<<".txt";
+				mainSim.settings_.datafile_name_ = datafilename.str();
+				//mainSim.settings_.picture_path_ = "/home/josef/Desktop/";
+				mainSim.settings_.takepicture_intervall_ = pic_time;
+				std::stringstream plotfile;
+				plotfile << "/home/josef/Desktop/plotfile_"<<pic_time;
+				mainSim.settings_.plotfile_ = plotfile.str();
+				mainSim.Initialize();
+				mainSim.Realize();
+				mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/picsEvery500ms_2013-08-22_1112");
+				while(!mainSim.done()){
+					mainSim.Step();
+					localisation::EstimatedRobotPose* es = mainLoca->getEstimatedRobotPose();
+					if(es->x < INFINITY){
+					counter++;
+					square_distance_sum += sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+					}
+				}
+				std::stringstream trajectoryfile;
+				trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
+				mainSim.WriteRobotTrajectory(trajectoryfile.str());
+				mainSim.CleanUp();
 			}
-			std::stringstream trajectoryfile;
-			trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
-			mainSim.WriteRobotTrajectory(trajectoryfile.str());
-			mainSim.CleanUp();
+			square_distance_sum = square_distance_sum/counter;
+			meanErrors.push_back(square_distance_sum);
+		}
+		while(!meanErrors.empty()){
+			double output = meanErrors.back();
+			meanErrors.pop_back();
+			std::cout<<"meanDistance from pose estimate: "<< output<<std::endl;
 		}
 		break;
 	case 4:

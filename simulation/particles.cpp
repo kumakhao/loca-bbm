@@ -44,7 +44,7 @@ void Particles::ParticleDataType::setPosition(double x, double y, double psi, do
 	this->orientation_ = psi;
 }
 
-void Particles::Update(std::vector<localisation::Particle> particle_data)
+void Particles::Update(std::vector<localisation::Particle> particle_data, int visibleRatio)
 {
 	int nr_of_particles;
 	bool initilisationDone = false;
@@ -62,7 +62,7 @@ void Particles::Update(std::vector<localisation::Particle> particle_data)
 		ParticleDataType* particleData =
 				dynamic_cast<ParticleDataType*> (particles_group_.at(i)->getUserData());
 		if(initilisationDone)
-			particleData->setPosition(particle_data.at(i).xPos, particle_data.at(i).yPos, particle_data.at(i).psi);
+			particleData->setPosition(particle_data.at(i*visibleRatio).xPos, particle_data.at(i*visibleRatio).yPos, particle_data.at(i*visibleRatio).psi);
 		else
 			particleData->setPosition(0.0, 0.0, 0.0, -1.0);
 
