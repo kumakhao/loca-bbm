@@ -27,8 +27,8 @@ int main(int argc, char** argv){
 	osg::setNotifyLevel(osg::WARN);
 	srand(time(NULL));
 
-	std::string mode_argument = "NULL";
-	int mode = 1;
+	std::string mode_argument = "-help";
+	int mode = -1;
 	if(argc > 1)
 		mode_argument = argv[1];
 	if(mode_argument == "0"){
@@ -40,7 +40,7 @@ int main(int argc, char** argv){
 		mode = 1;
 	}
 	if(mode_argument == "2"){
-		std::cout<<"framework Mode chosen."<<std::endl;
+		std::cout<<"Pic Test Mode chosen."<<std::endl;
 		mode = 2;
 	}
 	if(mode_argument == "3"){
@@ -51,6 +51,15 @@ int main(int argc, char** argv){
 		std::cout<<"croud Simulation chosen."<<std::endl;
 		mode = 4;
 	}
+	if(mode_argument == "-help"){
+		std::cout<<"Avalible modes are:"<<std::endl;
+		std::cout<<"0 - One Particle Mode"<<std::endl;
+		std::cout<<"1 - Standard Simulation"<<std::endl;
+		std::cout<<"2 - Pic Test Mode"<<std::endl;
+		std::cout<<"3 - Pic Frequency Simulation"<<std::endl;
+		std::cout<<"4 - Croud Simulation"<<std::endl;
+		return 0;
+	}
 	std::cout<<""<<std::endl;
 
 	Simulation mainSim;
@@ -59,12 +68,6 @@ int main(int argc, char** argv){
 
 	std::vector<double> orientaion, position;
 	std::vector<double> meanErrors;
-
-	// 0 = picTest
-	// 1 = sim
-	// 2 = framework
-	// 3 = pic frequency Simulation
-	// 4 = croud Simulation
 
 	cv::Mat img1;
 	cv::Mat img2;
@@ -78,6 +81,7 @@ int main(int argc, char** argv){
 		mainSim.settings_.robParameter_.kRadiusWheelRight = 0.08;
 		mainSim.settings_.robParameter_.kLeftWheelWidth = 0.05;
 		mainSim.settings_.robParameter_.kRightWheelWidth = 0.05;
+		mainSim.settings_.sys_error_on_ = false;
 		mainLoca->param.sigmaAngle = 0;
 		mainLoca->param.sigmaDistance = 0;
 		mainLoca->initilisation_done_ = true;
@@ -126,7 +130,7 @@ int main(int argc, char** argv){
 		mainSim.CleanUp();
 		break;
 	case 2:
-		expoBot_test();
+		unitTests::picTest();
 		;
 		break;
 	case 3:

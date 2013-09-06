@@ -35,12 +35,14 @@ bool unitTests::landmarkTest() {
 
 // To test the projection on a set of input data. Will display the image with projected bits.
 // +rating of pattern under projected 2D points.
-bool unitTests::cameraCalibrationTest(double x, double y, double psi, std::string imgPath) {
+double unitTests::cameraCalibrationTest(double x, double y, double psi, std::string imgPath) {
 
 	std::vector<cv::Point2d> imagePoints, imagePointsCliped;
 	std::vector<patternPoint> clipedImagePoints;
 	cv::Mat objectPoints = locaUtil::getBit3Dlocations_all();
-	cv::Mat img = cv::imread( imgPath, 1 );
+	cv::Mat color_img = cv::imread( imgPath, 1 );
+	cv::Mat img;
+	cvtColor(color_img,img,CV_RGB2GRAY);
 	cameraParam cam;
 	int grid = 1;
 
@@ -49,19 +51,19 @@ bool unitTests::cameraCalibrationTest(double x, double y, double psi, std::strin
 
 	clipedImagePoints = picRating::clipANDmark(imagePoints,locaUtil::getPatternCode93(), img.cols, img.rows);
 	double p = picRating::rateImage(img, clipedImagePoints,grid);
-
-	for(int i=0; i<imagePoints.size(); i++)
-		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
-		cv::rectangle(img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
-	std::ostringstream s;
-	s<<"Gewichtung: "<<p;
-	cv::putText(img, s.str(), cvPoint(30,700),
-		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
-
-	cv::namedWindow( "Display Image", CV_WINDOW_AUTOSIZE );
-	cv::imshow( "Display Image", img );
-	cv::waitKey(0);
-	return true;
+//	std::cout<<"  p = "<<p<<std::endl;
+//	for(int i=0; i<imagePoints.size(); i++)
+//		//cv::circle(img,cv::Point(imagePoints.at(i).x,imagePoints.at(i).y),grid,cv::Scalar(0,0,255),1,8);
+//		cv::rectangle(img,cv::Point(imagePoints.at(i).x-grid,imagePoints.at(i).y-grid),cv::Point(imagePoints.at(i).x+grid,imagePoints.at(i).y+grid),cv::Scalar(0,0,255),1,8,0);
+//	std::ostringstream s;
+//	s<<"Gewichtung: "<<p;
+//	cv::putText(img, s.str(), cvPoint(30,700),
+//		    cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cvScalar(250,250,250), 1, CV_AA);
+//
+//	cv::namedWindow( "Display Image", CV_WINDOW_AUTOSIZE );
+//	cv::imshow( "Display Image", img );
+//	cv::waitKey(0);
+	return p;
 }
 
 //
@@ -94,20 +96,48 @@ bool unitTests::picTest() {
 		std::cout << "Unable to open file";
 		return false;
 	}
-
-	double x, y, psi, incRight, incLeft;
-	int ansPics =  imgPaths.size();
-	int ansValues = pose.size()/ansPics;
-	assert(pose.size()%ansPics == 0);
-	for(int i=0;i<ansPics;i++){
-		psi = pose.at(i*ansValues+4);
-		y = pose.at(i*ansValues+3);
-		x = pose.at(i*ansValues+2);
-		incRight = pose.at(i*ansValues+1);
-		incLeft = pose.at(i*ansValues);
-		cameraCalibrationTest(x, y, psi, imgPaths.at(i));
-		//ratingEval(x, y, psi, imgPaths.at(i));
+	std::ofstream testFile ("/home/josef/Desktop/testfile.txt");
+	std::vector<cv::Point2d> imagePoints, imagePointsCliped;
+	std::vector<patternPoint> clipedImagePoints;
+	cv::Mat objectPoints = locaUtil::getBit3Dlocations_all();
+	cv::Mat color_img = cv::imread( imgPaths.at(0), 1 );
+	cv::Mat img;
+	unsigned char* pattern = locaUtil::getPatternCode93();
+	cvtColor(color_img,img,CV_RGB2GRAY);
+	cameraParam cam;
+	std::cout<<"from -0.5 to 0.5 in 0.005 steps"<<std::endl;
+	for(double x = -0.5; x <= 0.5; x += 0.005){
+		std::cout<<x<<std::endl;
+		for(double y = -0.5; y <= 0.5; y += 0.005){
+			double psum = 0;
+			for(double psi = -0.5; psi <= 0.5; psi += 0.005){
+				double p = 0;
+				cam.setExtr(psi,x,y);
+				cam.projectTo2D(&objectPoints,&imagePoints);
+				clipedImagePoints = picRating::clipANDmark(imagePoints,pattern, img.cols, img.rows);
+				p = picRating::rateImage(img, clipedImagePoints,1);
+				//if(p > 0.9)
+					psum += p;
+				//psum += cameraCalibrationTest(x, y, psi, imgPaths.at(0));
+			}
+			testFile << x <<" "<< y << " "<< psum <<std::endl;
+		}
 	}
+	testFile.close();
+//	double x, y, psi, incRight, incLeft;
+//	int ansPics =  imgPaths.size();
+//	int ansValues = pose.size()/ansPics;
+//	assert(pose.size()%ansPics == 0);
+//	for(int i=0;i<ansPics;i++){
+//		psi = pose.at(i*ansValues+8);
+//		y = pose.at(i*ansValues+5);
+//		x = pose.at(i*ansValues+2);
+//		incRight = pose.at(i*ansValues+1);
+//		incLeft = pose.at(i*ansValues);
+//		std::cout<<"pic: "<<imgPaths.at(i);
+//		cameraCalibrationTest(x, y, psi, imgPaths.at(i));
+//		//ratingEval(x, y, psi, imgPaths.at(i));
+//	}
 return true;
 }
 

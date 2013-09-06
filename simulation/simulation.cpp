@@ -28,6 +28,7 @@ Simulation::Simulation():
 
 void Simulation::Initialize() {
 
+	if(settings_.sys_error_on_)
 	{//random systematic errors
 		settings_.robParameter_.kDistanceLeftWheel += 	locaUtil::randomUniform()*settings_.robParameter_.kLeftWheelWidth
 														-(settings_.robParameter_.kLeftWheelWidth/2);
@@ -333,8 +334,8 @@ void Simulation::Initialize() {
     	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     	traits->x = 0;
     	traits->y = 0;
-    	traits->width = 800;
-    	traits->height = 600;
+    	traits->width = 1280;
+    	traits->height = 720;
     	traits->red = 8;
     	traits->green = 8;
     	traits->blue = 8;
@@ -347,11 +348,15 @@ void Simulation::Initialize() {
     	osg::ref_ptr<osg::GraphicsContext> pbuffer = osg::GraphicsContext::createGraphicsContext(traits.get());
     	osg::ref_ptr<osg::Camera> camera = view_camera_on_robot->getCamera();
     	camera->setGraphicsContext(pbuffer.get());
-    	camera->setViewport(new osg::Viewport(0,0,800,600));
+    	camera->setViewport(new osg::Viewport(0,0,1280,720));
     	camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
     	camera->setDrawBuffer(GL_BACK);
     	camera->setReadBuffer(GL_BACK);
     	camera->setFinalDrawCallback(screen_shot_callback_);
+    	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
+    	projectionMatrix(0,0) = 1.375; //to get to 72° angle of view Horrizontally
+    	projectionMatrix(1,1) = 3.2; //to make scaling the same as horrizontally, a square on texture is a square in camera image
+    	viewer_.getView(2)->getCamera()->setProjectionMatrix(projectionMatrix);
     	view_camera_on_robot->setCameraManipulator(cam_on_rob_mani);
     }
 }
@@ -383,16 +388,27 @@ void Simulation::Step() {
 	}
 	loop_time_ = tmptime;
 
+
+
 	viewer_.advance();
 	viewer_.eventTraversal();
 	viewer_.updateTraversal();
 	viewer_.renderingTraversals();
+
+//	osg::Matrix testmat = viewer_.getView(2)->getCamera()->getProjectionMatrix();
+//	testmat = viewer_.getView(2)->getCamera()->getProjectionMatrix();
+//	std::cout<<testmat(0,0)<<"  "<<testmat(0,1)<<"  "<<testmat(0,2)<<"  "<<testmat(0,3)<<std::endl;
+//	std::cout<<testmat(1,0)<<"  "<<testmat(1,1)<<"  "<<testmat(1,2)<<"  "<<testmat(1,3)<<std::endl;
+//	std::cout<<testmat(2,0)<<"  "<<testmat(2,1)<<"  "<<testmat(2,2)<<"  "<<testmat(2,3)<<std::endl;
+//	std::cout<<testmat(3,0)<<"  "<<testmat(3,1)<<"  "<<testmat(3,2)<<"  "<<testmat(3,3)<<std::endl;
+//	std::cout<<std::endl;
 
 	step_counter_ ++;
 	robotdata_ = dynamic_cast<RobotData*> (robot_->getUserData());
 
 	viewer_.getView(2)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
 	view_matrix_ = viewer_.getView(2)->getCamera()->getViewMatrix();
+
 //	osg::Matrix windowMatrix = viewer_.getView(2)->getCamera()->getViewport()->computeWindowMatrix();
 //	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
 //	osg::Matrix mat = projectionMatrix*windowMatrix;

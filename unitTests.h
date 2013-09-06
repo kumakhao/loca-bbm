@@ -16,7 +16,7 @@
 class unitTests{
 public:
 	static bool landmarkTest();
-	static bool cameraCalibrationTest(double x, double y, double psi, std::string imgPath);
+	static double cameraCalibrationTest(double x, double y, double psi, std::string imgPath);
 	static bool ratingEval(double x, double y, double psi, std::string imgPath);
 	static bool picTest();
 	static bool cvProjectTest();

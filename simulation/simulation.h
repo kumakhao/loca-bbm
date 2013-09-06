@@ -54,6 +54,8 @@ public:
 		int crowd_size_;
 		//how many particels are visable in the simulation 1=1:1, 2=1:2, 3=1:3 usw
 		int particle_visibility_ratio_;
+		//enable or disable systematic errors
+		bool sys_error_on_;
 
 		//Robot hardware paramerters including sensor nois!
 		RobotData::RobotParameter robParameter_;
@@ -64,7 +66,8 @@ public:
 		takepicture_intervall_(3000),
 		loop_target_time_(33333),
 		crowd_size_(0),
-		particle_visibility_ratio_(1)
+		particle_visibility_ratio_(1),
+		sys_error_on_(true)
 		{
 			std::ostringstream filename;
 			time_t t = time(0);   // get time now

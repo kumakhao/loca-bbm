@@ -13,8 +13,8 @@
 
 cameraParam::cameraParam() {
 	intrMat = cv::Mat(3, 3, CV_64FC1);
-	intrMat.at<double>(0, 0) = LOCAL_Fx;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = LOCAL_Cx;
-	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = LOCAL_Fy;	intrMat.at<double>(1, 2) = LOCAL_Cy;
+	intrMat.at<double>(0, 0) = 880;		intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 640;
+	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 1152;		intrMat.at<double>(1, 2) = 360;
 	intrMat.at<double>(2, 0) = 0.0;		intrMat.at<double>(2, 1) = 0.0;		intrMat.at<double>(2, 2) = 1.0;
 	rotMat = cv::Mat(3, 3, CV_64FC1);
 	//rotv = cv::Mat(3, 1, CV_64FC1);
