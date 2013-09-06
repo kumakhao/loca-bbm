@@ -201,7 +201,7 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 			for(int u=-grid;u<=grid;u++)
 				value += bw_pixel(img, x+j, y+u);
 		}
-		value = value / (grid+grid+1)*(grid+grid+1);
+		value = value / ((grid+grid+1)*(grid+grid+1));
 		if(pattern.at(i).patternValue == 255){
 			whiteCount++;
 			avgWhite += value;
@@ -215,8 +215,8 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 	}
 	// Wenn es Punkte im Bild gibt, werden die Mittelwerte gebildet.
 	if(pattern.size()>0){
-		avgBlack = avgBlack/blackCount;
-		avgWhite = avgWhite/whiteCount;
+		avgBlack = avgBlack/(blackCount);
+		avgWhite = avgWhite/(whiteCount);
 	}
 
 	// Wenn der mittlere Schwarzwert der dunkeln Pixel größer ist als der
@@ -239,12 +239,13 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 		p *= p;
 		pSum += p/kontrast;
 	}
-	pSum = pSum/pattern.size();
+	pSum = pSum/pattern.size();//*((log(133))/(log(kontrast/2+1)));
 //	std::cout<<std::endl;
 //	std::cout<<"avgWhite: "<<avgWhite<<"  avgBlack: "<<avgBlack<<"  pSum: "<<pSum<<"  exp(-pSum): "<<exp(-pSum)<<std::endl;
 //	std::cout<<std::endl;
 
 	return exp(-pSum);
+	//return kontrast;
 
 }
 
