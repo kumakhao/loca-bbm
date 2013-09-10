@@ -137,7 +137,7 @@ int main(int argc, char** argv){
 		for(int pic_time = 500; pic_time <= 1500; pic_time += 500){
 			double counter = 0;
 			double square_distance_sum = 0;
-			for(int x=0; x<11;x++){
+			for(int x=0; x<1;x++){
 				Simulation mainSim;
 				localisation *mainLoca = new localisation;
 				mainSim.setLocalisation(mainLoca);
@@ -154,7 +154,7 @@ int main(int argc, char** argv){
 				mainSim.settings_.plotfile_ = plotfile.str();
 				mainSim.Initialize();
 				mainSim.Realize();
-				mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/picsEvery500ms_2013-08-22_1112");
+				mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/Oval");
 				while(!mainSim.done()){
 					mainSim.Step();
 					localisation::EstimatedRobotPose* es = mainLoca->getEstimatedRobotPose();

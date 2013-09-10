@@ -106,21 +106,25 @@ bool unitTests::picTest() {
 	cvtColor(color_img,img,CV_RGB2GRAY);
 	cameraParam cam;
 	std::cout<<"from -0.5 to 0.5 in 0.005 steps"<<std::endl;
-	for(double x = -0.5; x <= 0.5; x += 0.005){
+	for(double x = -0.0; x <= 0.0; x += 0.1){
 		std::cout<<x<<std::endl;
-		for(double y = -0.5; y <= 0.5; y += 0.005){
+		for(double y = -0.5; y <= 0.5; y += 0.01){
 			double psum = 0;
-			for(double psi = -0.5; psi <= 0.5; psi += 0.005){
+			for(double psi = -0.2; psi <= 0.2; psi += 0.005){
 				double p = 0;
 				cam.setExtr(psi,x,y);
 				cam.projectTo2D(&objectPoints,&imagePoints);
 				clipedImagePoints = picRating::clipANDmark(imagePoints,pattern, img.cols, img.rows);
 				p = picRating::rateImage(img, clipedImagePoints,1);
-				//if(p > 0.9)
-					psum += p;
+//				if(p > 0.1)
+//					psum += p;
+				testFile << (psi/M_PI)*180 << " " << y << " "<< p <<std::endl;
+
 				//psum += cameraCalibrationTest(x, y, psi, imgPaths.at(0));
 			}
-			testFile << x <<" "<< y << " "<< psum <<std::endl;
+			if(psum < 0.1)
+				psum = 0.0;
+			//testFile << x <<" "<< y << " "<< psum <<std::endl;
 		}
 	}
 	testFile.close();
