@@ -117,7 +117,7 @@ void RobotData::UpdateIncrements()
 
 void RobotData::UpdateCamTransformation() {
 	osg::Matrix transMat = cam_on_robot_->getMatrix();
-	double x1 = -M_PI*(110.0/180.0);
+	double x1 = -M_PI*(120.0/180.0);
 	double c1 = cos(x1);
 	double c2 = cos(-psi_+(M_PI/2));
 	double c3 = 1;//cos(x3);

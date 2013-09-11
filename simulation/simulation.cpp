@@ -45,7 +45,7 @@ void Simulation::Initialize() {
 		data_to_file_writer_.datafile_path_ = settings_.datafile_name_;
 		data_to_file_writer_.plotfile_path_ = settings_.plotfile_;
 		data_to_file_writer_.Header();
-		takepicture_intervall_				= settings_.takepicture_intervall_;
+		takepicture_intervall_				= (1000*settings_.takepicture_intervall_)/settings_.loop_target_time_;
 		loop_target_time_					= settings_.loop_target_time_;
 		croud_size_							= settings_.crowd_size_;
 		particle_visibility_ratio_			= settings_.particle_visibility_ratio_;
@@ -83,186 +83,8 @@ void Simulation::Initialize() {
 	}
 
 	//Seed human doubles into the simulation.
+	AddCrowd(root_, croud_size_);
 
-	switch (croud_size_){
-	case 25:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(0,0,0) );
-			root_->addChild(human_transform);
-		}
-	case 24:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(2.5,0,0) );
-			root_->addChild(human_transform);
-		}
-	case 23:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(0,5,0) );
-			root_->addChild(human_transform);
-		}
-	case 22:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-2.5,-5,0) );
-			root_->addChild(human_transform);
-		}
-	case 21:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-2.5,0,0) );
-			root_->addChild(human_transform);
-		}
-	case 20:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-5,2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 19:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(2.5,-5,0) );
-			root_->addChild(human_transform);
-		}
-	case 18:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(0,2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 17:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-5,-2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 16:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(5,2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 15:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-5,5,0) );
-			root_->addChild(human_transform);
-		}
-	case 14:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(2.5,-2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 13:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-2.5,-2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 12:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(5,-5,0) );
-			root_->addChild(human_transform);
-		}
-	case 11:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(2.5,5,0) );
-			root_->addChild(human_transform);
-		}
-	case 10:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(5,0,0) );
-			root_->addChild(human_transform);
-		}
-	case 9:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-2.5,2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 8:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(0,-2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 7:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-5,-5,0) );
-			root_->addChild(human_transform);
-		}
-	case 6:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(5,5,0) );
-			root_->addChild(human_transform);
-		}
-	case 5:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-2.5,5,0) );
-			root_->addChild(human_transform);
-		}
-	case 4:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(-5,0,0) );
-			root_->addChild(human_transform);
-		}
-	case 3:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(0,-5,0) );
-			root_->addChild(human_transform);
-		}
-	case 2:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(5,-2.5,0) );
-			root_->addChild(human_transform);
-		}
-	case 1:
-		{
-			osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
-			human_transform->addChild(HumanDouble());
-			human_transform->setPosition( osg::Vec3d(2.5,2.5,0) );
-			root_->addChild(human_transform);
-		}
-	default:
-		break;
-	}
 
 	if(particles_on_){
 		particle_view_ = new Particles();
@@ -330,12 +152,11 @@ void Simulation::Initialize() {
 
     {//Setup view for the camera on the robot.
     	view_camera_on_robot->setSceneData(root_);
-    	//view_camera_on_robot->setUpViewInWindow(820,350,320,320);
     	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     	traits->x = 0;
     	traits->y = 0;
-    	traits->width = 1280;
-    	traits->height = 720;
+    	traits->width = settings_.camera_picture_width_;
+    	traits->height = settings_.camera_picture_height_;
     	traits->red = 8;
     	traits->green = 8;
     	traits->blue = 8;
@@ -348,17 +169,24 @@ void Simulation::Initialize() {
     	osg::ref_ptr<osg::GraphicsContext> pbuffer = osg::GraphicsContext::createGraphicsContext(traits.get());
     	osg::ref_ptr<osg::Camera> camera = view_camera_on_robot->getCamera();
     	camera->setGraphicsContext(pbuffer.get());
-    	camera->setViewport(new osg::Viewport(0,0,1280,720));
+    	camera->setViewport(new osg::Viewport(0,0,settings_.camera_picture_width_,settings_.camera_picture_height_));
     	camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
     	camera->setDrawBuffer(GL_BACK);
     	camera->setReadBuffer(GL_BACK);
     	camera->setFinalDrawCallback(screen_shot_callback_);
-    	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
-    	projectionMatrix(0,0) = 1.375; //to get to 72° angle of view Horrizontally
-    	projectionMatrix(1,1) = 3.2; //to make scaling the same as horrizontally, a square on texture is a square in camera image
-    	viewer_.getView(2)->getCamera()->setProjectionMatrix(projectionMatrix);
+    	viewer_.getView(2)->getCamera()->setProjectionMatrixAsPerspective(	settings_.field_of_view_horizontal_*settings_.camera_picture_height_/settings_.camera_picture_width_,
+    																			(double)settings_.camera_picture_width_/(double)settings_.camera_picture_height_,
+    																			1,
+    																			10000);
     	view_camera_on_robot->setCameraManipulator(cam_on_rob_mani);
     }
+	osg::Matrix windowMatrix = viewer_.getView(2)->getCamera()->getViewport()->computeWindowMatrix();
+	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
+	osg::Matrix mat = projectionMatrix*windowMatrix;
+	std::cout<<"Intrinsic camera parameter:"<<std::endl;
+	std::cout<<"fx: "<<mat(0,0)<<" fy: "<<mat(1,1)<<" cx:"<<-mat(2,0)<<" cy:"<<-mat(2,1)<<std::endl;
+	std::cout<<std::endl;
+	robotdata_ = dynamic_cast<RobotData*> (robot_->getUserData());
 }
 
 void Simulation::Realize() {
@@ -404,7 +232,7 @@ void Simulation::Step() {
 //	std::cout<<std::endl;
 
 	step_counter_ ++;
-	robotdata_ = dynamic_cast<RobotData*> (robot_->getUserData());
+
 
 	viewer_.getView(2)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
 	view_matrix_ = viewer_.getView(2)->getCamera()->getViewMatrix();
@@ -414,6 +242,14 @@ void Simulation::Step() {
 //	osg::Matrix mat = projectionMatrix*windowMatrix;
 //	std::cout<<"mat: "<<mat(0,0)<<" "<<mat(1,1)<<" "<<mat(2,0)<<" "<<mat(2,1)<<std::endl;
 //	std::cout<<"eye: "<<view_matrix_eye_.x()<<" "<<view_matrix_eye_.y()<<" "<<view_matrix_eye_.z()<<std::endl;
+
+	if(particles_on_){
+		// The dynamic update of the particle filter.
+		localisation_->dynamic(robotdata_->incremente_left_,robotdata_->incremente_right_);
+
+		// Update of simulations view of particles.
+		particle_view_->Update(localisation_->getParticles(), particle_visibility_ratio_);
+	}
 
 	//Picture handling
 	if(screen_shot_callback_->isPicTaken() && !picture_processed_){
@@ -443,25 +279,13 @@ void Simulation::Step() {
 		picture_processed_ = true;
 	}
 
-	else if(step_counter_ > 0){
-		// This block is only executed every 20th pass.
-		step_counter_ = 0;
-		if(particles_on_){
-			// The dynamic update of the particle filter.
-			localisation_->dynamic(robotdata_->incremente_left_,robotdata_->incremente_right_);
-
-			// Update of simulations view of particles.
-			particle_view_->Update(localisation_->getParticles(), particle_visibility_ratio_);
-		}
+	else {
 		// writes the current position and orientation of the robot to file.
 		data_to_file_writer_.WriteData(robotdata_->incremente_left_, robotdata_->incremente_right_,
 														robotdata_->x_pos_, view_matrix_eye_[0], localisation_->getPosition().at(0),
 														robotdata_->y_pos_, view_matrix_eye_[1], localisation_->getPosition().at(2),
 														robotdata_->psi_, view_matrix_(0,0), localisation_->getOrientation().at(1));
-//		old version
-//		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_, robotdata_->psi_,
-//											localisation_->getPosition().at(0), localisation_->getPosition().at(2),
-//											localisation_->getPosition().at(1)*3, localisation_->getPosition().at(3)*3);
+
 		es_ = localisation_->getEstimatedRobotPose();
 		data_to_file_writer_.WritePlotData(	robotdata_->x_pos_, robotdata_->y_pos_,
 											es_->x, es_->y,
@@ -472,11 +296,19 @@ void Simulation::Step() {
 	UpdateHUD();
 
 	// without pad_control pictures are taken every takepicture_intervall_ ms
-	if( (!pad_control_on_) && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>takepicture_intervall_) ){
+//	if( (!pad_control_on_) && (0.001*(cvGetTickCount()-take_picture_timer_)/cvGetTickFrequency()>takepicture_intervall_) ){
+//		std::cout<<"Sim: 'I queued a Shot!'"<<std::endl;
+//		screen_shot_callback_->queueShot();
+//		picture_processed_ = false;
+//		take_picture_timer_ = cvGetTickCount();
+//	}
+
+	if(step_counter_ % takepicture_intervall_ == 0){
 		screen_shot_callback_->queueShot();
 		picture_processed_ = false;
 		take_picture_timer_ = cvGetTickCount();
 	}
+
 	if(pad_control_on_){
 		if(picture_processed_ && !take_picture_button_pressed_ && sixaxes_->buttonPressed(BUTTON_CIRCLE)){
 				// Every 2 sec a Shot is queued to get a picture form the scene.
@@ -950,6 +782,46 @@ void Simulation::UpdateHUD() {
 	hud_text <<    "Nr of Particles: "<<localisation_->param.nrOfParticles<<"("<<localisation_->good_rating_count<<")"<<
 					"   Observe Highscore: "<<localisation_->highscore<<"("<<localisation_->highscore_count<<")";
 	hud_.setText(hud_text.str());
+}
+
+void Simulation::AddCrowd(osg::Group *root_, int size){
+	if(size < 1)
+		return;
+	if(size > 23)
+		size = 23;
+	std::vector<osg::Vec3d> crowdPos;
+	crowdPos.push_back( osg::Vec3d(2.5,0,0) );
+	crowdPos.push_back( osg::Vec3d(0,5,0) );
+	crowdPos.push_back( osg::Vec3d(-2.5,-5,0) );
+	crowdPos.push_back( osg::Vec3d(-5,2.5,0) );
+	crowdPos.push_back( osg::Vec3d(2.5,-5,0) );
+	crowdPos.push_back( osg::Vec3d(0,2.5,0) );
+	crowdPos.push_back( osg::Vec3d(-5,-2.5,0) );
+	crowdPos.push_back( osg::Vec3d(5,2.5,0) );
+	crowdPos.push_back( osg::Vec3d(-5,5,0) );
+	crowdPos.push_back( osg::Vec3d(2.5,-2.5,0) );
+	crowdPos.push_back( osg::Vec3d(-2.5,-2.5,0) );
+	crowdPos.push_back( osg::Vec3d(5,-5,0) );
+	crowdPos.push_back( osg::Vec3d(2.5,5,0) );
+	crowdPos.push_back( osg::Vec3d(5,0,0) );
+	crowdPos.push_back( osg::Vec3d(-2.5,2.5,0) );
+	crowdPos.push_back( osg::Vec3d(0,-2.5,0) );
+	crowdPos.push_back( osg::Vec3d(-5,-5,0) );
+	crowdPos.push_back( osg::Vec3d(5,5,0) );
+	crowdPos.push_back( osg::Vec3d(-2.5,5,0) );
+	crowdPos.push_back( osg::Vec3d(-5,0,0) );
+	crowdPos.push_back( osg::Vec3d(0,-5,0) );
+	crowdPos.push_back( osg::Vec3d(5,-2.5,0) );
+	crowdPos.push_back( osg::Vec3d(2.5,2.5,0) );
+	for(int i = 0; i < size; i++){
+		osg::PositionAttitudeTransform* human_transform = new osg::PositionAttitudeTransform();
+		human_transform->addChild(HumanDouble());
+		int tmp = std::rand()%crowdPos.size();
+		human_transform->setPosition(crowdPos.at(tmp));
+		crowdPos.erase(crowdPos.begin()+tmp);
+		root_->addChild(human_transform);
+	}
+
 }
 
 void Simulation::WriteRobotTrajectory() {

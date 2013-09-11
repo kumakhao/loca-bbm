@@ -67,7 +67,6 @@ int main(int argc, char** argv){
 
 
 	std::vector<double> orientaion, position;
-	std::vector<double> meanErrors;
 
 	cv::Mat img1;
 	cv::Mat img2;
@@ -103,15 +102,16 @@ int main(int argc, char** argv){
 		mainLoca->landmarks.addLandmark(3,-5.0,5.0);
 		mainLoca->landmarks.addLandmark(4,5.0,5.0);
 
-		mainLoca->initilisation_done_ = false;
+		mainLoca->initilisation_done_ = true;
 		mainSim.setLocalisation(mainLoca);
 		//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
 		mainSim.setObserveMode(Simulation::Pictures);
 		mainSim.enablePadControl();
 		mainSim.settings_.takepicture_intervall_ = 2000;
 		mainSim.settings_.robParameter_.kSpeed = 0.05;
-		mainSim.settings_.crowd_size_ = 3;
+		mainSim.settings_.crowd_size_ = 25;
 		mainSim.settings_.particle_visibility_ratio_ = 10;
+		mainSim.settings_.sys_error_on_ = false;
 		mainLoca->param.nrOfParticles = 2500;
 		mainSim.Initialize();
 		mainSim.Realize();
@@ -134,78 +134,110 @@ int main(int argc, char** argv){
 		;
 		break;
 	case 3:
-		for(int pic_time = 500; pic_time <= 1500; pic_time += 500){
-			double counter = 0;
-			double square_distance_sum = 0;
-			for(int x=0; x<1;x++){
-				Simulation mainSim;
-				localisation *mainLoca = new localisation;
-				mainSim.setLocalisation(mainLoca);
-				//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
-				mainSim.setObserveMode(Simulation::Pictures);
-				mainSim.enablePadControl();
-				std::stringstream datafilename;
-				datafilename << "/home/josef/Desktop/hallowelt_"<<pic_time<<".txt";
-				mainSim.settings_.datafile_name_ = datafilename.str();
-				//mainSim.settings_.picture_path_ = "/home/josef/Desktop/";
-				mainSim.settings_.takepicture_intervall_ = pic_time;
-				std::stringstream plotfile;
-				plotfile << "/home/josef/Desktop/plotfile_"<<pic_time;
-				mainSim.settings_.plotfile_ = plotfile.str();
-				mainSim.Initialize();
-				mainSim.Realize();
-				mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/Oval");
-				while(!mainSim.done()){
-					mainSim.Step();
-					localisation::EstimatedRobotPose* es = mainLoca->getEstimatedRobotPose();
-					if(es->x < INFINITY){
-					counter++;
-					square_distance_sum += sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+	{
+		std::vector<std::string> trajectorys;
+		trajectorys.push_back("oval");
+		trajectorys.push_back("serpentinen");
+		trajectorys.push_back("clockwise");
+		trajectorys.push_back("antiClockwise");
+		for(unsigned int name = 0; name < trajectorys.size(); name++){
+			std::stringstream filename;
+			filename << "/home/josef/workspace/Loca-Projekt/plots/picFrequency/" << trajectorys.at(name) << "_data";
+			std::ofstream testFile (filename.str().c_str());
+			testFile << "freq " << trajectorys.at(name) << std::endl;
+			for(int pic_time = 500; pic_time <= 1500; pic_time += 500){
+				testFile << pic_time << " ";
+				double counter = 0;
+				double square_distance_sum = 0;
+				for(int x=0; x<1;x++){
+					Simulation mainSim;
+					localisation *mainLoca_frequency = new localisation;
+					mainLoca_frequency->initilisation_done_ = true;
+					mainSim.settings_.particle_visibility_ratio_ = 10;
+					mainSim.setLocalisation(mainLoca_frequency);
+					//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
+					mainSim.setObserveMode(Simulation::Pictures);
+					mainSim.enablePadControl();
+
+					mainSim.settings_.takepicture_intervall_ = pic_time;
+
+					mainSim.Initialize();
+					mainSim.Realize();
+					std::stringstream trajPath;
+					trajPath << "/home/josef/workspace/Loca-Projekt/trajectorys/"<<trajectorys.at(name);
+					mainSim.ReadRobotTrajectory(trajPath.str());
+					while(!mainSim.done()){
+						mainSim.Step();
+						localisation::EstimatedRobotPose* es = mainLoca_frequency->getEstimatedRobotPose();
+						if(es->x < INFINITY){
+						counter++;
+						square_distance_sum += sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+						}
 					}
+//					std::stringstream trajectoryfile;
+//					trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
+//					mainSim.WriteRobotTrajectory(trajectoryfile.str());
+					mainSim.CleanUp();
 				}
-				std::stringstream trajectoryfile;
-				trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
-				mainSim.WriteRobotTrajectory(trajectoryfile.str());
-				mainSim.CleanUp();
+				square_distance_sum = square_distance_sum/counter;
+				//meanErrors.push_back(square_distance_sum);
+				testFile << square_distance_sum << std::endl;
 			}
-			square_distance_sum = square_distance_sum/counter;
-			meanErrors.push_back(square_distance_sum);
-		}
-		while(!meanErrors.empty()){
-			double output = meanErrors.back();
-			meanErrors.pop_back();
-			std::cout<<"meanDistance from pose estimate: "<< output<<std::endl;
+			testFile.close();
 		}
 		break;
+	}
 	case 4:
-		for(int croud_size = 0; croud_size <= 23; croud_size++){
-			Simulation mainSim;
-			localisation *mainLoca = new localisation;
-			mainSim.setLocalisation(mainLoca);
-			//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
-			mainSim.setObserveMode(Simulation::Pictures);
-			mainSim.enablePadControl();
-			std::stringstream datafilename;
-			datafilename << "/home/josef/workspace/Loca-Projekt/plots/croudEffect/LocaData_"<<croud_size<<".txt";
-			mainSim.settings_.crowd_size_ = croud_size;
-			mainSim.settings_.takepicture_intervall_ = 1000;
-			mainSim.settings_.datafile_name_ = datafilename.str();
-			mainSim.settings_.picture_path_ = "/home/josef/workspace/Loca-Projekt/pictures/croudEffect/";
-			std::stringstream plotfile;
-			plotfile << "/home/josef/workspace/Loca-Projekt/plots/croudEffect/plotfile_"<<croud_size;
-			mainSim.settings_.plotfile_ = plotfile.str();
-			mainSim.Initialize();
-			mainSim.Realize();
-			mainSim.ReadRobotTrajectory("/home/josef/workspace/Loca-Projekt/trajectorys/picsEvery500ms_2013-08-22_1112");
-			while(!mainSim.done()){
-				mainSim.Step();
+	{
+		std::vector<std::string> trajectorys;
+		trajectorys.push_back("oval");
+		//trajectorys.push_back("serpentinen");
+		//trajectorys.push_back("clockwise");
+		//trajectorys.push_back("antiClockwise");
+		for(unsigned int name = 0; name < trajectorys.size(); name++){
+			std::stringstream filename;
+			filename << "/home/josef/workspace/Loca-Projekt/plots/croudEffect/" << trajectorys.at(name) << "_data";
+			std::ofstream testFile (filename.str().c_str());
+			testFile << "size " << trajectorys.at(name) << std::endl;
+			for(int crowdSize = 3; crowdSize <= 3; crowdSize += 6){
+				testFile << crowdSize << " ";
+				double counter = 0;
+				double square_distance_sum = 0;
+				for(int x=0; x<10;x++){
+					Simulation mainSim;
+					localisation *mainLoca_frequency = new localisation;
+					mainLoca_frequency->initilisation_done_ = true;
+					mainSim.settings_.particle_visibility_ratio_ = 10;
+					mainSim.setLocalisation(mainLoca_frequency);
+					//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
+					mainSim.setObserveMode(Simulation::Pictures);
+					mainSim.enablePadControl();
+
+					mainSim.settings_.crowd_size_ = crowdSize;
+					mainSim.settings_.takepicture_intervall_ = 1500;
+
+					mainSim.Initialize();
+					mainSim.Realize();
+					std::stringstream trajPath;
+					trajPath << "/home/josef/workspace/Loca-Projekt/trajectorys/"<<trajectorys.at(name);
+					mainSim.ReadRobotTrajectory(trajPath.str());
+					while(!mainSim.done()){
+						mainSim.Step();
+						localisation::EstimatedRobotPose* es = mainLoca_frequency->getEstimatedRobotPose();
+						if(es->x < INFINITY){
+						counter++;
+						square_distance_sum += sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+						}
+					}
+					mainSim.CleanUp();
+				}
+				square_distance_sum = square_distance_sum/counter;
+				testFile << square_distance_sum << std::endl;
 			}
-			std::stringstream trajectoryfile;
-			trajectoryfile << "/home/josef/Desktop/trajectory_"<<croud_size;
-			mainSim.WriteRobotTrajectory(trajectoryfile.str());
-			mainSim.CleanUp();
+			testFile.close();
 		}
 		break;
+	}
 	default:
 		;
 		break;

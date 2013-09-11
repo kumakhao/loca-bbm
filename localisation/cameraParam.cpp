@@ -13,8 +13,8 @@
 
 cameraParam::cameraParam() {
 	intrMat = cv::Mat(3, 3, CV_64FC1);
-	intrMat.at<double>(0, 0) = 880;		intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 640;
-	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 1152;		intrMat.at<double>(1, 2) = 360;
+	intrMat.at<double>(0, 0) = 947.084;	intrMat.at<double>(0, 1) = 0.0;		intrMat.at<double>(0, 2) = 640;
+	intrMat.at<double>(1, 0) = 0.0;		intrMat.at<double>(1, 1) = 947.084;	intrMat.at<double>(1, 2) = 360;
 	intrMat.at<double>(2, 0) = 0.0;		intrMat.at<double>(2, 1) = 0.0;		intrMat.at<double>(2, 2) = 1.0;
 	rotMat = cv::Mat(3, 3, CV_64FC1);
 	//rotv = cv::Mat(3, 1, CV_64FC1);
@@ -57,7 +57,7 @@ void cameraParam::setExtr(double psi, double x, double y, double z) {
 	TranslMatr.at<double>(2,0) = 0; TranslMatr.at<double>(2,1) = 0; TranslMatr.at<double>(2,2) = 1; TranslMatr.at<double>(2,3) = 0;
 	TranslMatr.at<double>(3,0) = 0; TranslMatr.at<double>(3,1) = 0; TranslMatr.at<double>(3,2) = 0; TranslMatr.at<double>(3,3) = 1;
 
-	double pitch = -M_PI*(20.0/180.0);
+	double pitch = -M_PI*(30.0/180.0);
 	cv::Mat cameraPitch = cv::Mat(4, 4, CV_64FC1);
 	cameraPitch.at<double>(0,0) = 1; cameraPitch.at<double>(0,1) = 0; 			cameraPitch.at<double>(0,2) = 0;			cameraPitch.at<double>(0,3) = 0;
 	cameraPitch.at<double>(1,0) = 0; cameraPitch.at<double>(1,1) = cos(pitch);	cameraPitch.at<double>(1,2) = -sin(pitch); cameraPitch.at<double>(1,3) = 0;

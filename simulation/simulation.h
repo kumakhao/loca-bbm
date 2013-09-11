@@ -56,6 +56,12 @@ public:
 		int particle_visibility_ratio_;
 		//enable or disable systematic errors
 		bool sys_error_on_;
+		//Camera picture width
+		int camera_picture_width_;
+		//Camera picture height
+		int camera_picture_height_;
+		//Camera field of View horizontal in degrees
+		double field_of_view_horizontal_;
 
 		//Robot hardware paramerters including sensor nois!
 		RobotData::RobotParameter robParameter_;
@@ -67,7 +73,10 @@ public:
 		loop_target_time_(33333),
 		crowd_size_(0),
 		particle_visibility_ratio_(1),
-		sys_error_on_(true)
+		sys_error_on_(true),
+		camera_picture_width_(1280),
+		camera_picture_height_(720),
+		field_of_view_horizontal_(74)
 		{
 			std::ostringstream filename;
 			time_t t = time(0);   // get time now
@@ -125,6 +134,7 @@ private:
 	void Observe();
 	void Dynamic();
 	void UpdateHUD();
+	void AddCrowd(osg::Group *root_, int size);
 
 	bool particles_on_;
 	bool setup_done_;
@@ -134,7 +144,7 @@ private:
 
 	ObserveMode observe_mode_;
 
-	double step_counter_;
+	int step_counter_;
 	double view_matrix_distance_;
 	int takepicture_intervall_;
 	int loop_target_time_;
