@@ -15,9 +15,17 @@ Simulation::Simulation():
 	picture_processed_(true),
 	pad_control_on_(false),
 	take_picture_button_pressed_(false),
+	blind_mode_on_(false),
 	observe_mode_(noObserve),
-	step_counter_(0.0),
 	view_matrix_distance_(0.0),
+	field_of_view_horizontal_(74),
+	step_counter_(0.0),
+	takepicture_intervall_(2000),
+	loop_target_time_(33333),
+	croud_size_(0),
+	particle_visibility_ratio_(1),
+	camera_picture_width_(1280),
+	camera_picture_height_(720),
 	take_picture_timer_(0),
 	loop_time_(0),
 	sixaxes_(NULL)
@@ -49,6 +57,10 @@ void Simulation::Initialize() {
 		loop_target_time_					= settings_.loop_target_time_;
 		croud_size_							= settings_.crowd_size_;
 		particle_visibility_ratio_			= settings_.particle_visibility_ratio_;
+		camera_picture_width_				= settings_.camera_picture_width_;
+		camera_picture_height_				= settings_.camera_picture_height_;
+		field_of_view_horizontal_			= settings_.field_of_view_horizontal_;
+		blind_mode_on_						= settings_.blind_mode_on_;
 	}
 
 	osgGA::TrackballManipulator* cam_on_rob_mani = new osgGA::TrackballManipulator;
@@ -66,9 +78,12 @@ void Simulation::Initialize() {
 	//std::cout<<"ThreadingModelafter: "<<viewer_.getThreadingModel()<<std::endl;
 	viewer_.setUpThreading();
 
-	viewer_.addView(view_robot);
-	viewer_.addView(view_map);
 	viewer_.addView(view_camera_on_robot);
+	if(!blind_mode_on_){
+		viewer_.addView(view_robot);
+		viewer_.addView(view_map);
+	}
+
 
 	{//light
 		mylightsource = new osg::LightSource();
@@ -119,44 +134,47 @@ void Simulation::Initialize() {
 
 	if(pad_control_on_)
 		sixaxes_ = new cJoystick();
-	if( (!pad_control_on_) || (!sixaxes_->isActiv()) ){
-		KeyboardEventHandler* robotControlHandler;
-		robotControlHandler = new KeyboardEventHandler((RobotData*)robot_->getUserData());
-		view_robot->addEventHandler(robotControlHandler);
-		pad_control_on_ = false;
+
+	if(!blind_mode_on_){
+		if( (!pad_control_on_) || (!sixaxes_->isActiv()) ){
+			KeyboardEventHandler* robotControlHandler;
+			robotControlHandler = new KeyboardEventHandler((RobotData*)robot_->getUserData());
+			view_robot->addEventHandler(robotControlHandler);
+			pad_control_on_ = false;
+		}
+
+
+		{//Setup view from behind the robot
+			view_robot->setSceneData(root_);
+			view_robot->setUpViewInWindow(10,10,800,600);
+			osg::ref_ptr<osgGA::NodeTrackerManipulator> robot_camera_manipulator = new osgGA::NodeTrackerManipulator;
+			robot_camera_manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,-1.0,0));
+			robot_camera_manipulator->setTrackNode(robot_->getChild(0));
+			robot_camera_manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
+			view_robot->setCameraManipulator(robot_camera_manipulator);
+			//view_robot->getCamera()->setFinalDrawCallback(screen_shot_callback_);
+		}
+
+		{//Setup view strait down on the robot.
+			view_map->setSceneData(root_);
+			view_map->setUpViewInWindow(820,10,320,320);
+			osg::ref_ptr<osgGA::NodeTrackerManipulator> map_camera_manipulator = new osgGA::NodeTrackerManipulator;
+			//osg::ref_ptr<osgGA::TrackballManipulator> trackball_mani = new osgGA::TrackballManipulator;
+			map_camera_manipulator->setHomePosition(osg::Vec3(0, 0, 23), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+			map_camera_manipulator->setTrackNode(robot_->getChild(0));
+			map_camera_manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER);
+			//view_fix->getCameraManipulator()->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
+			view_map->setCameraManipulator( map_camera_manipulator );
+		}
 	}
-
-
-	{//Setup view from behind the robot
-		view_robot->setSceneData(root_);
-		view_robot->setUpViewInWindow(10,10,800,600);
-		osg::ref_ptr<osgGA::NodeTrackerManipulator> robot_camera_manipulator = new osgGA::NodeTrackerManipulator;
-		robot_camera_manipulator->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,-1.0,0));
-		robot_camera_manipulator->setTrackNode(robot_->getChild(0));
-		robot_camera_manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER_AND_ROTATION);
-		view_robot->setCameraManipulator(robot_camera_manipulator);
-		//view_robot->getCamera()->setFinalDrawCallback(screen_shot_callback_);
-	}
-
-    {//Setup view strait down on the robot.
-    	view_map->setSceneData(root_);
-		view_map->setUpViewInWindow(820,10,320,320);
-		osg::ref_ptr<osgGA::NodeTrackerManipulator> map_camera_manipulator = new osgGA::NodeTrackerManipulator;
-		//osg::ref_ptr<osgGA::TrackballManipulator> trackball_mani = new osgGA::TrackballManipulator;
-		map_camera_manipulator->setHomePosition(osg::Vec3(0, 0, 23), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
-		map_camera_manipulator->setTrackNode(robot_->getChild(0));
-		map_camera_manipulator->setTrackerMode(osgGA::NodeTrackerManipulator::NODE_CENTER);
-		//view_fix->getCameraManipulator()->setHomePosition(osg::Vec3(0, -3, 0), osg::Vec3(0,0,0), osg::Vec3(0,0,0));
-		view_map->setCameraManipulator( map_camera_manipulator );
-    }
 
     {//Setup view for the camera on the robot.
     	view_camera_on_robot->setSceneData(root_);
     	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits;
     	traits->x = 0;
     	traits->y = 0;
-    	traits->width = settings_.camera_picture_width_;
-    	traits->height = settings_.camera_picture_height_;
+    	traits->width = camera_picture_width_;
+    	traits->height = camera_picture_height_;
     	traits->red = 8;
     	traits->green = 8;
     	traits->blue = 8;
@@ -169,23 +187,23 @@ void Simulation::Initialize() {
     	osg::ref_ptr<osg::GraphicsContext> pbuffer = osg::GraphicsContext::createGraphicsContext(traits.get());
     	osg::ref_ptr<osg::Camera> camera = view_camera_on_robot->getCamera();
     	camera->setGraphicsContext(pbuffer.get());
-    	camera->setViewport(new osg::Viewport(0,0,settings_.camera_picture_width_,settings_.camera_picture_height_));
+    	camera->setViewport(new osg::Viewport(0,0,camera_picture_width_,camera_picture_height_));
     	camera->setClearColor(osg::Vec4(0.0f,0.0f,0.0f,0.0f));
     	camera->setDrawBuffer(GL_BACK);
     	camera->setReadBuffer(GL_BACK);
     	camera->setFinalDrawCallback(screen_shot_callback_);
-    	viewer_.getView(2)->getCamera()->setProjectionMatrixAsPerspective(	settings_.field_of_view_horizontal_*settings_.camera_picture_height_/settings_.camera_picture_width_,
-    																			(double)settings_.camera_picture_width_/(double)settings_.camera_picture_height_,
+    	viewer_.getView(0)->getCamera()->setProjectionMatrixAsPerspective(	field_of_view_horizontal_*camera_picture_height_/camera_picture_width_,
+    																			(double)camera_picture_width_/(double)camera_picture_height_,
     																			1,
     																			10000);
     	view_camera_on_robot->setCameraManipulator(cam_on_rob_mani);
     }
-	osg::Matrix windowMatrix = viewer_.getView(2)->getCamera()->getViewport()->computeWindowMatrix();
-	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
-	osg::Matrix mat = projectionMatrix*windowMatrix;
-	std::cout<<"Intrinsic camera parameter:"<<std::endl;
-	std::cout<<"fx: "<<mat(0,0)<<" fy: "<<mat(1,1)<<" cx:"<<-mat(2,0)<<" cy:"<<-mat(2,1)<<std::endl;
-	std::cout<<std::endl;
+//	osg::Matrix windowMatrix = viewer_.getView(0)->getCamera()->getViewport()->computeWindowMatrix();
+//	osg::Matrix projectionMatrix = viewer_.getView(0)->getCamera()->getProjectionMatrix();
+//	osg::Matrix mat = projectionMatrix*windowMatrix;
+//	std::cout<<"Intrinsic camera parameter:"<<std::endl;
+//	std::cout<<"fx: "<<mat(0,0)<<" fy: "<<mat(1,1)<<" cx:"<<-mat(2,0)<<" cy:"<<-mat(2,1)<<std::endl;
+//	std::cout<<std::endl;
 	robotdata_ = dynamic_cast<RobotData*> (robot_->getUserData());
 }
 
@@ -209,11 +227,11 @@ void Simulation::Step() {
 
 	int64 tmptime = cvGetTickCount();
 	int64 difftime = (tmptime-loop_time_)/cvGetTickFrequency();
-	if(difftime < loop_target_time_){
-		//std::cout<<"sleeping: "<<loop_target_time_-difftime<<std::endl;
-		usleep(loop_target_time_-difftime);
-		return;
-	}
+//	if(difftime < loop_target_time_){
+//		//std::cout<<"sleeping: "<<loop_target_time_-difftime<<std::endl;
+//		usleep(loop_target_time_-difftime);
+//		return;
+//	}
 	loop_time_ = tmptime;
 
 
@@ -234,8 +252,8 @@ void Simulation::Step() {
 	step_counter_ ++;
 
 
-	viewer_.getView(2)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
-	view_matrix_ = viewer_.getView(2)->getCamera()->getViewMatrix();
+	viewer_.getView(0)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
+	view_matrix_ = viewer_.getView(0)->getCamera()->getViewMatrix();
 
 //	osg::Matrix windowMatrix = viewer_.getView(2)->getCamera()->getViewport()->computeWindowMatrix();
 //	osg::Matrix projectionMatrix = viewer_.getView(2)->getCamera()->getProjectionMatrix();
@@ -638,9 +656,7 @@ void Simulation::ReadRobotTrajectory(std::string path) {
 	std::ifstream datafile;
 	std::string line;
 	datafile.open(path.c_str(), std::ios_base::in);
-	std::cout<<"reading trajectory from file"<<std::endl;
 	if(datafile.is_open()){
-		std::cout<<"file opend"<<std::endl;
 		trajectory_from_file_.clear();
 		while(datafile.good()){
 			getline(datafile,line);

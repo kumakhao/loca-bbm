@@ -22,11 +22,12 @@
 #include "localisation/cameraParam.h"
 #include "localisation/localisation.h"
 #include "framework_expobot/expoBot_test.h"
+#include "util/msTimer.h"
 
 int main(int argc, char** argv){
 	osg::setNotifyLevel(osg::WARN);
 	srand(time(NULL));
-
+	msTimer simTime;
 	std::string mode_argument = "-help";
 	int mode = -1;
 	if(argc > 1)
@@ -137,19 +138,23 @@ int main(int argc, char** argv){
 	{
 		std::vector<std::string> trajectorys;
 		trajectorys.push_back("oval");
-		trajectorys.push_back("serpentinen");
-		trajectorys.push_back("clockwise");
-		trajectorys.push_back("antiClockwise");
+//		trajectorys.push_back("serpentinen");
+//		trajectorys.push_back("clockwise");
+//		trajectorys.push_back("antiClockwise");
 		for(unsigned int name = 0; name < trajectorys.size(); name++){
 			std::stringstream filename;
 			filename << "/home/josef/workspace/Loca-Projekt/plots/picFrequency/" << trajectorys.at(name) << "_data";
 			std::ofstream testFile (filename.str().c_str());
 			testFile << "freq " << trajectorys.at(name) << std::endl;
-			for(int pic_time = 500; pic_time <= 1500; pic_time += 500){
+
+			for(int pic_time = 500; pic_time <= 4000; pic_time += pic_time){
+				int repeats = 10;
+				double square_distance[repeats];
 				testFile << pic_time << " ";
-				double counter = 0;
 				double square_distance_sum = 0;
-				for(int x=0; x<1;x++){
+				double square_distance_var = 0;
+				for(int x=0; x<repeats;x++){
+					double counter = 0;
 					Simulation mainSim;
 					localisation *mainLoca_frequency = new localisation;
 					mainLoca_frequency->initilisation_done_ = true;
@@ -157,33 +162,42 @@ int main(int argc, char** argv){
 					mainSim.setLocalisation(mainLoca_frequency);
 					//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
 					mainSim.setObserveMode(Simulation::Pictures);
-					mainSim.enablePadControl();
+					//mainSim.enablePadControl();
 
 					mainSim.settings_.takepicture_intervall_ = pic_time;
+					mainSim.settings_.blind_mode_on_ = true;
 
 					mainSim.Initialize();
 					mainSim.Realize();
 					std::stringstream trajPath;
 					trajPath << "/home/josef/workspace/Loca-Projekt/trajectorys/"<<trajectorys.at(name);
 					mainSim.ReadRobotTrajectory(trajPath.str());
+					simTime.Start();
 					while(!mainSim.done()){
 						mainSim.Step();
 						localisation::EstimatedRobotPose* es = mainLoca_frequency->getEstimatedRobotPose();
 						if(es->x < INFINITY){
 						counter++;
-						square_distance_sum += sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+						square_distance[x] += sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
 						}
 					}
+					double tmp = square_distance[x]/counter;
+					square_distance[x] = tmp;
+					square_distance_sum += tmp;
+					std::cout<<"Time: "<<(double)simTime.getTimeFromStart()*0.000001<<std::endl;
 //					std::stringstream trajectoryfile;
 //					trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
 //					mainSim.WriteRobotTrajectory(trajectoryfile.str());
 					mainSim.CleanUp();
 				}
-				square_distance_sum = square_distance_sum/counter;
-				//meanErrors.push_back(square_distance_sum);
-				testFile << square_distance_sum << std::endl;
+				square_distance_sum = square_distance_sum/repeats;
+				for(int i=0;i<repeats;i++)
+					square_distance_var = pow((square_distance[i]-square_distance_sum),2);
+				square_distance_var = square_distance_var/repeats;
+				testFile << square_distance_sum << " " << square_distance_var << std::endl;
 			}
 			testFile.close();
+			std::cout<<std::endl;
 		}
 		break;
 	}

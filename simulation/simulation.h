@@ -62,6 +62,8 @@ public:
 		int camera_picture_height_;
 		//Camera field of View horizontal in degrees
 		double field_of_view_horizontal_;
+		//Disable windows
+		bool blind_mode_on_;
 
 		//Robot hardware paramerters including sensor nois!
 		RobotData::RobotParameter robParameter_;
@@ -76,7 +78,8 @@ public:
 		sys_error_on_(true),
 		camera_picture_width_(1280),
 		camera_picture_height_(720),
-		field_of_view_horizontal_(74)
+		field_of_view_horizontal_(74),
+		blind_mode_on_(false)
 		{
 			std::ostringstream filename;
 			time_t t = time(0);   // get time now
@@ -141,15 +144,22 @@ private:
 	bool picture_processed_;
 	bool pad_control_on_;
 	bool take_picture_button_pressed_;
+	bool blind_mode_on_;
 
 	ObserveMode observe_mode_;
 
-	int step_counter_;
+
 	double view_matrix_distance_;
+	double field_of_view_horizontal_;
+
+	int step_counter_;
 	int takepicture_intervall_;
 	int loop_target_time_;
 	int croud_size_;
 	int particle_visibility_ratio_;
+	int camera_picture_width_;
+	int camera_picture_height_;
+
 
 	std::stringstream trajectory_buffer_;
 	std::vector<double> trajectory_from_file_;
