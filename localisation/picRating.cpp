@@ -185,7 +185,7 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 	double avgWhite = 0.0;
 	int blackCount = 0;
 	double avgBlack = 0.0;
-	double kontrast = 0.0;
+	double kontrast2 = 0.0;
 	double pSum = 0.0;
 
 	if(pattern.size()<10)
@@ -225,11 +225,12 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 		return 0.0;
 
 	// Der Kontrast ist der quadratische Abstand der mittleren Schwarz- und Weißwerte
-	kontrast = avgWhite-avgBlack;
-	kontrast *= kontrast;
+	kontrast2 = avgWhite-avgBlack;
+	kontrast2 *= kontrast2;
 
 	// Hier wird der quadratische Abstand der Bildpixelwerte zu den mittleren
 	// Schwarz- bzw Weißwerten gebildet und durch den Kontrast geteilt.
+	int minKontrast = 10;
 	for(unsigned int i=0;i<pattern.size();i++){
 		double p = 0;
 		if(pattern.at(i).patternValue == 0)
@@ -237,14 +238,14 @@ double picRating::rateImage(cv::Mat img, std::vector<patternPoint> pattern,
 		if(pattern.at(i).patternValue == 255)
 			p = pattern.at(i).pixelValue - avgWhite;
 		p *= p;
-		pSum += p/kontrast;
+		pSum += (p+minKontrast*minKontrast)/(kontrast2/4+minKontrast*minKontrast); //p/kontrast2;
 	}
-	pSum = pSum/pattern.size();//*((log(133))/(log(kontrast/2+1)));
+	//pSum = pSum/pattern.size();
 //	std::cout<<std::endl;
 //	std::cout<<"avgWhite: "<<avgWhite<<"  avgBlack: "<<avgBlack<<"  pSum: "<<pSum<<"  exp(-pSum): "<<exp(-pSum)<<std::endl;
 //	std::cout<<std::endl;
 
-	return exp(-pSum);
+	return exp(-pSum*0.5);
 	//return kontrast;
 
 }
