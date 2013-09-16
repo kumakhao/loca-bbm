@@ -141,7 +141,7 @@ void localisation::observeImgOneParticle(cv::Mat* img) {
 
 	std::vector<cv::Point2d> imagePoints, imagePointsCliped;
 	std::vector<patternPoint> clipedImagePoints;
-	int grid = 3;
+	int grid = 1;
 	camera_model_.setExtr(oneParticle.psi,oneParticle.xPos,oneParticle.yPos);
 	std::cout<<"pos: "<<oneParticle.xPos<<" "<<oneParticle.yPos<<std::endl;
 	camera_model_.projectTo2D(&Points_3D_,&imagePoints);
