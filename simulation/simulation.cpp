@@ -19,7 +19,7 @@ Simulation::Simulation():
 	observe_mode_(noObserve),
 	view_matrix_distance_(0.0),
 	field_of_view_horizontal_(74),
-	step_counter_(0.0),
+	step_counter_(0),
 	takepicture_intervall_(2000),
 	loop_target_time_(33333),
 	croud_size_(0),
@@ -38,14 +38,12 @@ void Simulation::Initialize() {
 
 	if(settings_.sys_error_on_)
 	{//random systematic errors
-		settings_.robParameter_.kDistanceLeftWheel += 	locaUtil::randomUniform()*settings_.robParameter_.kLeftWheelWidth
-														-(settings_.robParameter_.kLeftWheelWidth/2);
+		settings_.robParameter_.kDistanceLeftWheel += 	locaUtil::randomGaussian()*settings_.robParameter_.kLeftWheelWidth*0.1;
 		//std::cout<<"leftWidth: "<<settings_.robParameter_.kDistanceLeftWheel-0.35<<std::endl;
-		settings_.robParameter_.kDistanceRightWheel+= 	locaUtil::randomUniform()*settings_.robParameter_.kRightWheelWidth
-														-(settings_.robParameter_.kRightWheelWidth/2);
+		settings_.robParameter_.kDistanceRightWheel+= 	locaUtil::randomGaussian()*settings_.robParameter_.kRightWheelWidth*0.1;
 		//std::cout<<"RightWidth: "<<settings_.robParameter_.kDistanceRightWheel-0.35<<std::endl;
-		settings_.robParameter_.kRadiusWheelLeft += settings_.robParameter_.kRadiusWheelLeft*0.005*locaUtil::randomGaussian();
-		settings_.robParameter_.kRadiusWheelRight += settings_.robParameter_.kRadiusWheelRight*0.005*locaUtil::randomGaussian();
+		settings_.robParameter_.kRadiusWheelLeft += settings_.robParameter_.kRadiusWheelLeft*0.001*locaUtil::randomGaussian();
+		settings_.robParameter_.kRadiusWheelRight += settings_.robParameter_.kRadiusWheelRight*0.001*locaUtil::randomGaussian();
 	}
 
 	{//apply settings_
@@ -249,7 +247,7 @@ void Simulation::Step() {
 //	std::cout<<testmat(3,0)<<"  "<<testmat(3,1)<<"  "<<testmat(3,2)<<"  "<<testmat(3,3)<<std::endl;
 //	std::cout<<std::endl;
 
-	step_counter_ ++;
+
 
 
 	viewer_.getView(0)->getCamera()->getViewMatrixAsLookAt(view_matrix_eye_, view_matrix_center_, view_matrix_up_, view_matrix_distance_);
@@ -389,6 +387,7 @@ void Simulation::Step() {
 		trajectory_buffer_ << robotdata_->psi_speed_ << std::endl;
 	}
 	//trajectory_buffer_ << "------------------" << std::endl;
+	step_counter_ ++;
 }
 
 double Simulation::getRobX() {

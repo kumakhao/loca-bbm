@@ -137,10 +137,10 @@ int main(int argc, char** argv){
 	case 3:
 	{
 		std::vector<std::string> trajectorys;
-		trajectorys.push_back("oval");
-//		trajectorys.push_back("serpentinen");
-//		trajectorys.push_back("clockwise");
-//		trajectorys.push_back("antiClockwise");
+		//trajectorys.push_back("oval");
+		//trajectorys.push_back("serpentinen");
+		//trajectorys.push_back("clockwise");
+		trajectorys.push_back("antiClockwise");
 		for(unsigned int name = 0; name < trajectorys.size(); name++){
 			std::stringstream filename;
 			filename << "/home/josef/workspace/Loca-Projekt/plots/picFrequency/" << trajectorys.at(name) << "_data";
@@ -165,7 +165,7 @@ int main(int argc, char** argv){
 					//mainSim.enablePadControl();
 
 					mainSim.settings_.takepicture_intervall_ = pic_time;
-					mainSim.settings_.blind_mode_on_ = true;
+					mainSim.settings_.blind_mode_on_ = false;
 
 					mainSim.Initialize();
 					mainSim.Realize();
@@ -178,13 +178,17 @@ int main(int argc, char** argv){
 						localisation::EstimatedRobotPose* es = mainLoca_frequency->getEstimatedRobotPose();
 						if(es->x < INFINITY){
 						counter++;
-						square_distance[x] += sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+						double tmp = sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+						if(tmp > 20)
+							std::cout<<"droped someting"<<std::endl;
+						else
+							square_distance[x] += tmp;
 						}
 					}
 					double tmp = square_distance[x]/counter;
 					square_distance[x] = tmp;
 					square_distance_sum += tmp;
-					std::cout<<"Time: "<<(double)simTime.getTimeFromStart()*0.000001<<std::endl;
+					std::cout<<"Time: "<<(double)simTime.getTimeFromStart()*0.000001<<"    "<<square_distance[x]<<std::endl;
 //					std::stringstream trajectoryfile;
 //					trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
 //					mainSim.WriteRobotTrajectory(trajectoryfile.str());
@@ -203,55 +207,77 @@ int main(int argc, char** argv){
 	}
 	case 4:
 	{
-		std::vector<std::string> trajectorys;
-		trajectorys.push_back("oval");
-		//trajectorys.push_back("serpentinen");
-		//trajectorys.push_back("clockwise");
-		//trajectorys.push_back("antiClockwise");
-		for(unsigned int name = 0; name < trajectorys.size(); name++){
-			std::stringstream filename;
-			filename << "/home/josef/workspace/Loca-Projekt/plots/croudEffect/" << trajectorys.at(name) << "_data";
-			std::ofstream testFile (filename.str().c_str());
-			testFile << "size " << trajectorys.at(name) << std::endl;
-			for(int crowdSize = 3; crowdSize <= 3; crowdSize += 6){
-				testFile << crowdSize << " ";
-				double counter = 0;
-				double square_distance_sum = 0;
-				for(int x=0; x<10;x++){
-					Simulation mainSim;
-					localisation *mainLoca_frequency = new localisation;
-					mainLoca_frequency->initilisation_done_ = true;
-					mainSim.settings_.particle_visibility_ratio_ = 10;
-					mainSim.setLocalisation(mainLoca_frequency);
-					//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
-					mainSim.setObserveMode(Simulation::Pictures);
-					mainSim.enablePadControl();
+			std::vector<std::string> trajectorys;
+			trajectorys.push_back("oval");
+			//trajectorys.push_back("serpentinen");
+			//trajectorys.push_back("clockwise");
+			//trajectorys.push_back("antiClockwise");
+			for(unsigned int name = 0; name < trajectorys.size(); name++){
+				std::stringstream filename;
+				filename << "/home/josef/workspace/Loca-Projekt/plots/croudEffect/" << trajectorys.at(name) << "_data";
+				std::ofstream testFile (filename.str().c_str());
+				testFile << "size " << trajectorys.at(name) << std::endl;
 
-					mainSim.settings_.crowd_size_ = crowdSize;
-					mainSim.settings_.takepicture_intervall_ = 1500;
+				for(int crowdSize = 3; crowdSize <= 21; crowdSize += 6){
+					int repeats = 10;
+					double square_distance[repeats];
+					testFile << crowdSize << " ";
+					double square_distance_sum = 0;
+					double square_distance_var = 0;
+					for(int x=0; x<repeats;x++){
+						double counter = 0;
+						Simulation mainSim;
+						localisation *mainLoca_frequency = new localisation;
+						mainLoca_frequency->initilisation_done_ = true;
+						mainSim.settings_.particle_visibility_ratio_ = 10;
+						mainSim.setLocalisation(mainLoca_frequency);
+						//GPS mode is buggy. Partikel verschwinden und führen zu out of range exception für den Vektor der sie hält.
+						mainSim.setObserveMode(Simulation::Pictures);
+						//mainSim.enablePadControl();
 
-					mainSim.Initialize();
-					mainSim.Realize();
-					std::stringstream trajPath;
-					trajPath << "/home/josef/workspace/Loca-Projekt/trajectorys/"<<trajectorys.at(name);
-					mainSim.ReadRobotTrajectory(trajPath.str());
-					while(!mainSim.done()){
-						mainSim.Step();
-						localisation::EstimatedRobotPose* es = mainLoca_frequency->getEstimatedRobotPose();
-						if(es->x < INFINITY){
-						counter++;
-						square_distance_sum += sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+						mainSim.settings_.crowd_size_ = crowdSize;
+						mainSim.settings_.takepicture_intervall_ = 1500;
+						mainSim.settings_.blind_mode_on_ = false;
+
+						mainSim.Initialize();
+						mainSim.Realize();
+						std::stringstream trajPath;
+						trajPath << "/home/josef/workspace/Loca-Projekt/trajectorys/"<<trajectorys.at(name);
+						mainSim.ReadRobotTrajectory(trajPath.str());
+						simTime.Start();
+						while(!mainSim.done()){
+							mainSim.Step();
+							localisation::EstimatedRobotPose* es = mainLoca_frequency->getEstimatedRobotPose();
+							if(es->x < INFINITY){
+							counter++;
+							double tmp = sqrt(pow(es->x-mainSim.getRobX(),2) + pow(es->y-mainSim.getRobY(),2));
+							if(tmp > 20)
+								std::cout<<"droped someting"<<std::endl;
+							else
+								square_distance[x] += tmp;
+							}
 						}
+						double tmp = square_distance[x]/counter;
+						square_distance[x] = tmp;
+						square_distance_sum += tmp;
+						std::cout<<"Time: "<<(double)simTime.getTimeFromStart()*0.000001<<"    "<<square_distance[x]<<std::endl;
+	//					std::stringstream trajectoryfile;
+	//					trajectoryfile << "/home/josef/Desktop/trajectory_"<<pic_time;
+	//					mainSim.WriteRobotTrajectory(trajectoryfile.str());
+						mainSim.CleanUp();
+						testFile<< x << " " << square_distance[x]<<std::endl;
 					}
-					mainSim.CleanUp();
+					square_distance_sum = square_distance_sum/repeats;
+					for(int i=0;i<repeats;i++)
+						square_distance_var = pow((square_distance[i]-square_distance_sum),2);
+					square_distance_var = square_distance_var/repeats;
+					testFile << square_distance_sum << " " << square_distance_var << std::endl;
 				}
-				square_distance_sum = square_distance_sum/counter;
-				testFile << square_distance_sum << std::endl;
+				testFile.close();
+				std::cout<<std::endl;
 			}
-			testFile.close();
+			break;
 		}
-		break;
-	}
 	default:
 		;
 		break;
