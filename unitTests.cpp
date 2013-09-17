@@ -108,6 +108,8 @@ bool unitTests::picTest() {
 	cameraParam cam;
 	std::cout<<"from -0.5 to 0.5 in 0.005 steps"<<std::endl;
 	int counter = 0;
+	std::vector<double> p_i;
+	double sum_p = 0;
 	for(double x = -6.0; x <= 6.0; x += 0.1){
 		std::cout<<x<<std::endl;
 		for(double y = -6.0; y <= 6.0; y += 0.1){
@@ -120,16 +122,27 @@ bool unitTests::picTest() {
 				p = picRating::rateImage(img, clipedImagePoints,1);
 //				if(p > 0.1)
 //					psum += p;
+				if(p > 0.0000000001){
+					p_i.push_back(p);
+					sum_p += p;
+				}
 				if(p > 0.01)
 					testFile << counter << " " << p <<std::endl;
 				counter ++;
 				//psum += cameraCalibrationTest(x, y, psi, imgPaths.at(0));
 			}
-			if(psum < 0.1)
-				psum = 0.0;
+//			if(psum < 0.1)
+//				psum = 0.0;
 			//testFile << x <<" "<< y << " "<< psum <<std::endl;
 		}
 	}
+	double var_p = 0;
+	sum_p = sum_p/counter;
+	for(int i=0;i<p_i.size();i++){
+		var_p += pow(p_i.at(i)-sum_p,2);
+	}
+	var_p = var_p/counter;
+	testFile<<"hier das ergebniss: "<<sum_p<<"  "<<var_p<<"  "<<counter<<std::endl;
 	testFile.close();
 //	double x, y, psi, incRight, incLeft;
 //	int ansPics =  imgPaths.size();
